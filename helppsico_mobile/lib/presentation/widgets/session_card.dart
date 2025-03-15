@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../../core/theme.dart';
 
 class SessionCard extends StatelessWidget {
-  const SessionCard({Key? key}) : super(key: key);
+  const SessionCard({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +27,7 @@ class SessionCard extends StatelessWidget {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                         decoration: BoxDecoration(
-                          color: AppTheme.secondaryColor.withOpacity(0.1),
+                          color: AppTheme.secondaryColor.withAlpha(25),
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: const Text(
@@ -57,11 +57,11 @@ class SessionCard extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 12),
-                  Row(
+                  const Row(
                     children: [
-                      const Icon(Icons.location_on_outlined, size: 16, color: Colors.grey),
-                      const SizedBox(width: 4),
-                      const Text(
+                      Icon(Icons.location_on_outlined, size: 16, color: Colors.grey),
+                      SizedBox(width: 4),
+                      Text(
                         "Rua teste, 789",
                         style: TextStyle(
                           color: Colors.grey,
@@ -71,16 +71,16 @@ class SessionCard extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 12),
-                  Row(
+                  const Row(
                     children: [
-                      const CircleAvatar(
+                      CircleAvatar(
                         backgroundImage: AssetImage('assets/images/profile.jpeg'),
                         radius: 30,
                       ),
-                      const SizedBox(width: 16),
+                      SizedBox(width: 16),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        children: const [
+                        children: [
                           Text(
                             "Dra. Ana Martins",
                             style: TextStyle(
