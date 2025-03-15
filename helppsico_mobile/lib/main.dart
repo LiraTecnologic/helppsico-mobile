@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'core/theme.dart';
+import 'presentation/screens/dashboard_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -13,6 +14,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'HelpPsico',
       theme: AppTheme.theme,
+      home: const DashboardScreen(),
       debugShowCheckedModeBanner: false,
     );
   }
