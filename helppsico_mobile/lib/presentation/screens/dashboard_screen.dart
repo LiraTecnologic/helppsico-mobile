@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../core/theme.dart';
+import '../widgets/session_card.dart';
 import '../widgets/document_card.dart';
 
 class DashboardScreen extends StatelessWidget {
