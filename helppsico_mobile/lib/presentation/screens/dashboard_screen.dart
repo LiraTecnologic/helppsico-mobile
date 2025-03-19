@@ -40,7 +40,7 @@ class DashboardScreen extends StatelessWidget {
           children: [
             const Text(
               "Próxima sessão",
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 10),
             const SessionCard(),
@@ -55,7 +55,7 @@ class DashboardScreen extends StatelessWidget {
             const SizedBox(height: 20),
             const Text(
               "Último documento",
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 10),
             const DocumentCard(),
@@ -74,32 +74,42 @@ class DashboardScreen extends StatelessWidget {
   }
 
   Widget _buildDrawer(BuildContext context) {
-    return Drawer(
-      child: Container(
-        color: AppTheme.primaryColor,
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: [
-            const DrawerHeader(
-              child: Center(
-                child: Text(
-                  "Menu",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 32,
-                    fontWeight: FontWeight.bold
-                  )
-                ),
+    return SizedBox(
+      width: MediaQuery.of(context).size.width * 0.7, 
+      child: Drawer(
+        child: Container(
+          color: AppTheme.primaryColor,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(vertical: 30),
+                    child: const Center(
+                      child: Text(
+                        "Menu",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 32,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                  _buildDrawerItem(Icons.notifications, "Notificações"),
+                  _buildDrawerItem(Icons.calendar_today, "Sessões"),
+                  _buildDrawerItem(Icons.insert_drive_file, "Documentos"),
+                  _buildDrawerItem(Icons.star, "Avaliar psicólogo"),
+                  _buildDrawerItem(Icons.home, "Meu painel"),
+                ],
               ),
-            ),
-            _buildDrawerItem(Icons.notifications, "Notificações"),
-            _buildDrawerItem(Icons.calendar_today, "Sessões"),
-            _buildDrawerItem(Icons.insert_drive_file, "Documentos"),
-            _buildDrawerItem(Icons.star, "Avaliar psicólogo"),
-            _buildDrawerItem(Icons.home, "Meu painel"),
-            const Divider(color: Colors.white),
-            _buildDrawerItem(Icons.exit_to_app, "Sair"),
-          ],
+              Padding(
+                padding: const EdgeInsets.only(bottom: 16.0),
+                child: _buildDrawerItem(Icons.exit_to_app, "Sair"),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -112,4 +122,4 @@ class DashboardScreen extends StatelessWidget {
       onTap: () {},
     );
   }
-} 
+}
