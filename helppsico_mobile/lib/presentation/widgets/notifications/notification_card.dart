@@ -74,7 +74,7 @@ class NotificationCard extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 16.0),
-            _buildActionButton(),
+            
           ],
         ),
       ),
@@ -113,26 +113,4 @@ class NotificationCard extends StatelessWidget {
     );
   }
   
-  Widget _buildActionButton() {
-    return SizedBox(
-      width: double.infinity,
-      child: TextButton(
-        onPressed: onActionPressed,
-        style: TextButton.styleFrom(
-          backgroundColor: const Color(0xFFE6F0FF), 
-          padding: const EdgeInsets.symmetric(vertical: 12.0),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8.0),
-          ),
-        ),
-        child: Text(
-          actionText,
-          style: const TextStyle(
-            color: Color(0xFF3B82F6), 
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-      ),
-    );
-  }
 }
