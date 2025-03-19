@@ -24,7 +24,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
         onPressed: onMenuPressed ?? () {},
       ),
       title: SizedBox(
-        height: 36,
+        height: 56,
         child: Image.asset(
           'assets/images/logo.png',
           fit: BoxFit.contain,
