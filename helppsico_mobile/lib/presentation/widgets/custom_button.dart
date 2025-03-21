@@ -1,6 +1,4 @@
-
 import 'package:flutter/material.dart';
-
 
 class CustomButton extends StatelessWidget {
   final String text;
@@ -12,8 +10,8 @@ class CustomButton extends StatelessWidget {
     Key? key,
     required this.text,
     required this.onPressed,
-    this.backgroundColor = const Color(0xFFDDE6FF), 
-    this.textColor = Colors.black,
+    this.backgroundColor = const Color.fromARGB(255, 83, 137, 231),
+    this.textColor = const Color.fromARGB(255, 255, 255, 255),
   }) : super(key: key);
 
   @override
@@ -32,10 +30,7 @@ class CustomButton extends StatelessWidget {
         ),
         child: Text(
           text,
-          style: TextStyle(
-            color: textColor,
-            fontWeight: FontWeight.bold,
-          ),
+          style: TextStyle(color: textColor, fontWeight: FontWeight.bold),
         ),
       ),
     );
