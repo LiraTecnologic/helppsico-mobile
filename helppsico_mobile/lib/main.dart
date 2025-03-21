@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:helppsico_mobile/presentation/screens/login_screen.dart';
+import 'package:helppsico_mobile/presentation/screens/notifications_screen.dart';
 
 
 void main() {
@@ -19,9 +19,9 @@ class MyApp extends StatelessWidget {
         scaffoldBackgroundColor: Colors.white,
         fontFamily: 'Roboto',
       ),
-      initialRoute: '/login',
+      initialRoute: '/notifications',
       routes: {
-        '/login': (context) => const LoginScreen(),
+        '/notifications': (context) => const NotificationsScreen(),
       },
     );
   }
