@@ -75,7 +75,7 @@ class DashboardScreen extends StatelessWidget {
 
   Widget _buildDrawer(BuildContext context) {
     return SizedBox(
-      width: MediaQuery.of(context).size.width * 0.7, 
+      width: MediaQuery.of(context).size.width * 0.7,
       child: Drawer(
         child: Container(
           color: AppTheme.primaryColor,
@@ -84,19 +84,33 @@ class DashboardScreen extends StatelessWidget {
             children: [
               Column(
                 children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(vertical: 30),
-                    child: const Center(
-                      child: Text(
-                        "Menu",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 32,
-                          fontWeight: FontWeight.bold,
+                  const SizedBox(height: 20), 
+                  Stack(
+                    children: [
+                      Align(
+                        alignment: Alignment.center,
+                        child: const Text(
+                          "Menu",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 32,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
-                    ),
+                      Positioned(
+                        bottom: 20,
+                        right: 0,
+                        child: IconButton(
+                          icon: const Icon(Icons.menu, color: Colors.white, size: 25),
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                        ),
+                      ),
+                    ],
                   ),
+                  const SizedBox(height: 24), 
                   _buildDrawerItem(Icons.notifications, "Notificações"),
                   _buildDrawerItem(Icons.calendar_today, "Sessões"),
                   _buildDrawerItem(Icons.insert_drive_file, "Documentos"),
@@ -117,8 +131,8 @@ class DashboardScreen extends StatelessWidget {
 
   Widget _buildDrawerItem(IconData icon, String title) {
     return ListTile(
-      leading: Icon(icon, color: Colors.white),
-      title: Text(title, style: const TextStyle(color: Colors.white)),
+      leading: Icon(icon, color: const Color.fromARGB(255, 255, 255, 255)),
+      title: Text(title, style: const TextStyle(color: Color.fromARGB(255, 255, 255, 255))),
       onTap: () {},
     );
   }
