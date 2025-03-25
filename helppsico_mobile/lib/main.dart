@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:helppsico_mobile/presentation/screens/login_screen.dart';
+import 'core/theme.dart';
+import 'package:helppsico_mobile/presentation/screens/dashboard_screen.dart';
 import 'package:helppsico_mobile/presentation/screens/notifications_screen.dart';
+
 
 
 void main() {
@@ -7,7 +11,9 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
+  
   const MyApp({Key? key}) : super(key: key);
+
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +28,10 @@ class MyApp extends StatelessWidget {
       initialRoute: '/notifications',
       routes: {
         '/notifications': (context) => const NotificationsScreen(),
+        '/login': (context) => const LoginScreen(),
+        '/menu' : (context) => const DashboardScreen(),
       },
     );
   }
 }
+
