@@ -1,21 +1,37 @@
 import 'package:flutter/material.dart';
+import 'package:helppsico_mobile/presentation/screens/login_screen.dart';
 import 'core/theme.dart';
-import 'presentation/screens/dashboard_screen.dart';
+import 'package:helppsico_mobile/presentation/screens/dashboard_screen.dart';
+import 'package:helppsico_mobile/presentation/screens/notifications_screen.dart';
+
+
 
 void main() {
   runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  
+  const MyApp({Key? key}) : super(key: key);
+
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'HelpPsico',
-      theme: AppTheme.theme,
-      home: const DashboardScreen(),
       debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+        scaffoldBackgroundColor: Colors.white,
+        fontFamily: 'Roboto',
+      ),
+      initialRoute: '/notifications',
+      routes: {
+        '/notifications': (context) => const NotificationsScreen(),
+        '/login': (context) => const LoginScreen(),
+        '/menu' : (context) => const DashboardScreen(),
+      },
     );
   }
-} 
+}
+
