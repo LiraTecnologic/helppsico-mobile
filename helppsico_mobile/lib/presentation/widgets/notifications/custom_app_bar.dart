@@ -6,10 +6,10 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final VoidCallback? onNotificationPressed;
   
   const CustomAppBar({
-    Key? key,
+    super.key,
     this.onMenuPressed,
     this.onNotificationPressed,
-  }) : super(key: key);
+  });
   
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);

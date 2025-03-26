@@ -8,12 +8,12 @@ class TextLink extends StatelessWidget {
   final double fontSize;
 
   const TextLink({
-    Key? key,
+    super.key,
     required this.text,
     required this.onTap,
     this.textColor = const Color(0xFF3B82F6), // Blue color
     this.fontSize = 14.0,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

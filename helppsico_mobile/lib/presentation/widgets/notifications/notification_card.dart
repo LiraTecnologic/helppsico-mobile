@@ -15,14 +15,14 @@ class NotificationCard extends StatelessWidget {
   final VoidCallback onActionPressed;
   
   const NotificationCard({
-    Key? key,
+    super.key,
     required this.type,
     required this.date,
     required this.title,
     required this.description,
     required this.actionText,
     required this.onActionPressed,
-  }) : super(key: key);
+  });
   
   @override
   Widget build(BuildContext context) {

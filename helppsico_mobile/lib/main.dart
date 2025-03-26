@@ -3,6 +3,7 @@ import 'package:helppsico_mobile/presentation/screens/login_screen.dart';
 import 'core/theme.dart';
 import 'package:helppsico_mobile/presentation/screens/dashboard_screen.dart';
 import 'package:helppsico_mobile/presentation/screens/notifications_screen.dart';
+import 'package:helppsico_mobile/presentation/screens/rate_screen.dart';
 
 
 
@@ -12,7 +13,7 @@ void main() {
 
 class MyApp extends StatelessWidget {
   
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({super.key});
 
 
   @override
@@ -25,11 +26,15 @@ class MyApp extends StatelessWidget {
         scaffoldBackgroundColor: Colors.white,
         fontFamily: 'Roboto',
       ),
-      initialRoute: '/notifications',
+      initialRoute: '/avaliar-psicologo',
       routes: {
         '/notifications': (context) => const NotificationsScreen(),
         '/login': (context) => const LoginScreen(),
-        '/menu' : (context) => const DashboardScreen(),
+        '/menu': (context) => const DashboardScreen(),
+        '/avaliar-psicologo': (context) => const AvaliarPsicologoScreen(
+          psicologoId: '1', // Você deve passar o ID real do psicólogo
+          psicologoNome: 'Dra. Ana Martins', // Você deve passar o nome real do psicólogo
+        ),
       },
     );
   }
