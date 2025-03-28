@@ -42,14 +42,14 @@ class _AvaliarPsicologoScreenState extends State<AvaliarPsicologoScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildEmptyCard(),  
+            _buildPsychologistCard(),  
           ],
         ),
       ),
     );
   }
 
-  
+
   Widget _buildDrawer(BuildContext context) {
     return Drawer(
       child: Container(
@@ -118,13 +118,32 @@ class _AvaliarPsicologoScreenState extends State<AvaliarPsicologoScreen> {
   }
 
 
-  Widget _buildEmptyCard() {
+  Widget _buildPsychologistCard() {
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       elevation: 4,
-      child: Container(
-        height: 150,
-        padding: const EdgeInsets.all(400.0),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            const CircleAvatar(
+              radius: 40,
+              child: Icon(Icons.person, size: 40),
+            ),
+            const SizedBox(height: 10),
+            const SizedBox(height: 10),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: List.generate(5, (index) => 
+                Icon(
+                  Icons.star,
+                  color: index < 4 ? Colors.amber : Colors.grey,
+                ),
+              ),
+            ),
+            const SizedBox(height: 5),
+          ],
+        ),
       ),
     );
   }
