@@ -17,48 +17,28 @@ class AvaliarPsicologoScreen extends StatefulWidget {
 
 class _AvaliarPsicologoScreenState extends State<AvaliarPsicologoScreen> {
   int _rating = 0;
+  final TextEditingController _comentarioController = TextEditingController();
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: AppTheme.primaryColor,
-        iconTheme: const IconThemeData(color: Colors.white),
-        title: Container(
-          padding: const EdgeInsets.all(4),
-          decoration: BoxDecoration(
-            color: Colors.transparent,
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Image.asset(
-            'assets/icons/logo.png',
-            height: 65,
-            width: 65,
-          ),
+  void dispose() {
+    _comentarioController.dispose();
+    super.dispose();
+  }
+
+  void _enviarAvaliacao() {
+    if (_rating == 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Por favor, selecione uma nota para a avaliação'),
         ),
-        centerTitle: true,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.notifications, color: Colors.white),
-            onPressed: () {
-              Navigator.pushNamed(context, '/notifications');
-            },
-          ),
-        ],
-      ),
-      drawer: _buildDrawer(context),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildPsychologistCard(),
-            const SizedBox(height: 20),
-            _buildRatingSection(),
-          ],
-        ),
-      ),
-    );
+      );
+      return;
+    }
+
+   
+    print('Avaliação enviada: Nota $_rating, Comentário: ${_comentarioController.text}');
+    
+    Navigator.pop(context);
   }
 
   Widget _buildDrawer(BuildContext context) {
@@ -128,6 +108,52 @@ class _AvaliarPsicologoScreenState extends State<AvaliarPsicologoScreen> {
     );
   }
 
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: AppTheme.primaryColor,
+        iconTheme: const IconThemeData(color: Colors.white),
+        title: Container(
+          padding: const EdgeInsets.all(4),
+          decoration: BoxDecoration(
+            color: Colors.transparent,
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Image.asset(
+            'assets/icons/logo.png',
+            height: 65,
+            width: 65,
+          ),
+        ),
+        centerTitle: true,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.notifications, color: Colors.white),
+            onPressed: () {
+              Navigator.pushNamed(context, '/notifications');
+            },
+          ),
+        ],
+      ),
+      drawer: _buildDrawer(context),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildPsychologistCard(),
+            const SizedBox(height: 20),
+            _buildRatingSection(),
+            const SizedBox(height: 20),
+            _buildCommentSection(),
+            const SizedBox(height: 20),
+            _buildSubmitButton(),
+          ],
+        ),
+      ),
+    );
+  }
 
   Widget _buildPsychologistCard() {
     return Card(
@@ -168,7 +194,6 @@ class _AvaliarPsicologoScreenState extends State<AvaliarPsicologoScreen> {
     );
   }
 
-
   Widget _buildRatingSection() {
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -202,6 +227,47 @@ class _AvaliarPsicologoScreenState extends State<AvaliarPsicologoScreen> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildCommentSection() {
+    return Card(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      elevation: 4,
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              "Comentários (opcional)",
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 10),
+            TextField(
+              controller: _comentarioController,
+              maxLines: 4,
+              decoration: const InputDecoration(
+                hintText: "Digite seu comentário aqui...",
+                border: OutlineInputBorder(),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSubmitButton() {
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton(
+        onPressed: _enviarAvaliacao,
+        style: ElevatedButton.styleFrom(
+          padding: const EdgeInsets.symmetric(vertical: 16),
+        ),
+        child: const Text('Enviar Avaliação'),
       ),
     );
   }
