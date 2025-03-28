@@ -49,7 +49,7 @@ class _AvaliarPsicologoScreenState extends State<AvaliarPsicologoScreen> {
     );
   }
 
-
+  // Menu lateral
   Widget _buildDrawer(BuildContext context) {
     return Drawer(
       child: Container(
@@ -117,7 +117,7 @@ class _AvaliarPsicologoScreenState extends State<AvaliarPsicologoScreen> {
     );
   }
 
-
+  
   Widget _buildPsychologistCard() {
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -131,6 +131,14 @@ class _AvaliarPsicologoScreenState extends State<AvaliarPsicologoScreen> {
               child: Icon(Icons.person, size: 40),
             ),
             const SizedBox(height: 10),
+            Text(
+              widget.psicologoNome,
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const Text(
+              "Psicóloga Clínica • CRP 06/12345",
+              style: TextStyle(color: Colors.grey),
+            ),
             const SizedBox(height: 10),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -142,6 +150,7 @@ class _AvaliarPsicologoScreenState extends State<AvaliarPsicologoScreen> {
               ),
             ),
             const SizedBox(height: 5),
+            const Text("(42 avaliações)", style: TextStyle(color: Colors.grey)),
           ],
         ),
       ),
