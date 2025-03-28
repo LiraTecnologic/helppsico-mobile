@@ -183,6 +183,23 @@ class _AvaliarPsicologoScreenState extends State<AvaliarPsicologoScreen> {
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 10),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: List.generate(5, (index) {
+                return IconButton(
+                  icon: Icon(
+                    index < _rating ? Icons.star : Icons.star_border,
+                    color: Colors.amber,
+                    size: 40,
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      _rating = index + 1;
+                    });
+                  },
+                );
+              }),
+            ),
           ],
         ),
       ),
