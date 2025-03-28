@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:helppsico_mobile/presentation/screens/documents_screen.dart';
 import 'package:helppsico_mobile/presentation/screens/login_screen.dart';
-import 'core/theme.dart';
 import 'package:helppsico_mobile/presentation/screens/dashboard_screen.dart';
 import 'package:helppsico_mobile/presentation/screens/notifications_screen.dart';
 
@@ -30,6 +30,7 @@ class MyApp extends StatelessWidget {
         '/notifications': (context) => const NotificationsScreen(),
         '/login': (context) => const LoginScreen(),
         '/menu' : (context) => const DashboardScreen(),
+        '/documents' : (context) => const DocumentsScreen(),
       },
     );
   }
