@@ -16,40 +16,31 @@ class AvaliarPsicologoScreen extends StatefulWidget {
 }
 
 class _AvaliarPsicologoScreenState extends State<AvaliarPsicologoScreen> {
+  int _rating = 0;
+  final TextEditingController _comentarioController = TextEditingController();
+
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: AppTheme.primaryColor,
-        iconTheme: const IconThemeData(color: Colors.white),
-        title: Container(
-          padding: const EdgeInsets.all(4),
-          decoration: BoxDecoration(
-            color: Colors.transparent,
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Image.asset(
-            'assets/icons/logo.png',
-            height: 65,
-            width: 65,
-          ),
-        ),
-        centerTitle: true,
-      ),
-      drawer: _buildDrawer(context),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildPsychologistCard(),  
-          ],
-        ),
-      ),
-    );
+  void dispose() {
+    _comentarioController.dispose();
+    super.dispose();
   }
 
-  // Menu lateral
+  void _enviarAvaliacao() {
+    if (_rating == 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Por favor, selecione uma nota para a avaliação'),
+        ),
+      );
+      return;
+    }
+
+   
+    print('Avaliação enviada: Nota $_rating');
+
+    Navigator.pop(context);
+  }
+
   Widget _buildDrawer(BuildContext context) {
     return Drawer(
       child: Container(
@@ -117,7 +108,50 @@ class _AvaliarPsicologoScreenState extends State<AvaliarPsicologoScreen> {
     );
   }
 
-  
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: AppTheme.primaryColor,
+        iconTheme: const IconThemeData(color: Colors.white),
+        title: Container(
+          padding: const EdgeInsets.all(4),
+          decoration: BoxDecoration(
+            color: Colors.transparent,
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Image.asset(
+            'assets/icons/logo.png',
+            height: 65,
+            width: 65,
+          ),
+        ),
+        centerTitle: true,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.notifications, color: Colors.white),
+            onPressed: () {
+              Navigator.pushNamed(context, '/notifications');
+            },
+          ),
+        ],
+      ),
+      drawer: _buildDrawer(context),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildPsychologistCard(),
+            const SizedBox(height: 20),
+            _buildRatingSection(),
+          ],
+        ),
+      ),
+    );
+  }
+
+
   Widget _buildPsychologistCard() {
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -152,6 +186,22 @@ class _AvaliarPsicologoScreenState extends State<AvaliarPsicologoScreen> {
             const SizedBox(height: 5),
             const Text("(42 avaliações)", style: TextStyle(color: Colors.grey)),
           ],
+        ),
+      ),
+    );
+  }
+
+  
+  Widget _buildRatingSection() {
+    return Card(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      elevation: 4,
+      child: Container(
+        height: 80,
+        padding: const EdgeInsets.all(200.0),
+        child: Column(
+          
+          children: [],
         ),
       ),
     );
