@@ -17,28 +17,48 @@ class AvaliarPsicologoScreen extends StatefulWidget {
 
 class _AvaliarPsicologoScreenState extends State<AvaliarPsicologoScreen> {
   int _rating = 0;
-  final TextEditingController _comentarioController = TextEditingController();
 
   @override
-  void dispose() {
-    _comentarioController.dispose();
-    super.dispose();
-  }
-
-  void _enviarAvaliacao() {
-    if (_rating == 0) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Por favor, selecione uma nota para a avaliação'),
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: AppTheme.primaryColor,
+        iconTheme: const IconThemeData(color: Colors.white),
+        title: Container(
+          padding: const EdgeInsets.all(4),
+          decoration: BoxDecoration(
+            color: Colors.transparent,
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Image.asset(
+            'assets/icons/logo.png',
+            height: 65,
+            width: 65,
+          ),
         ),
-      );
-      return;
-    }
-
-   
-    print('Avaliação enviada: Nota $_rating');
-
-    Navigator.pop(context);
+        centerTitle: true,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.notifications, color: Colors.white),
+            onPressed: () {
+              Navigator.pushNamed(context, '/notifications');
+            },
+          ),
+        ],
+      ),
+      drawer: _buildDrawer(context),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildPsychologistCard(),
+            const SizedBox(height: 20),
+            _buildRatingSection(),
+          ],
+        ),
+      ),
+    );
   }
 
   Widget _buildDrawer(BuildContext context) {
@@ -108,49 +128,6 @@ class _AvaliarPsicologoScreenState extends State<AvaliarPsicologoScreen> {
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: AppTheme.primaryColor,
-        iconTheme: const IconThemeData(color: Colors.white),
-        title: Container(
-          padding: const EdgeInsets.all(4),
-          decoration: BoxDecoration(
-            color: Colors.transparent,
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Image.asset(
-            'assets/icons/logo.png',
-            height: 65,
-            width: 65,
-          ),
-        ),
-        centerTitle: true,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.notifications, color: Colors.white),
-            onPressed: () {
-              Navigator.pushNamed(context, '/notifications');
-            },
-          ),
-        ],
-      ),
-      drawer: _buildDrawer(context),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildPsychologistCard(),
-            const SizedBox(height: 20),
-            _buildRatingSection(),
-          ],
-        ),
-      ),
-    );
-  }
-
 
   Widget _buildPsychologistCard() {
     return Card(
@@ -191,17 +168,22 @@ class _AvaliarPsicologoScreenState extends State<AvaliarPsicologoScreen> {
     );
   }
 
-  
+
   Widget _buildRatingSection() {
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       elevation: 4,
-      child: Container(
-        height: 80,
-        padding: const EdgeInsets.all(200.0),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
         child: Column(
-          
-          children: [],
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              "Como você avalia a consulta?",
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 10),
+          ],
         ),
       ),
     );
