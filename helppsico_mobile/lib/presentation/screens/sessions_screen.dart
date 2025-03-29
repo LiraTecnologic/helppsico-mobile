@@ -6,7 +6,7 @@ import 'package:helppsico_mobile/presentation/widgets/sessions/session_tab_bar_w
 
 
 class SessionsPage extends StatefulWidget {
-  const SessionsPage({Key? key}) : super(key: key);
+  const SessionsPage({super.key});
 
   @override
   State<SessionsPage> createState() => _SessionsPageState();

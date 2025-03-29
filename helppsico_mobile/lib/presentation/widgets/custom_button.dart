@@ -7,12 +7,12 @@ class CustomButton extends StatelessWidget {
   final Color? textColor;
 
   const CustomButton({
-    Key? key,
+    super.key,
     required this.text,
     required this.onPressed,
     this.backgroundColor = const Color.fromARGB(255, 83, 137, 231),
     this.textColor = const Color.fromARGB(255, 255, 255, 255),
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

@@ -7,7 +7,7 @@ import 'package:helppsico_mobile/presentation/widgets/notifications/custom_app_b
 import 'package:helppsico_mobile/presentation/widgets/notifications/notification_card.dart';
 
 class NotificationsScreen extends StatelessWidget {
-  const NotificationsScreen({Key? key}) : super(key: key);
+  const NotificationsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
