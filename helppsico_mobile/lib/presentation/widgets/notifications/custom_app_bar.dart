@@ -1,13 +1,10 @@
-
 import 'package:flutter/material.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
-  final VoidCallback? onMenuPressed;
   final VoidCallback? onNotificationPressed;
   
   const CustomAppBar({
     super.key,
-    this.onMenuPressed,
     this.onNotificationPressed,
   });
   
@@ -21,7 +18,9 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       elevation: 0,
       leading: IconButton(
         icon: const Icon(Icons.menu, color: Colors.white),
-        onPressed: onMenuPressed ?? () {},
+        onPressed: () {
+          Scaffold.of(context).openDrawer();
+        },
       ),
       title: SizedBox(
         height: 56,
