@@ -1,9 +1,10 @@
-// lib/screens/sessoes_page.dart
+
 import 'package:flutter/material.dart';
 import 'package:helppsico_mobile/presentation/widgets/notifications/custom_app_bar.dart';
 import 'package:helppsico_mobile/presentation/widgets/sessions/session_card_widget.dart';
 import 'package:helppsico_mobile/presentation/widgets/sessions/session_tab_bar_widget.dart';
-
+import 'package:helppsico_mobile/data/mock_sessions.dart';
+import 'package:helppsico_mobile/data/models/session_model.dart';
 
 class SessionsPage extends StatefulWidget {
   const SessionsPage({super.key});
@@ -14,6 +15,34 @@ class SessionsPage extends StatefulWidget {
 
 class _SessionsPageState extends State<SessionsPage> {
   int _selectedTabIndex = 0;
+  final MockSessionRepository _sessionRepository = MockSessionRepository();
+  List<SessionModel> _sessions = [];
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSessions();
+  }
+
+  Future<void> _loadSessions() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final sessions = await _sessionRepository.getSessions();
+      setState(() {
+        _sessions = sessions;
+        _isLoading = false;
+      });
+    } catch (e) {
+      print('Erro ao carregar sessões: $e');
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -33,12 +62,13 @@ class _SessionsPageState extends State<SessionsPage> {
               },
             ),
             
-            // Sessions List
             Expanded(
-              child: ListView(
-                padding: const EdgeInsets.symmetric(vertical: 8),
-                children: _buildSessionsList(),
-              ),
+              child: _isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : ListView(
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    children: _buildSessionsList(),
+                  ),
             ),
           ],
         ),
@@ -47,117 +77,24 @@ class _SessionsPageState extends State<SessionsPage> {
   }
 
   List<Widget> _buildSessionsList() {
-    // Retorna a lista de sessões baseada na aba selecionada
-    switch (_selectedTabIndex) {
-      case 0: // Próximas
-      
-        return [
-          // Sessão 1 (como mostrado na imagem)
-          SessionCardWidget(
-            date: 'Amanhã, 24 fev 2025',
-            doctorName: 'Dra. Ana Martins',
-            sessionType: 'Terapia Individual',
-            timeRange: '14:00 - 15:00',
-            status: SessionStatus.pending,
-            onReschedule: () {},
-            onCancel: () {},
-          ),
-          
-          // Sessão 2 (como mostrado na imagem)
-          SessionCardWidget(
-            date: 'Quinta, 27 fev 2025',
-            doctorName: 'Dr. Carlos Silva',
-            sessionType: 'Avaliação Psicológica',
-            timeRange: '10:30 - 12:00',
-            status: SessionStatus.scheduled,
-            paymentInfo: 'Pago via Cartão de Crédito',
-            onReschedule: () {},
-            onCancel: () {},
-          ),
-          
-          // Sessões adicionais para permitir rolagem
-          SessionCardWidget(
-            date: 'Segunda, 3 mar 2025',
-            doctorName: 'Dr. Roberto Almeida',
-            sessionType: 'Terapia Cognitivo-Comportamental',
-            timeRange: '09:00 - 10:00',
-            status: SessionStatus.scheduled,
-            paymentInfo: 'Pago via PIX',
-            onReschedule: () {},
-            onCancel: () {},
-          ),
-          
-          SessionCardWidget(
-            date: 'Quarta, 5 mar 2025',
-            doctorName: 'Dra. Fernanda Costa',
-            sessionType: 'Terapia Individual',
-            timeRange: '16:30 - 17:30',
-            status: SessionStatus.pending,
-            onReschedule: () {},
-            onCancel: () {},
-          ),
-          
-          SessionCardWidget(
-            date: 'Sexta, 7 mar 2025',
-            doctorName: 'Dr. Paulo Mendes',
-            sessionType: 'Aconselhamento Familiar',
-            timeRange: '14:00 - 15:30',
-            status: SessionStatus.scheduled,
-            paymentInfo: 'Pago via Convênio',
-            onReschedule: () {},
-            onCancel: () {},
-          ),
-          
-          SessionCardWidget(
-            date: 'Terça, 11 mar 2025',
-            doctorName: 'Dra. Juliana Santos',
-            sessionType: 'Terapia Infantil',
-            timeRange: '13:00 - 14:00',
-            status: SessionStatus.scheduled,
-            paymentInfo: 'Pago via Boleto',
-            onReschedule: () {},
-            onCancel: () {},
-          ),
-        ];
-        
-      case 1: // Concluídas
-        return [
-          SessionCardWidget(
-            date: 'Segunda, 17 fev 2025',
-            doctorName: 'Dra. Ana Martins',
-            sessionType: 'Terapia Individual',
-            timeRange: '14:00 - 15:00',
-            status: SessionStatus.completed,
-            paymentInfo: 'Pago via Cartão de Crédito',
-            onReschedule: null,
-            onCancel: null,
-          ),
-          
-          SessionCardWidget(
-            date: 'Quarta, 12 fev 2025',
-            doctorName: 'Dr. Carlos Silva',
-            sessionType: 'Avaliação Psicológica',
-            timeRange: '10:30 - 12:00',
-            status: SessionStatus.completed,
-            paymentInfo: 'Pago via PIX',
-            onReschedule: null,
-            onCancel: null,
-          ),
-          
-          SessionCardWidget(
-            date: 'Sexta, 7 fev 2025',
-            doctorName: 'Dra. Fernanda Costa',
-            sessionType: 'Terapia Individual',
-            timeRange: '16:30 - 17:30',
-            status: SessionStatus.completed,
-            paymentInfo: 'Pago via Convênio',
-            onReschedule: null,
-            onCancel: null,
-          )
-        ];
+    final sessions = _selectedTabIndex == 0
+      ? _sessions.where((session) => 
+          session.status == SessionStatus.pending || 
+          session.status == SessionStatus.scheduled
+        ).toList()
+      : _sessions.where((session) => 
+          session.status == SessionStatus.completed
+        ).toList();
 
-      default:
-        return [];
-    }
+    return sessions.map((session) => SessionCardWidget(
+      date: session.date,
+      doctorName: session.doctorName,
+      sessionType: session.sessionType,
+      timeRange: session.timeRange,
+      status: session.status,
+      paymentInfo: session.paymentInfo,
+      onReschedule: session.status == SessionStatus.completed ? null : () {},
+      onCancel: session.status == SessionStatus.completed ? null : () {},
+    )).toList();
   }
 }

@@ -16,7 +16,7 @@ class LoginScreen extends StatelessWidget {
       body: SafeArea(
         child: Stack(
           children: [
-            // widgets, com um padding superior para liberar espaço para o logo
+           
             SingleChildScrollView(
               padding: const EdgeInsets.only(top: 170),
               child: Padding(
@@ -90,7 +90,7 @@ class LoginScreen extends StatelessWidget {
                 ),
               ),
             ),
-            // Logo posicionada de forma absoluta na parte superior
+            
             Positioned(
               top: 20,
               left: 0,
