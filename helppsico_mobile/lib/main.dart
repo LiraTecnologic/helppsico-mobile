@@ -3,6 +3,7 @@ import 'package:helppsico_mobile/presentation/screens/documents_screen.dart';
 import 'package:helppsico_mobile/presentation/screens/login_screen.dart';
 import 'package:helppsico_mobile/presentation/screens/dashboard_screen.dart';
 import 'package:helppsico_mobile/presentation/screens/notifications_screen.dart';
+import 'package:helppsico_mobile/presentation/screens/sessions_screen.dart';
 
 
 
@@ -31,6 +32,7 @@ class MyApp extends StatelessWidget {
         '/login': (context) => const LoginScreen(),
         '/menu' : (context) => const DashboardScreen(),
         '/documents' : (context) => const DocumentsScreen(),
+        '/sessions' : (context) => const SessionsPage(),
       },
     );
   }
