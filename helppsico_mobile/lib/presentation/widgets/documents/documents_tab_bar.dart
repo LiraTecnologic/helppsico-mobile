@@ -1,7 +1,13 @@
 import 'package:flutter/material.dart';
+import '../../../data/models/document_model.dart';
 
 class DocumentsTabBar extends StatelessWidget {
-  const DocumentsTabBar({super.key});
+  final Function(DocumentType?) onTypeSelected;
+
+  const DocumentsTabBar({
+    super.key,
+    required this.onTypeSelected,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -9,25 +15,31 @@ class DocumentsTabBar extends StatelessWidget {
       scrollDirection: Axis.horizontal,
       child: Row(
         children: [
-          _buildTab('Todos', true),
-          _buildTab('Importantes', false),
-        
+          _buildTab('Anamnese', DocumentType.anamnese),
+          _buildTab('Avaliação', DocumentType.avaliacao),
+          _buildTab('Relatórios', DocumentType.relatorio),
+          _buildTab('Atestados', DocumentType.atestado),
+          _buildTab('Encaminhamentos', DocumentType.encaminhamento),
+          _buildTab('Outros', DocumentType.outros),
         ],
       ),
     );
   }
 
-  Widget _buildTab(String label, bool isSelected) {
+  Widget _buildTab(String label, DocumentType type) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8.0),
-      child: Chip(
+      child: FilterChip(
         label: Text(
           label,
-          style: TextStyle(
-            color: isSelected ? Colors.white : Colors.black,
+          style: const TextStyle(
+            color: Colors.black,
           ),
         ),
-        backgroundColor: isSelected ? Colors.blue : Colors.grey[200],
+        backgroundColor: Colors.grey[200],
+        onSelected: (selected) {
+          onTypeSelected(selected ? type : null);
+        },
       ),
     );
   }
