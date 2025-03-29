@@ -26,7 +26,7 @@ class MyApp extends StatelessWidget {
         scaffoldBackgroundColor: Colors.white,
         fontFamily: 'Roboto',
       ),
-      initialRoute: '/notifications',
+      initialRoute: '/documents',
       routes: {
         '/notifications': (context) => const NotificationsScreen(),
         '/login': (context) => const LoginScreen(),
