@@ -3,7 +3,7 @@ import 'package:helppsico_mobile/data/models/user_model.dart';
 
 void main() {
   group('User Model', () {
-    // Dados de teste
+   
     final userId = 'user123';
     final userName = 'John Doe';
     final userEmail = 'john@example.com';
@@ -75,7 +75,7 @@ void main() {
 
     
     test('should handle empty string values', () {
-      // Arrange
+     
       final emptyUser = User(
         id: '',
         name: '',
