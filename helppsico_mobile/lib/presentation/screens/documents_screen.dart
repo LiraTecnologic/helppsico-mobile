@@ -12,7 +12,7 @@ class DocumentsScreen extends StatefulWidget {
 
 class _DocumentsScreenState extends State<DocumentsScreen> {
   final TextEditingController _searchController = TextEditingController();
-  
+
   // Dummy data for demonstration
   final List<DocumentItem> documents = [
     DocumentItem(
@@ -69,14 +69,12 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
         children: [
           Padding(
             padding: const EdgeInsets.only(left: 16.0, top: 16.0),
-            child: Container(// apenas para alinhar o texto
+            child: Container(
+              // apenas para alinhar o texto
               alignment: Alignment.centerLeft,
               child: Text(
                 'Documentos',
-                style: TextStyle(
-                  fontSize: 20.0,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
                 textAlign: TextAlign.left,
               ),
             ),
@@ -88,13 +86,16 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
               hintText: 'Pesquisar documentos...',
               leading: const Icon(Icons.search),
               backgroundColor: WidgetStateProperty.all(Colors.white),
-              //não aceita Colors.white 
-              
+
+              //não aceita Colors.white
             ),
           ),
 
           const SizedBox(height: 16.0),
-          Container(alignment: Alignment.centerLeft, child: const DocumentsTabBar()),
+          Container(
+            alignment: Alignment.centerLeft,
+            child: const DocumentsTabBar(),
+          ),
           const SizedBox(height: 16.0),
           Expanded(
             child: SizedBox(
@@ -113,9 +114,7 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          
-        },
+        onPressed: () {},
         child: const Icon(Icons.add),
       ),
     );

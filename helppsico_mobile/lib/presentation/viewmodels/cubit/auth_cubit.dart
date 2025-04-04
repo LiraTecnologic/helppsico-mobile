@@ -7,8 +7,9 @@ class AuthCubit extends Cubit<AuthState> {
   final AuthService _authService;
 
   AuthCubit({AuthService? authService})
+      //initializer list(é usada para inicializar variáveis ​​de instância antes de chamar o construtor principal da classe )
       : _authService = authService ?? AuthService(),
-        super(const AuthInitial());
+        super(const AuthInitial());//é usado para que o estado do authCubit seja inicializado com o estado AuthInitial
 
   Future<void> login(String email, String password) async {
     emit(const AuthLoading());
@@ -25,3 +26,9 @@ class AuthCubit extends Cubit<AuthState> {
     emit(const AuthInitial());
   }
 }
+
+
+
+
+
+
