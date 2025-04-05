@@ -1,6 +1,6 @@
 class SessionModel {
   final String id;
-  final String psicologoId;
+  final String psicologoName;
   final String pacienteId;
   final DateTime data; 
   final String valor;
@@ -9,7 +9,7 @@ class SessionModel {
 
   SessionModel({
     required this.id,
-    required this.psicologoId,
+    required this.psicologoName,
     required this.pacienteId,
     required this.data,
     required this.valor,
@@ -21,9 +21,9 @@ class SessionModel {
   factory SessionModel.fromJson(Map<String, dynamic> json) {
     return SessionModel(
       id: json['id'],
-      psicologoId: json['psicologoId'],
+      psicologoName: json['psicologoId'],
       pacienteId: json['pacienteId'],
-      data: DateTime(json['data'].toDate().year, json['data'].toDate().month, json['data'].toDate().day, json['data'].toDate().hour),
+      data: DateTime.parse(json['data']),
       valor: json['valor'],
       endereco: json['endereco'],
       finalizada: bool.parse(json['finalizada']),
