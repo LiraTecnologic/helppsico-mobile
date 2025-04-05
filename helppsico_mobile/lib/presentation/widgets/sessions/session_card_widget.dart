@@ -50,13 +50,9 @@ class SessionCardWidget extends StatelessWidget {
             Row(
               children: [
                 // Profile Image
-                Container(
-                  width: 50,
-                  height: 50,
-                  decoration: const BoxDecoration(
-                    color: Color(0xFFEEEEEE),
-                    shape: BoxShape.circle,
-                  ),
+                const CircleAvatar(
+                  radius: 25,
+                  backgroundImage: AssetImage('assets/images/ghibli.jpeg'),
                 ),
                 const SizedBox(width: 12),
 
