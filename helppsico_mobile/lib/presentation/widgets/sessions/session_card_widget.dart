@@ -49,7 +49,7 @@ class SessionCardWidget extends StatelessWidget {
 
             Row(
               children: [
-                // Profile Image
+                
                 const CircleAvatar(
                   radius: 25,
                   backgroundImage: AssetImage('assets/images/ghibli.jpeg'),
@@ -110,11 +110,11 @@ class SessionCardWidget extends StatelessWidget {
 
     switch (status) {
       case SessionStatus.open:
-        backgroundColor = const Color(0xFF1E88E5);
+        backgroundColor = const Color(0xFF43A047);
         text = 'Em Aberto';
         break;
       case SessionStatus.completed:
-        backgroundColor = const Color(0xFF43A047);
+        backgroundColor = const Color(0xFF666666);
         text = 'Finalizada';
         break;
     }
