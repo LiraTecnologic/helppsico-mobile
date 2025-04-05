@@ -9,7 +9,7 @@ import 'package:helppsico_mobile/presentation/viewmodels/cubit/sessions_cubit.da
 import 'package:helppsico_mobile/presentation/viewmodels/bloc/sessions_state.dart';
 
 class SessionsPage extends StatefulWidget {
-  const SessionsPage({Key? key}) : super(key: key);
+  const SessionsPage({super.key});
 
   @override
   State<SessionsPage> createState() => _SessionsPageState();
@@ -21,7 +21,6 @@ class _SessionsPageState extends State<SessionsPage> {
   @override
   void initState() {
     super.initState();
-    // Fetch sessions when page loads
     context.read<SessionsCubit>().fetchSessions();
   }
 
