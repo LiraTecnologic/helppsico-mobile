@@ -25,9 +25,8 @@ class SessionTabBar extends StatelessWidget {
       ),
       child: Row(
         children: [
-          _buildTab('Próximas', 0),
-          _buildTab('Concluídas', 1),
-          _buildTab('Todas', 2),
+          _buildTab('Em Aberto', 0),
+          _buildTab('Finalizadas', 1),
         ],
       ),
     );

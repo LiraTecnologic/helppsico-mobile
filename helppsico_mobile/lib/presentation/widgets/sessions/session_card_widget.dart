@@ -1,43 +1,31 @@
 // lib/widgets/session_card_widget.dart
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import '../../../data/models/session_model.dart';
 
 enum SessionStatus {
-  pending,
-  scheduled,
-  completed,
-  canceled
+  open, // Em Aberto
+  completed, // Finalizada
 }
 
 class SessionCardWidget extends StatelessWidget {
-  final String date;
-  final String doctorName;
-  final String sessionType;
-  final String timeRange;
-  final SessionStatus status;
-  final String? paymentInfo;
-  final Function()? onReschedule;
-  final Function()? onCancel;
+  final SessionModel session;
 
-  const SessionCardWidget({
-    super.key,
-    required this.date,
-    required this.doctorName,
-    required this.sessionType,
-    required this.timeRange,
-    required this.status,
-    this.paymentInfo,
-    this.onReschedule,
-    this.onCancel,
-  });
+  const SessionCardWidget({super.key, required this.session});
 
   @override
   Widget build(BuildContext context) {
+    final String formattedDate = DateFormat('dd/MM/yyyy').format(session.data);
+
+    final String timeRange = DateFormat('HH:mm').format(session.data);
+
+    final SessionStatus status =
+        session.finalizada ? SessionStatus.completed : SessionStatus.open;
+
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       elevation: 1,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -48,18 +36,17 @@ class SessionCardWidget extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  date,
+                  formattedDate,
                   style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 16,
                   ),
                 ),
-                _buildStatusBadge(),
+                _buildStatusBadge(status),
               ],
             ),
             const SizedBox(height: 16),
-            
-            // Doctor Info Row
+
             Row(
               children: [
                 // Profile Image
@@ -72,14 +59,13 @@ class SessionCardWidget extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 12),
-                
-                // Doctor Info
+
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        doctorName,
+                        session.psicologoName,
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 16,
@@ -87,70 +73,32 @@ class SessionCardWidget extends StatelessWidget {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        sessionType,
-                        style: TextStyle(
-                          color: Colors.grey[600],
-                          fontSize: 14,
-                        ),
+                        session.endereco,
+                        style: TextStyle(color: Colors.grey[600], fontSize: 14),
                       ),
                       const SizedBox(height: 4),
                       Text(
                         timeRange,
-                        style: TextStyle(
-                          color: Colors.grey[800],
-                          fontSize: 14,
-                        ),
+                        style: TextStyle(color: Colors.grey[800], fontSize: 14),
                       ),
                     ],
                   ),
                 ),
               ],
             ),
-            
-            
-            if (paymentInfo != null) ...[
-              const SizedBox(height: 12),
-              Row(
-                children: [
-                  const Icon(
-                    Icons.payment,
-                    size: 16,
-                    color: Color(0xFF666666),
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    paymentInfo!,
-                    style: TextStyle(
-                      color: Colors.grey[600],
-                      fontSize: 14,
-                    ),
-                  ),
-                ],
-              ),
-            ],
-            
-            // Action Buttons
-            const SizedBox(height: 16),
+
+            const SizedBox(height: 12),
             Row(
-              mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                // Reschedule Button
-                TextButton(
-                  onPressed: onReschedule,
-                  style: TextButton.styleFrom(
-                    foregroundColor: const Color(0xFF1042CB),
-                  ),
-                  child: const Text('Reagendar'),
+                const Icon(
+                  Icons.payments_outlined,
+                  size: 16,
+                  color: Color(0xFF666666),
                 ),
                 const SizedBox(width: 8),
-                
-                // Cancel Button
-                TextButton(
-                  onPressed: onCancel,
-                  style: TextButton.styleFrom(
-                    foregroundColor: Colors.red,
-                  ),
-                  child: const Text('Cancelar'),
+                Text(
+                  'R\$ ${session.valor}',
+                  style: TextStyle(color: Colors.grey[600], fontSize: 14),
                 ),
               ],
             ),
@@ -160,26 +108,18 @@ class SessionCardWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildStatusBadge() {
+  Widget _buildStatusBadge(SessionStatus status) {
     Color backgroundColor;
     String text;
 
     switch (status) {
-      case SessionStatus.pending:
-        backgroundColor = const Color(0xFFFFAA00);
-        text = 'A pagar';
-        break;
-      case SessionStatus.scheduled:
+      case SessionStatus.open:
         backgroundColor = const Color(0xFF1E88E5);
-        text = 'Agendada';
+        text = 'Em Aberto';
         break;
       case SessionStatus.completed:
         backgroundColor = const Color(0xFF43A047);
-        text = 'Concluída';
-        break;
-      case SessionStatus.canceled:
-        backgroundColor = const Color(0xFFE53935);
-        text = 'Cancelada';
+        text = 'Finalizada';
         break;
     }
 
