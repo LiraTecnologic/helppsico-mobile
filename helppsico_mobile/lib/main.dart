@@ -1,20 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:helppsico_mobile/data/repositories/sessions_repository.dart';
 import 'package:helppsico_mobile/presentation/screens/documents_screen.dart';
 import 'package:helppsico_mobile/presentation/screens/login_screen.dart';
 import 'package:helppsico_mobile/presentation/screens/dashboard_screen.dart';
 import 'package:helppsico_mobile/presentation/screens/notifications_screen.dart';
 import 'package:helppsico_mobile/presentation/screens/sessions_screen.dart';
-
-
+import 'package:helppsico_mobile/presentation/viewmodels/cubit/sessions_cubit.dart';
 
 void main() {
   runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  
   const MyApp({Key? key}) : super(key: key);
-
 
   @override
   Widget build(BuildContext context) {
@@ -30,11 +29,13 @@ class MyApp extends StatelessWidget {
       routes: {
         '/notifications': (context) => const NotificationsScreen(),
         '/login': (context) => const LoginScreen(),
-        '/menu' : (context) => const DashboardScreen(),
-        '/documents' : (context) => const DocumentsScreen(),
-        '/sessions' : (context) => const SessionsPage(),
+        '/menu': (context) => const DashboardScreen(),
+        '/documents': (context) => const DocumentsScreen(),
+        '/sessions': (context) => BlocProvider(
+          create: (context) => SessionsCubit(SessionRepository()),
+          child: const SessionsPage(),
+        ),
       },
     );
   }
 }
-

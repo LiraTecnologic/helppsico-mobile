@@ -31,7 +31,7 @@ class SessionCardWidget extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Date and Status Row
+            
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
