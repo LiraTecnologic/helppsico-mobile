@@ -19,6 +19,7 @@ dependencies:
   build_runner: ^2.4.6
   coverage: ^1.6.3
   bloc_test: ^9.0.3
+  intl: ^0.20.2
   
 dev_dependencies:
   flutter_test:
