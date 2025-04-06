@@ -16,7 +16,6 @@ class DocumentsScreen extends StatefulWidget {
 
 class _DocumentsScreenState extends State<DocumentsScreen> with SingleTickerProviderStateMixin {
   final TextEditingController _searchController = TextEditingController();
-
   final MockDocumentRepository _documentRepository = MockDocumentRepository();
   List<DocumentModel> _documents = [];
   List<DocumentModel> _filteredDocuments = [];
@@ -25,9 +24,6 @@ class _DocumentsScreenState extends State<DocumentsScreen> with SingleTickerProv
   String? _error;
   bool _showFavorites = false;
   late TabController _tabController;
-
-
-  
 
   @override
   void initState() {
@@ -150,7 +146,6 @@ class _DocumentsScreenState extends State<DocumentsScreen> with SingleTickerProv
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
       appBar: CustomAppBar(),
-
       drawer: const CustomDrawer(),
       body: SafeArea(
         child: _isLoading
@@ -210,61 +205,10 @@ class _DocumentsScreenState extends State<DocumentsScreen> with SingleTickerProv
                   child: _buildDocumentsList(),
                 ),
               ],
-
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(left: 16.0, top: 16.0),
-            child: Container(
-              // apenas para alinhar o texto
-              alignment: Alignment.centerLeft,
-              child: Text(
-                'Documentos',
-                style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
-                textAlign: TextAlign.left,
-              ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: SearchBar(
-              controller: _searchController,
-              hintText: 'Pesquisar documentos...',
-              leading: const Icon(Icons.search),
-              backgroundColor: WidgetStateProperty.all(Colors.white),
-
-              //não aceita Colors.white
-            ),
-          ),
-
-          const SizedBox(height: 16.0),
-          Container(
-            alignment: Alignment.centerLeft,
-            child: const DocumentsTabBar(),
-          ),
-          const SizedBox(height: 16.0),
-          Expanded(
-            child: SizedBox(
-              width: MediaQuery.of(context).size.width * 0.9,
-              child: ListView.builder(
-                itemCount: documents.length,
-                itemBuilder: (context, index) {
-                  return DocumentListItem(
-                    document: documents[index],
-                    onFavoritePressed: () => _toggleFavorite(index),
-                  );
-                },
-              ),
-
             ),
       ),
       floatingActionButton: FloatingActionButton(
-
         onPressed: _showUploadDialog,
-
-        onPressed: () {},
-
         child: const Icon(Icons.add),
       ),
     );

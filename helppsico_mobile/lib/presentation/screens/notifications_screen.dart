@@ -19,9 +19,12 @@ class NotificationsScreen extends StatelessWidget {
                 ..fetchNotifications(),
       child: Scaffold(
 
+
         backgroundColor: const Color(0xFFF7F7F7), // Light gray background
         appBar: const CustomAppBar(),
         drawer: const CustomDrawer(),
+
+
 
         backgroundColor: const Color(0xFFF7F7F7),
         appBar: CustomAppBar(
