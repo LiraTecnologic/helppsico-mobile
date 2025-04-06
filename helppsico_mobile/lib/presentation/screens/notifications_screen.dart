@@ -5,6 +5,7 @@ import 'package:helppsico_mobile/presentation/viewmodels/cubit/notifications_cub
 import 'package:helppsico_mobile/presentation/viewmodels/bloc/notifications_state.dart';
 import 'package:helppsico_mobile/presentation/widgets/notifications/custom_app_bar.dart';
 import 'package:helppsico_mobile/presentation/widgets/notifications/notification_card.dart';
+import 'package:helppsico_mobile/presentation/widgets/drawer/custom_drawer.dart';
 
 class NotificationsScreen extends StatelessWidget {
   const NotificationsScreen({super.key});
@@ -17,11 +18,20 @@ class NotificationsScreen extends StatelessWidget {
               NotificationsCubit(NotificationRepository())
                 ..fetchNotifications(),
       child: Scaffold(
+
+
+        backgroundColor: const Color(0xFFF7F7F7), // Light gray background
+        appBar: const CustomAppBar(),
+        drawer: const CustomDrawer(),
+
+
+
         backgroundColor: const Color(0xFFF7F7F7),
         appBar: CustomAppBar(
           onMenuPressed: () {},
           onNotificationPressed: () {},
         ),
+
         body: SafeArea(
           child: Padding(
             padding: const EdgeInsets.all(16.0),

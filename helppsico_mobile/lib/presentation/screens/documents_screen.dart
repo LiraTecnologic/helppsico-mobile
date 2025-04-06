@@ -5,6 +5,7 @@ import 'package:helppsico_mobile/presentation/widgets/documents/document_item.da
 import 'package:helppsico_mobile/presentation/widgets/documents/documents_tab_bar.dart';
 import 'package:helppsico_mobile/presentation/widgets/documents/upload_document_dialog.dart';
 import 'package:helppsico_mobile/presentation/widgets/notifications/custom_app_bar.dart';
+import 'package:helppsico_mobile/presentation/widgets/drawer/custom_drawer.dart';
 
 class DocumentsScreen extends StatefulWidget {
   const DocumentsScreen({super.key});
@@ -15,7 +16,6 @@ class DocumentsScreen extends StatefulWidget {
 
 class _DocumentsScreenState extends State<DocumentsScreen> with SingleTickerProviderStateMixin {
   final TextEditingController _searchController = TextEditingController();
-
   final MockDocumentRepository _documentRepository = MockDocumentRepository();
   List<DocumentModel> _documents = [];
   List<DocumentModel> _filteredDocuments = [];
@@ -24,11 +24,6 @@ class _DocumentsScreenState extends State<DocumentsScreen> with SingleTickerProv
   String? _error;
   bool _showFavorites = false;
   late TabController _tabController;
-
-
-  
-  
-
 
   @override
   void initState() {
@@ -127,88 +122,93 @@ class _DocumentsScreenState extends State<DocumentsScreen> with SingleTickerProv
     );
   }
 
+  IconData _getDocumentIcon(DocumentType type) {
+    switch (type) {
+      case DocumentType.anamnese:
+        return Icons.note_alt;
+      case DocumentType.avaliacao:
+        return Icons.assessment;
+      case DocumentType.relatorio:
+        return Icons.description;
+      case DocumentType.atestado:
+        return Icons.medical_services;
+      case DocumentType.encaminhamento:
+        return Icons.send;
+      case DocumentType.outros:
+        return Icons.insert_drive_file;
+      default:
+        return Icons.insert_drive_file;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFF5F5F5),
       appBar: CustomAppBar(),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(left: 16.0, top: 16.0),
-            child: Container(
-
-
-
-
-
-              // apenas para alinhar o texto
-
-              alignment: Alignment.centerLeft,
-              child: const Text(
-                'Documentos',
-                style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
-                textAlign: TextAlign.left,
-              ),
+      drawer: const CustomDrawer(),
+      body: SafeArea(
+        child: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(left: 16.0, top: 16.0),
+                  child: Container(
+                    alignment: Alignment.centerLeft,
+                    child: const Text(
+                      'Documentos',
+                      style: TextStyle(
+                        fontSize: 20.0,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      textAlign: TextAlign.left,
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: SearchBar(
+                    controller: _searchController,
+                    hintText: 'Pesquisar documentos...',
+                    leading: const Icon(Icons.search),
+                    backgroundColor: MaterialStateProperty.all(Colors.white),
+                  ),
+                ),
+                const SizedBox(height: 16.0),
+                TabBar(
+                  controller: _tabController,
+                  onTap: (index) {
+                    setState(() {
+                      _showFavorites = index == 1;
+                      _selectedType = null; 
+                    });
+                    _filterDocuments();
+                  },
+                  tabs: const [
+                    Tab(text: 'Todos'),
+                    Tab(text: 'Favoritos'),
+                  ],
+                ),
+                const SizedBox(height: 16.0),
+                DocumentsTabBar(
+                  onTypeSelected: (type) {
+                    setState(() {
+                      _selectedType = type;
+                    });
+                    _filterDocuments();
+                  },
+                ),
+                const SizedBox(height: 16.0),
+                Expanded(
+                  child: _buildDocumentsList(),
+                ),
+              ],
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: SearchBar(
-              controller: _searchController,
-              hintText: 'Pesquisar documentos...',
-              leading: const Icon(Icons.search),
-
-              backgroundColor: MaterialStateProperty.all(Colors.white),
-
-              backgroundColor: WidgetStateProperty.all(Colors.white),
-
-              //não aceita Colors.white
-
-            ),
-          ),
-          const SizedBox(height: 16.0),
-
-          TabBar(
-            controller: _tabController,
-            onTap: (index) {
-              setState(() {
-                _showFavorites = index == 1;
-                _selectedType = null; 
-              });
-              _filterDocuments();
-            },
-            tabs: const [
-              Tab(text: 'Todos'),
-              Tab(text: 'Favoritos'),
-            ],
-          ),
-          const SizedBox(height: 16.0),
-          DocumentsTabBar(
-            onTypeSelected: (type) {
-              setState(() {
-                _selectedType = type;
-              });
-              _filterDocuments();
-            },
-
-          Container(
-            alignment: Alignment.centerLeft,
-            child: const DocumentsTabBar(),
-
-          ),
-          const SizedBox(height: 16.0),
-          Expanded(
-            child: _buildDocumentsList(),
-          ),
-        ],
       ),
       floatingActionButton: FloatingActionButton(
-
         onPressed: _showUploadDialog,
-
-        onPressed: () {},
-
         child: const Icon(Icons.add),
       ),
     );

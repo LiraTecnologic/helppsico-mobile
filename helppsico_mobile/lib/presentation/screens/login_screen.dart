@@ -9,8 +9,27 @@ import 'package:helppsico_mobile/presentation/widgets/text_divider.dart';
 import 'package:helppsico_mobile/presentation/widgets/text_link.dart';
 
 
-class LoginScreen extends StatelessWidget {
-  const LoginScreen({super.key});
+
+
+class LoginScreen extends StatefulWidget {
+  const LoginScreen({Key? key}) : super(key: key);
+
+
+  @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
+  final _formKey = GlobalKey<FormState>();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();

@@ -1,0 +1,149 @@
+import 'package:flutter/material.dart';
+import '../../../core/theme.dart';
+import '../../screens/dashboard_screen.dart';
+import '../../screens/sessions_screen.dart';
+import '../../screens/documents_screen.dart';
+import '../../screens/notifications_screen.dart';
+import '../../screens/login_screen.dart';
+
+class CustomDrawer extends StatelessWidget {
+  const CustomDrawer({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: MediaQuery.of(context).size.width * 0.7,
+      child: Drawer(
+        child: Container(
+          color: AppTheme.primaryColor,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                children: [
+                  const SizedBox(height: 20),
+                  Stack(
+                    children: [
+                      const Align(
+                        alignment: Alignment.center,
+                        child: Text(
+                          "Menu",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 32,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        bottom: 20,
+                        right: 0,
+                        child: IconButton(
+                          icon: const Icon(Icons.menu, color: Colors.white, size: 25),
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 24),
+                  _buildDrawerItem(
+                    context: context,
+                    icon: Icons.home,
+                    title: "Meu Painel",
+                    onTap: () {
+                      Navigator.pop(context);
+                      if (ModalRoute.of(context)?.settings.name != '/dashboard') {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(builder: (context) => const DashboardScreen()),
+                        );
+                      }
+                    },
+                  ),
+                  _buildDrawerItem(
+                    context: context,
+                    icon: Icons.calendar_today,
+                    title: "Sessões",
+                    onTap: () {
+                      Navigator.pop(context);
+                      if (ModalRoute.of(context)?.settings.name != '/sessions') {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(builder: (context) => const SessionsPage()),
+                        );
+                      }
+                    },
+                  ),
+                  _buildDrawerItem(
+                    context: context,
+                    icon: Icons.description,
+                    title: "Documentos",
+                    onTap: () {
+                      Navigator.pop(context);
+                      if (ModalRoute.of(context)?.settings.name != '/documents') {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(builder: (context) => const DocumentsScreen()),
+                        );
+                      }
+                    },
+                  ),
+                  _buildDrawerItem(
+                    context: context,
+                    icon: Icons.notifications,
+                    title: "Notificações",
+                    onTap: () {
+                      Navigator.pop(context);
+                      if (ModalRoute.of(context)?.settings.name != '/notifications') {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(builder: (context) => const NotificationsScreen()),
+                        );
+                      }
+                    },
+                  ),
+                ],
+              ),
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: _buildDrawerItem(
+                  context: context,
+                  icon: Icons.logout,
+                  title: "Sair",
+                  onTap: () {
+                    Navigator.pop(context);
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (context) => const LoginScreen()),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDrawerItem({
+    required BuildContext context,
+    required IconData icon,
+    required String title,
+    required VoidCallback onTap,
+  }) {
+    return ListTile(
+      leading: Icon(icon, color: Colors.white),
+      title: Text(
+        title,
+        style: const TextStyle(
+          color: Colors.white,
+          fontSize: 16,
+        ),
+      ),
+      onTap: onTap,
+    );
+  }
+} 

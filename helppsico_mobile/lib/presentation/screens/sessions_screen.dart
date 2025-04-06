@@ -1,10 +1,10 @@
-
 import 'package:flutter/material.dart';
 import 'package:helppsico_mobile/presentation/widgets/notifications/custom_app_bar.dart';
 import 'package:helppsico_mobile/presentation/widgets/sessions/session_card_widget.dart';
 import 'package:helppsico_mobile/presentation/widgets/sessions/session_tab_bar_widget.dart';
 import 'package:helppsico_mobile/data/mock_sessions.dart';
 import 'package:helppsico_mobile/data/models/session_model.dart';
+import 'package:helppsico_mobile/presentation/widgets/drawer/custom_drawer.dart';
 
 class SessionsPage extends StatefulWidget {
   const SessionsPage({super.key});
@@ -49,6 +49,7 @@ class _SessionsPageState extends State<SessionsPage> {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
       appBar: CustomAppBar(),
+      drawer: const CustomDrawer(),
       body: SafeArea(
         child: Column(
           children: [
@@ -62,6 +63,7 @@ class _SessionsPageState extends State<SessionsPage> {
               },
             ),
             
+            // Sessions List
             Expanded(
               child: _isLoading
                 ? const Center(child: CircularProgressIndicator())
