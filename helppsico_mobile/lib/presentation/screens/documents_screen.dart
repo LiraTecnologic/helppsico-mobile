@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:helppsico_mobile/data/mock_documents.dart';
+import 'package:helppsico_mobile/data/models/document_model.dart';
 import 'package:helppsico_mobile/presentation/widgets/documents/document_item.dart';
 import 'package:helppsico_mobile/presentation/widgets/documents/documents_tab_bar.dart';
+import 'package:helppsico_mobile/presentation/widgets/documents/upload_document_dialog.dart';
 import 'package:helppsico_mobile/presentation/widgets/notifications/custom_app_bar.dart';
 
 class DocumentsScreen extends StatefulWidget {
@@ -10,8 +13,18 @@ class DocumentsScreen extends StatefulWidget {
   State<DocumentsScreen> createState() => _DocumentsScreenState();
 }
 
-class _DocumentsScreenState extends State<DocumentsScreen> {
+class _DocumentsScreenState extends State<DocumentsScreen> with SingleTickerProviderStateMixin {
   final TextEditingController _searchController = TextEditingController();
+
+  final MockDocumentRepository _documentRepository = MockDocumentRepository();
+  List<DocumentModel> _documents = [];
+  List<DocumentModel> _filteredDocuments = [];
+  DocumentType? _selectedType;
+  bool _isLoading = true;
+  String? _error;
+  bool _showFavorites = false;
+  late TabController _tabController;
+
 
   
   final List<DocumentItem> documents = [
@@ -52,12 +65,102 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
     ),
   ];
 
-  void _toggleFavorite(int index) {
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 2, vsync: this);
+    _loadDocuments();
+    _searchController.addListener(_filterDocuments);
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    _tabController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _loadDocuments() async {
+    try {
+      setState(() {
+        _isLoading = true;
+        _error = null;
+      });
+      
+      final documents = await _documentRepository.getDocuments();
+      setState(() {
+        _documents = documents;
+        _filteredDocuments = documents;
+        _isLoading = false;
+      });
+      _filterDocuments();
+    } catch (e) {
+      setState(() {
+        _error = e.toString();
+        _isLoading = false;
+      });
+    }
+  }
+
+  void _toggleFavorite(DocumentModel document) async {
+    try {
+      final updatedDocument = document.copyWith(isFavorite: !document.isFavorite);
+      await _documentRepository.updateDocument(updatedDocument);
+      setState(() {
+        final index = _documents.indexWhere((d) => d.id == document.id);
+        if (index != -1) {
+          _documents[index] = updatedDocument;
+        }
+      });
+      _filterDocuments();
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Erro ao atualizar favorito: $e')),
+        );
+      }
+    }
+  }
+
+  void _filterDocuments() {
+    String searchQuery = _searchController.text.toLowerCase();
+    
     setState(() {
-      documents[index] = documents[index].copyWith(
-        isFavorite: !documents[index].isFavorite,
-      );
+      _filteredDocuments = _documents.where((doc) {
+        bool matchesSearch = doc.title.toLowerCase().contains(searchQuery) ||
+            doc.description.toLowerCase().contains(searchQuery) ||
+            doc.patientName.toLowerCase().contains(searchQuery);
+        
+        bool matchesType = _selectedType == null || doc.type == _selectedType;
+        bool matchesFavorites = !_showFavorites || doc.isFavorite;
+        
+        return matchesSearch && matchesType && matchesFavorites;
+      }).toList();
     });
+  }
+
+  Future<void> _showUploadDialog() async {
+    await showDialog<DocumentModel>(
+      context: context,
+      builder: (context) => UploadDocumentDialog(
+        onUpload: (document) async {
+          try {
+            await _documentRepository.uploadDocument(document);
+            if (mounted) {
+              _loadDocuments();
+              Navigator.of(context).pop();
+            }
+          } catch (e) {
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Erro ao fazer upload do documento: $e')),
+              );
+            }
+          }
+        },
+      ),
+    );
   }
 
   @override
@@ -70,9 +173,11 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
           Padding(
             padding: const EdgeInsets.only(left: 16.0, top: 16.0),
             child: Container(
+
               // apenas para alinhar o texto
+
               alignment: Alignment.centerLeft,
-              child: Text(
+              child: const Text(
                 'Documentos',
                 style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
                 textAlign: TextAlign.left,
@@ -85,38 +190,120 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
               controller: _searchController,
               hintText: 'Pesquisar documentos...',
               leading: const Icon(Icons.search),
+
+              backgroundColor: MaterialStateProperty.all(Colors.white),
+
               backgroundColor: WidgetStateProperty.all(Colors.white),
 
               //não aceita Colors.white
+
             ),
           ),
-
           const SizedBox(height: 16.0),
+
+          TabBar(
+            controller: _tabController,
+            onTap: (index) {
+              setState(() {
+                _showFavorites = index == 1;
+                _selectedType = null; 
+              });
+              _filterDocuments();
+            },
+            tabs: const [
+              Tab(text: 'Todos'),
+              Tab(text: 'Favoritos'),
+            ],
+          ),
+          const SizedBox(height: 16.0),
+          DocumentsTabBar(
+            onTypeSelected: (type) {
+              setState(() {
+                _selectedType = type;
+              });
+              _filterDocuments();
+            },
+
           Container(
             alignment: Alignment.centerLeft,
             child: const DocumentsTabBar(),
+
           ),
           const SizedBox(height: 16.0),
           Expanded(
-            child: SizedBox(
-              width: MediaQuery.of(context).size.width * 0.9,
-              child: ListView.builder(
-                itemCount: documents.length,
-                itemBuilder: (context, index) {
-                  return DocumentListItem(
-                    document: documents[index],
-                    onFavoritePressed: () => _toggleFavorite(index),
-                  );
-                },
-              ),
-            ),
+            child: _buildDocumentsList(),
           ),
         ],
       ),
       floatingActionButton: FloatingActionButton(
+
+        onPressed: _showUploadDialog,
+
         onPressed: () {},
+
         child: const Icon(Icons.add),
       ),
+    );
+  }
+
+  Widget _buildDocumentsList() {
+    if (_isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    if (_error != null) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(_error!),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: _loadDocuments,
+              child: const Text('Tentar Novamente'),
+            ),
+          ],
+        ),
+      );
+    }
+
+    if (_filteredDocuments.isEmpty) {
+      String message = 'Nenhum documento encontrado';
+      if (_showFavorites) {
+        message = 'Nenhum documento favorito encontrado';
+      } else if (_selectedType != null) {
+        message = 'Nenhum documento deste tipo encontrado';
+      }
+      return Center(child: Text(message));
+    }
+
+    return ListView.builder(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      itemCount: _filteredDocuments.length,
+      itemBuilder: (context, index) {
+        final document = _filteredDocuments[index];
+        return DocumentListItem(
+          document: document,
+          onFavoritePressed: () => _toggleFavorite(document),
+          onDeletePressed: () async {
+            try {
+              await _documentRepository.deleteDocument(document.id);
+              if (mounted) {
+                setState(() {
+                  _documents.removeWhere((doc) => doc.id == document.id);
+                });
+                _filterDocuments();
+              }
+            } catch (e) {
+              if (mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Erro ao excluir documento: $e')),
+                );
+              }
+            }
+          },
+        );
+      },
     );
   }
 }
