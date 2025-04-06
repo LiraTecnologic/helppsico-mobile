@@ -13,13 +13,22 @@ class NotificationsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => NotificationsCubit(
-        NotificationRepository(),
-      )..fetchNotifications(),
+      create:
+          (context) =>
+              NotificationsCubit(NotificationRepository())
+                ..fetchNotifications(),
       child: Scaffold(
+
         backgroundColor: const Color(0xFFF7F7F7), // Light gray background
         appBar: const CustomAppBar(),
         drawer: const CustomDrawer(),
+
+        backgroundColor: const Color(0xFFF7F7F7),
+        appBar: CustomAppBar(
+          onMenuPressed: () {},
+          onNotificationPressed: () {},
+        ),
+
         body: SafeArea(
           child: Padding(
             padding: const EdgeInsets.all(16.0),
@@ -28,10 +37,7 @@ class NotificationsScreen extends StatelessWidget {
               children: [
                 const Text(
                   'Notificações',
-                  style: TextStyle(
-                    fontSize: 24.0,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 16.0),
                 Expanded(
@@ -51,10 +57,9 @@ class NotificationsScreen extends StatelessWidget {
                               date: _formatDate(notification.createdAt),
                               title: notification.title,
                               description: notification.message,
-                              actionText: notification.actionText ?? 'Ver Detalhes',
-                              onActionPressed: () {
-                                // Handle action press
-                              },
+                              actionText:
+                                  notification.actionText ?? 'Ver Detalhes',
+                              onActionPressed: () {},
                             );
                           },
                         );
@@ -83,14 +88,14 @@ class NotificationsScreen extends StatelessWidget {
   }
 
   String _formatDate(DateTime date) {
-    // You can implement your own date formatting logic here
-    // For now, returning a simple format
     return '${date.day} ${_getMonth(date.month)} ${date.year}';
   }
 
   String _getMonth(int month) {
-    const months = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 
-                   'jul', 'ago', 'set', 'out', 'nov', 'dez'];
+    const months = [
+      'jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez',
+    ];
+    
     return months[month - 1];
   }
 }
