@@ -9,7 +9,6 @@ import 'package:helppsico_mobile/presentation/widgets/text_divider.dart';
 import 'package:helppsico_mobile/presentation/widgets/text_link.dart';
 
 
-
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
 
@@ -31,6 +30,35 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: SafeArea(
+        child: Stack(
+          children: [
+           
+            SingleChildScrollView(
+              padding: const EdgeInsets.only(top: 170),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    const Text(
+                      'Iniciar sessão',
+                      style: TextStyle(
+                        fontSize: 24.0,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 8.0),
+                    const Text(
+                      'Tenha a melhor interaçãoo com seu psicólogo',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 16.0,
+                        color: Colors.black87,
+
     return BlocProvider(
       create: (context) => AuthCubit(),
       child: BlocConsumer<AuthCubit, AuthState>(
@@ -173,6 +201,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                           ],
                         ),
+
                       ),
                     ),
                   ),
@@ -190,8 +219,25 @@ class _LoginScreenState extends State<LoginScreen> {
                 ],
               ),
             ),
+
+            
+            Positioned(
+              top: 20,
+              left: 0,
+              right: 0,
+              child: Center(
+                child: Image.asset(
+                  'assets/images/logoAzul.png',
+                  height: 150,
+                ),
+              ),
+            ),
+          ],
+        ),
+
           );
         },
+
       ),
     );
   }

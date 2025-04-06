@@ -2,9 +2,102 @@ import 'package:flutter/material.dart';
 import '../../core/theme.dart';
 import '../widgets/session_card.dart';
 import '../widgets/document_card.dart';
+import '../screens/documents_screen.dart';
+import '../screens/sessions_screen.dart';
+import '../screens/notifications_screen.dart';
+import '../screens/login_screen.dart';
+import '../../data/mock_documents.dart';
+import '../../data/mock_sessions.dart';
+import '../../data/models/document_model.dart';
+import '../../data/models/session_model.dart';
 
-class DashboardScreen extends StatelessWidget {
+class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
+
+  @override
+  State<DashboardScreen> createState() => _DashboardScreenState();
+}
+
+class _DashboardScreenState extends State<DashboardScreen> {
+  DocumentModel? _lastDocument;
+  SessionModel? _nextSession;
+  final MockDocumentRepository _documentRepository = MockDocumentRepository();
+  final MockSessionRepository _sessionRepository = MockSessionRepository();
+
+  @override
+  void initState() {
+    super.initState();
+    _loadData();
+  }
+
+  Future<void> _loadData() async {
+    try {
+      await Future.wait([
+        _loadLastDocument(),
+        _loadNextSession(),
+      ]);
+    } catch (e) {
+      print('Erro ao carregar dados: $e');
+    }
+  }
+
+  Future<void> _loadLastDocument() async {
+    try {
+      final documents = await _documentRepository.getDocuments();
+      if (documents.isNotEmpty) {
+        setState(() {
+          _lastDocument = documents.first; // O primeiro documento é o mais recente
+        });
+      }
+    } catch (e) {
+      print('Erro ao carregar último documento: $e');
+    }
+  }
+
+  Future<void> _loadNextSession() async {
+    try {
+      final nextSession = await _sessionRepository.getNextSession();
+      if (nextSession != null) {
+        setState(() {
+          _nextSession = nextSession;
+        });
+      }
+    } catch (e) {
+      print('Erro ao carregar próxima sessão: $e');
+    }
+  }
+
+  IconData _getDocumentIcon(DocumentType type) {
+    switch (type) {
+      case DocumentType.anamnese:
+        return Icons.note_alt;
+      case DocumentType.avaliacao:
+        return Icons.assessment;
+      case DocumentType.relatorio:
+        return Icons.description;
+      case DocumentType.atestado:
+        return Icons.medical_services;
+      case DocumentType.encaminhamento:
+        return Icons.send;
+      case DocumentType.outros:
+        return Icons.insert_drive_file;
+      default:
+        return Icons.insert_drive_file;
+    }
+  }
+
+  String _getSessionStatus(SessionStatus status) {
+    switch (status) {
+      case SessionStatus.pending:
+        return "Pendente";
+      case SessionStatus.scheduled:
+        return "Pago";
+      case SessionStatus.completed:
+        return "Concluída";
+      case SessionStatus.canceled:
+        return "Cancelada";
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +121,12 @@ class DashboardScreen extends StatelessWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.notifications, color: Colors.white),
-            onPressed: () {},
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const NotificationsScreen()),
+              );
+            },
           ),
         ],
       ),
@@ -43,12 +141,37 @@ class DashboardScreen extends StatelessWidget {
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 10),
-            const SessionCard(),
+            if (_nextSession != null)
+              SessionCard(
+                date: _nextSession!.date,
+                doctorName: _nextSession!.doctorName,
+                sessionType: _nextSession!.sessionType,
+                timeRange: _nextSession!.timeRange,
+                status: _getSessionStatus(_nextSession!.status),
+                paymentInfo: _nextSession!.paymentInfo,
+                location: _nextSession!.location,
+                crp: _nextSession!.crp,
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const SessionsPage()),
+                  );
+                },
+              ),
             const SizedBox(height: 10),
             Align(
               alignment: Alignment.centerLeft,
               child: ElevatedButton(
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const SessionsPage()),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppTheme.secondaryColor,
+                  foregroundColor: Colors.white,
+                ),
                 child: const Text("Todas sessões"),
               ),
             ),
@@ -58,13 +181,33 @@ class DashboardScreen extends StatelessWidget {
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 10),
-            const DocumentCard(),
+            if (_lastDocument != null)
+              DocumentCard(
+                title: _lastDocument!.title,
+                date: "${_lastDocument!.date.day}/${_lastDocument!.date.month}",
+                icon: _getDocumentIcon(_lastDocument!.type),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const DocumentsScreen()),
+                  );
+                },
+              ),
             const SizedBox(height: 10),
             Align(
               alignment: Alignment.centerLeft,
               child: ElevatedButton(
-                onPressed: () {},
-                child: const Text("Documentos"),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const DocumentsScreen()),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppTheme.secondaryColor,
+                  foregroundColor: Colors.white,
+                ),
+                child: const Text("Todos documentos"),
               ),
             ),
           ],
@@ -111,16 +254,61 @@ class DashboardScreen extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 24), 
-                  _buildDrawerItem(Icons.notifications, "Notificações"),
-                  _buildDrawerItem(Icons.calendar_today, "Sessões"),
-                  _buildDrawerItem(Icons.insert_drive_file, "Documentos"),
-                  _buildDrawerItem(Icons.star, "Avaliar psicólogo"),
-                  _buildDrawerItem(Icons.home, "Meu painel"),
+                  _buildDrawerItem(
+                    icon: Icons.home,
+                    title: "Meu Painel",
+                    onTap: () {
+                      Navigator.pop(context);
+                    },
+                  ),
+                  _buildDrawerItem(
+                    icon: Icons.calendar_today,
+                    title: "Sessões",
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const SessionsPage()),
+                      );
+                    },
+                  ),
+                  _buildDrawerItem(
+                    icon: Icons.description,
+                    title: "Documentos",
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const DocumentsScreen()),
+                      );
+                    },
+                  ),
+                  _buildDrawerItem(
+                    icon: Icons.notifications,
+                    title: "Notificações",
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const NotificationsScreen()),
+                      );
+                    },
+                  ),
                 ],
               ),
               Padding(
-                padding: const EdgeInsets.only(bottom: 16.0),
-                child: _buildDrawerItem(Icons.exit_to_app, "Sair"),
+                padding: const EdgeInsets.all(16.0),
+                child: _buildDrawerItem(
+                  icon: Icons.logout,
+                  title: "Sair",
+                  onTap: () {
+                    Navigator.pop(context);
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (context) => const LoginScreen()),
+                    );
+                  },
+                ),
               ),
             ],
           ),
@@ -129,11 +317,21 @@ class DashboardScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildDrawerItem(IconData icon, String title) {
+  Widget _buildDrawerItem({
+    required IconData icon,
+    required String title,
+    required VoidCallback onTap,
+  }) {
     return ListTile(
-      leading: Icon(icon, color: const Color.fromARGB(255, 255, 255, 255)),
-      title: Text(title, style: const TextStyle(color: Color.fromARGB(255, 255, 255, 255))),
-      onTap: () {},
+      leading: Icon(icon, color: Colors.white),
+      title: Text(
+        title,
+        style: const TextStyle(
+          color: Colors.white,
+          fontSize: 16,
+        ),
+      ),
+      onTap: onTap,
     );
   }
 }

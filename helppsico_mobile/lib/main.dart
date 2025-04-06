@@ -17,6 +17,10 @@ void main() {
 
 class MyApp extends StatelessWidget {
 
+  
+
+
+
   const MyApp({super.key});
 
 
@@ -31,8 +35,8 @@ class MyApp extends StatelessWidget {
         fontFamily: 'Roboto',
       ),
 
-
       initialRoute: '/menu',
+
 
       routes: {
         '/notifications': (context) => const NotificationsScreen(),

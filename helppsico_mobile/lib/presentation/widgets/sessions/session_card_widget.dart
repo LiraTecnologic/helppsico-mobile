@@ -1,12 +1,6 @@
 // lib/widgets/session_card_widget.dart
 import 'package:flutter/material.dart';
-
-enum SessionStatus {
-  pending,
-  scheduled,
-  completed,
-  canceled
-}
+import 'package:helppsico_mobile/data/models/session_model.dart';
 
 class SessionCardWidget extends StatelessWidget {
   final String date;
