@@ -25,6 +25,7 @@ dependencies:
   coverage: ^1.6.3
   bloc_test: ^9.0.3
 
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

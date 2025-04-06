@@ -27,43 +27,7 @@ class _DocumentsScreenState extends State<DocumentsScreen> with SingleTickerProv
 
 
   
-  final List<DocumentItem> documents = [
-    DocumentItem(
-      title: 'Relatório de Avaliação',
-      date: '24 Nov 2023',
-      fileSize: '2.4 MB',
-      fileType: 'PDF',
-      isFavorite: true,
-    ),
-    DocumentItem(
-      title: 'Questionário de Anamnese',
-      date: '18 Nov 2023',
-      fileSize: '1.2 MB',
-      fileType: 'DOC',
-      isFavorite: false,
-    ),
-    DocumentItem(
-      title: 'Resultados de Testes',
-      date: '16 Nov 2023',
-      fileSize: '3.6 MB',
-      fileType: 'PDF',
-      isFavorite: false,
-    ),
-    DocumentItem(
-      title: 'Relatório de Avaliação',
-      date: '24 Nov 2023',
-      fileSize: '2.4 MB',
-      fileType: 'PDF',
-      isFavorite: true,
-    ),
-    DocumentItem(
-      title: 'Relatório de Avaliação',
-      date: '24 Nov 2023',
-      fileSize: '2.4 MB',
-      fileType: 'PDF',
-      isFavorite: true,
-    ),
-  ];
+  
 
 
   @override
@@ -173,6 +137,9 @@ class _DocumentsScreenState extends State<DocumentsScreen> with SingleTickerProv
           Padding(
             padding: const EdgeInsets.only(left: 16.0, top: 16.0),
             child: Container(
+
+
+
 
 
               // apenas para alinhar o texto

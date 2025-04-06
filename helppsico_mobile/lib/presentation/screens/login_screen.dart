@@ -12,7 +12,6 @@ import 'package:helppsico_mobile/presentation/widgets/text_link.dart';
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
 
-
   @override
   State<LoginScreen> createState() => _LoginScreenState();
 }
