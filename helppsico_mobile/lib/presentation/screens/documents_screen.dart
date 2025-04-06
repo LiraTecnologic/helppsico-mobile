@@ -15,6 +15,7 @@ class DocumentsScreen extends StatefulWidget {
 
 class _DocumentsScreenState extends State<DocumentsScreen> with SingleTickerProviderStateMixin {
   final TextEditingController _searchController = TextEditingController();
+
   final MockDocumentRepository _documentRepository = MockDocumentRepository();
   List<DocumentModel> _documents = [];
   List<DocumentModel> _filteredDocuments = [];
@@ -23,6 +24,47 @@ class _DocumentsScreenState extends State<DocumentsScreen> with SingleTickerProv
   String? _error;
   bool _showFavorites = false;
   late TabController _tabController;
+
+
+  
+  final List<DocumentItem> documents = [
+    DocumentItem(
+      title: 'Relatório de Avaliação',
+      date: '24 Nov 2023',
+      fileSize: '2.4 MB',
+      fileType: 'PDF',
+      isFavorite: true,
+    ),
+    DocumentItem(
+      title: 'Questionário de Anamnese',
+      date: '18 Nov 2023',
+      fileSize: '1.2 MB',
+      fileType: 'DOC',
+      isFavorite: false,
+    ),
+    DocumentItem(
+      title: 'Resultados de Testes',
+      date: '16 Nov 2023',
+      fileSize: '3.6 MB',
+      fileType: 'PDF',
+      isFavorite: false,
+    ),
+    DocumentItem(
+      title: 'Relatório de Avaliação',
+      date: '24 Nov 2023',
+      fileSize: '2.4 MB',
+      fileType: 'PDF',
+      isFavorite: true,
+    ),
+    DocumentItem(
+      title: 'Relatório de Avaliação',
+      date: '24 Nov 2023',
+      fileSize: '2.4 MB',
+      fileType: 'PDF',
+      isFavorite: true,
+    ),
+  ];
+
 
   @override
   void initState() {
@@ -131,13 +173,13 @@ class _DocumentsScreenState extends State<DocumentsScreen> with SingleTickerProv
           Padding(
             padding: const EdgeInsets.only(left: 16.0, top: 16.0),
             child: Container(
+
+              // apenas para alinhar o texto
+
               alignment: Alignment.centerLeft,
               child: const Text(
                 'Documentos',
-                style: TextStyle(
-                  fontSize: 20.0,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
                 textAlign: TextAlign.left,
               ),
             ),
@@ -148,10 +190,17 @@ class _DocumentsScreenState extends State<DocumentsScreen> with SingleTickerProv
               controller: _searchController,
               hintText: 'Pesquisar documentos...',
               leading: const Icon(Icons.search),
+
               backgroundColor: MaterialStateProperty.all(Colors.white),
+
+              backgroundColor: WidgetStateProperty.all(Colors.white),
+
+              //não aceita Colors.white
+
             ),
           ),
           const SizedBox(height: 16.0),
+
           TabBar(
             controller: _tabController,
             onTap: (index) {
@@ -174,6 +223,11 @@ class _DocumentsScreenState extends State<DocumentsScreen> with SingleTickerProv
               });
               _filterDocuments();
             },
+
+          Container(
+            alignment: Alignment.centerLeft,
+            child: const DocumentsTabBar(),
+
           ),
           const SizedBox(height: 16.0),
           Expanded(
@@ -182,7 +236,11 @@ class _DocumentsScreenState extends State<DocumentsScreen> with SingleTickerProv
         ],
       ),
       floatingActionButton: FloatingActionButton(
+
         onPressed: _showUploadDialog,
+
+        onPressed: () {},
+
         child: const Icon(Icons.add),
       ),
     );
