@@ -4,7 +4,7 @@ import 'package:helppsico_mobile/data/models/document_model.dart';
 import 'package:helppsico_mobile/presentation/widgets/documents/document_item.dart';
 import 'package:helppsico_mobile/presentation/widgets/documents/documents_tab_bar.dart';
 import 'package:helppsico_mobile/presentation/widgets/documents/upload_document_dialog.dart';
-import 'package:helppsico_mobile/presentation/widgets/notifications/custom_app_bar.dart';
+import 'package:helppsico_mobile/presentation/widgets/custom_app_bar.dart';
 import 'package:helppsico_mobile/presentation/widgets/drawer/custom_drawer.dart';
 
 class DocumentsScreen extends StatefulWidget {

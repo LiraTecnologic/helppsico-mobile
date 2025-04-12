@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:helppsico_mobile/presentation/widgets/notifications/custom_app_bar.dart';
+import 'package:helppsico_mobile/presentation/widgets/custom_app_bar.dart';
 import 'package:helppsico_mobile/presentation/widgets/sessions/session_card_widget.dart';
 import 'package:helppsico_mobile/presentation/widgets/sessions/session_tab_bar_widget.dart';
 import 'package:helppsico_mobile/data/mock_sessions.dart';

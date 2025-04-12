@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import '../../core/theme.dart';
+import '../../data/mock_reviews.dart';
+import '../../data/models/review_model.dart';
+import '../widgets/drawer/custom_drawer.dart';
+import '../widgets/custom_app_bar.dart';
 
 class AvaliarPsicologoScreen extends StatefulWidget {
   final String psicologoId;
@@ -18,6 +22,13 @@ class AvaliarPsicologoScreen extends StatefulWidget {
 class _AvaliarPsicologoScreenState extends State<AvaliarPsicologoScreen> {
   int _rating = 0;
   final TextEditingController _comentarioController = TextEditingController();
+  late List<ReviewModel> _reviews;
+
+  @override
+  void initState() {
+    super.initState();
+    _reviews = MockReviews.getReviewsByPsicologoId(widget.psicologoId);
+  }
 
   @override
   void dispose() {
@@ -35,69 +46,32 @@ class _AvaliarPsicologoScreenState extends State<AvaliarPsicologoScreen> {
       return;
     }
 
-   
-    print('Avaliação enviada: Nota $_rating, Comentário: ${_comentarioController.text}');
-    
-    Navigator.pop(context);
+    final newReview = ReviewModel(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      psicologoId: widget.psicologoId,
+      userName: 'Usuário Atual',
+      rating: _rating,
+      comment: _comentarioController.text.trim(),
+      date: DateTime.now(),
+    );
+
+    setState(() {
+      MockReviews.addReview(newReview);
+      _reviews = MockReviews.getReviewsByPsicologoId(widget.psicologoId);
+      _rating = 0;
+      _comentarioController.clear();
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Avaliação enviada com sucesso!'),
+        backgroundColor: Colors.green,
+      ),
+    );
   }
 
   Widget _buildDrawer(BuildContext context) {
-    return Drawer(
-      child: Container(
-        color: AppTheme.primaryColor,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Column(
-              children: [
-                const SizedBox(height: 20), 
-                Stack(
-                  children: [
-                    const Align(
-                      alignment: Alignment.center,
-                      child: Text(
-                        "Menu",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 32,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                    Positioned(
-                      bottom: 20,
-                      right: 0,
-                      child: IconButton(
-                        icon: const Icon(Icons.menu, color: Colors.white, size: 25),
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 24), 
-                _buildDrawerItem(Icons.notifications, "Notificações", () {
-                  Navigator.pushNamed(context, '/notifications');
-                }),
-                _buildDrawerItem(Icons.calendar_today, "Sessões", () {}),
-                _buildDrawerItem(Icons.insert_drive_file, "Documentos", () {}),
-                _buildDrawerItem(Icons.star, "Avaliar psicólogo", () {}),
-                _buildDrawerItem(Icons.home, "Meu painel", () {
-                  Navigator.pushNamed(context, '/menu');
-                }),
-              ],
-            ),
-            Padding(
-              padding: const EdgeInsets.only(bottom: 16.0),
-              child: _buildDrawerItem(Icons.exit_to_app, "Sair", () {
-                Navigator.pushNamed(context, '/login');
-              }),
-            ),
-          ],
-        ),
-      ),
-    );
+    return const CustomDrawer();
   }
 
   Widget _buildDrawerItem(IconData icon, String title, VoidCallback onTap) {
@@ -111,31 +85,7 @@ class _AvaliarPsicologoScreenState extends State<AvaliarPsicologoScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: AppTheme.primaryColor,
-        iconTheme: const IconThemeData(color: Colors.white),
-        title: Container(
-          padding: const EdgeInsets.all(4),
-          decoration: BoxDecoration(
-            color: Colors.transparent,
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Image.asset(
-            'assets/icons/logo.png',
-            height: 65,
-            width: 65,
-          ),
-        ),
-        centerTitle: true,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.notifications, color: Colors.white),
-            onPressed: () {
-              Navigator.pushNamed(context, '/notifications');
-            },
-          ),
-        ],
-      ),
+      appBar: const CustomAppBar(),
       drawer: _buildDrawer(context),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
@@ -149,6 +99,8 @@ class _AvaliarPsicologoScreenState extends State<AvaliarPsicologoScreen> {
             _buildCommentSection(),
             const SizedBox(height: 20),
             _buildSubmitButton(),
+            const SizedBox(height: 20),
+            _buildReviewsList(),
           ],
         ),
       ),
@@ -241,15 +193,15 @@ class _AvaliarPsicologoScreenState extends State<AvaliarPsicologoScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              "Comentários (opcional)",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              'Deixe seu comentário',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 10),
             TextField(
               controller: _comentarioController,
-              maxLines: 4,
+              maxLines: 3,
               decoration: const InputDecoration(
-                hintText: "Digite seu comentário aqui...",
+                hintText: 'Escreva aqui sua experiência...',
                 border: OutlineInputBorder(),
               ),
             ),
@@ -265,10 +217,75 @@ class _AvaliarPsicologoScreenState extends State<AvaliarPsicologoScreen> {
       child: ElevatedButton(
         onPressed: _enviarAvaliacao,
         style: ElevatedButton.styleFrom(
+          backgroundColor: AppTheme.primaryColor,
           padding: const EdgeInsets.symmetric(vertical: 16),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
         ),
-        child: const Text('Enviar Avaliação'),
+        child: const Text(
+          "Enviar Avaliação",
+          style: TextStyle(fontSize: 18),
+        ),
       ),
+    );
+  }
+
+  Widget _buildReviewsList() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Avaliações',
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 10),
+        ListView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: _reviews.length,
+          itemBuilder: (context, index) {
+            final review = _reviews[index];
+            return Card(
+              margin: const EdgeInsets.only(bottom: 10),
+              child: Padding(
+                padding: const EdgeInsets.all(12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Text(
+                          review.userName,
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        const Spacer(),
+                        Row(
+                          children: List.generate(
+                            5,
+                            (i) => Icon(
+                              Icons.star,
+                              size: 18,
+                              color: i < review.rating ? Colors.amber : Colors.grey,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Text(review.comment),
+                    const SizedBox(height: 4),
+                    Text(
+                      '${review.date.day}/${review.date.month}/${review.date.year}',
+                      style: const TextStyle(color: Colors.grey, fontSize: 12),
+                    ),
+                  ],
+                ),
+              ),
+            );          
+          },
+        ),
+      ],
     );
   }
 }

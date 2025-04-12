@@ -3,14 +3,14 @@ import 'package:http/http.dart' as http;
 import '../models/notification_model.dart';
 
 class NotificationRepository {
-  final String baseUrl = 'http://localhost:7000'; //Adicione o endpoint da api aqui :)
+  final String baseUrl = 'http://localhost:7000'; 
 
   Future<List<NotificationModel>> getNotifications() async {
     try {
       final response = await http.get(Uri.parse('$baseUrl/notifications'));
       
       if (response.statusCode == 200) {
-        final List<dynamic> jsonList = json.decode(response.body);//o json retornado tem que ser do tipo lista 
+        final List<dynamic> jsonList = json.decode(response.body);
         return jsonList
             .map((json) => NotificationModel.fromJson(json))
             .toList();
