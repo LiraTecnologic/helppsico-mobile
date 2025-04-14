@@ -71,18 +71,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   IconData _getDocumentIcon(DocumentType type) {
     switch (type) {
-      case DocumentType.anamnese:
-        return Icons.note_alt;
-      case DocumentType.avaliacao:
-        return Icons.assessment;
-      case DocumentType.relatorio:
-        return Icons.description;
-      case DocumentType.atestado:
+      case DocumentType.ATESTADO:
         return Icons.medical_services;
-      case DocumentType.encaminhamento:
+      case DocumentType.DECLARACAO:
+        return Icons.description;
+      case DocumentType.RELATORIO_PSICOLOGICO:
+        return Icons.psychology;
+      case DocumentType.RELATORIO_MULTIPROFISSIONAL:
+        return Icons.group;
+      case DocumentType.LAUDO_PSICOLOGICO:
+        return Icons.assessment;
+      case DocumentType.PARECER_PSICOLOGICO:
         return Icons.send;
-      case DocumentType.outros:
-        return Icons.insert_drive_file;
       default:
         return Icons.insert_drive_file;
     }
