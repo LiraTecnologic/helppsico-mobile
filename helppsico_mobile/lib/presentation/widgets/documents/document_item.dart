@@ -49,15 +49,25 @@ class DocumentListItem extends StatelessWidget {
                 ),
                 onPressed: onFavoritePressed,
               ),
-              IconButton(
-                icon: const Icon(Icons.delete_outline),
-                onPressed: onDeletePressed,
-              ),
-              IconButton(
+              PopupMenuButton<String>(
                 icon: const Icon(Icons.more_vert),
-                onPressed: () {
-                  
+                onSelected: (value) {
+                  if (value == 'delete') {
+                    onDeletePressed();
+                  }
                 },
+                itemBuilder: (BuildContext context) => [
+                  const PopupMenuItem<String>(
+                    value: 'delete',
+                    child: Row(
+                      children: [
+                        Icon(Icons.delete_outline, color: Colors.red),
+                        SizedBox(width: 8),
+                        Text('Excluir'),
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
@@ -71,29 +81,29 @@ class DocumentListItem extends StatelessWidget {
     Color textColor;
     
     switch (document.type) {
-      case DocumentType.anamnese:
-        backgroundColor = Colors.blue.withOpacity(0.1);
-        textColor = Colors.blue;
-        break;
-      case DocumentType.avaliacao:
-        backgroundColor = Colors.green.withOpacity(0.1);
-        textColor = Colors.green;
-        break;
-      case DocumentType.relatorio:
-        backgroundColor = Colors.orange.withOpacity(0.1);
-        textColor = Colors.orange;
-        break;
-      case DocumentType.atestado:
+      case DocumentType.ATESTADO:
         backgroundColor = Colors.purple.withOpacity(0.1);
         textColor = Colors.purple;
         break;
-      case DocumentType.encaminhamento:
+      case DocumentType.DECLARACAO:
+        backgroundColor = Colors.blue.withOpacity(0.1);
+        textColor = Colors.blue;
+        break;
+      case DocumentType.RELATORIO_PSICOLOGICO:
+        backgroundColor = Colors.orange.withOpacity(0.1);
+        textColor = Colors.orange;
+        break;
+      case DocumentType.RELATORIO_MULTIPROFISSIONAL:
+        backgroundColor = Colors.green.withOpacity(0.1);
+        textColor = Colors.green;
+        break;
+      case DocumentType.LAUDO_PSICOLOGICO:
         backgroundColor = Colors.red.withOpacity(0.1);
         textColor = Colors.red;
         break;
-      case DocumentType.outros:
-        backgroundColor = Colors.grey.withOpacity(0.1);
-        textColor = Colors.grey;
+      case DocumentType.PARECER_PSICOLOGICO:
+        backgroundColor = Colors.indigo.withOpacity(0.1);
+        textColor = Colors.indigo;
         break;
     }
 
