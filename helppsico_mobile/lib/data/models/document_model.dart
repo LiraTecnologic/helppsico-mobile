@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
 enum DocumentType {
-  anamnese,
-  avaliacao,
-  relatorio,
-  atestado,
-  encaminhamento,
-  outros
+  ATESTADO,
+  DECLARACAO,
+  RELATORIO_PSICOLOGICO,
+  RELATORIO_MULTIPROFISSIONAL,
+  LAUDO_PSICOLOGICO,
+  PARECER_PSICOLOGICO
 }
 
 class DocumentModel {
@@ -97,4 +97,4 @@ class DocumentModel {
       fileUrl: fileUrl ?? this.fileUrl,
     );
   }
-} 
+}
