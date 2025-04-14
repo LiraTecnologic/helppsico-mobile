@@ -4,12 +4,12 @@ class MockDocumentRepository {
   static List<DocumentModel> _documents = [
     DocumentModel(
       id: '1',
-      title: 'Relatório de Avaliação',
-      description: 'Relatório inicial do paciente',
+      title: 'Relatório Psicológico',
+      description: 'Relatório detalhado do paciente',
       date: DateTime.now(),
       fileSize: '2.4 MB',
       fileType: 'PDF',
-      type: DocumentType.avaliacao,
+      type: DocumentType.RELATORIO_PSICOLOGICO,
       isFavorite: true,
       patientId: '1',
       patientName: 'João Silva',
@@ -17,12 +17,12 @@ class MockDocumentRepository {
     ),
     DocumentModel(
       id: '2',
-      title: 'Questionário de Anamnese',
-      description: 'Respostas do questionário inicial',
+      title: 'Laudo Psicológico',
+      description: 'Laudo de avaliação psicológica',
       date: DateTime.now().subtract(const Duration(days: 1)),
       fileSize: '1.2 MB',
       fileType: 'DOC',
-      type: DocumentType.anamnese,
+      type: DocumentType.LAUDO_PSICOLOGICO,
       isFavorite: false,
       patientId: '2',
       patientName: 'Maria Santos',
@@ -30,12 +30,12 @@ class MockDocumentRepository {
     ),
     DocumentModel(
       id: '3',
-      title: 'Atestado Médico',
+      title: 'Atestado',
       description: 'Atestado para afastamento',
       date: DateTime.now().subtract(const Duration(days: 2)),
       fileSize: '0.8 MB',
       fileType: 'PDF',
-      type: DocumentType.atestado,
+      type: DocumentType.ATESTADO,
       isFavorite: false,
       patientId: '1',
       patientName: 'João Silva',
@@ -68,4 +68,4 @@ class MockDocumentRepository {
     }
     return document;
   }
-} 
+}
