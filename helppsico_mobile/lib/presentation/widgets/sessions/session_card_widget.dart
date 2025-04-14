@@ -1,7 +1,7 @@
 // lib/widgets/session_card_widget.dart
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import '../../../data/models/session_model.dart';
+import '../../../domain/entities/session_model.dart';
 
 enum SessionStatus {
   open, // Em Aberto

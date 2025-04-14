@@ -1,136 +1,105 @@
-import 'dart:convert';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:http/http.dart' as http;
-import 'package:http/testing.dart';
+import 'package:mockito/mockito.dart';
+import 'package:mockito/annotations.dart';
+import 'package:helppsico_mobile/core/services/http/generic_http_service.dart';
+import 'package:helppsico_mobile/data/datasource/sessionsDataSource.dart';
 import 'package:helppsico_mobile/data/repositories/sessions_repository.dart';
+import 'package:helppsico_mobile/domain/entities/session_model.dart';
 
+@GenerateNiceMocks([MockSpec<SessionsDataSource>()])
+import 'sessions_repository_test.mocks.dart';
 
 void main() {
+  late MockSessionsDataSource mockDataSource;
+  late SessionRepository repository;
+
+  setUp(() {
+    mockDataSource = MockSessionsDataSource();
+    repository = SessionRepository(mockDataSource);
+  });
+
   group('SessionRepository', () {
-    late SessionRepository repository;
-    late MockClient mockClient;
-    const baseUrl = 'http://localhost:7000';
+    final mockSessionData = {
+      'id': '123',
+      'psicologoId': 'Dr. Smith',
+      'pacienteId': 'patient123',
+      'data': '2024-01-01T10:00:00.000Z',
+      'valor': '150.00',
+      'endereco': 'Rua Example, 123',
+      'finalizada': 'false'
+    };
 
-    setUp(() {
-      mockClient = MockClient((request) async {
-        throw UnimplementedError('Mock not implemented for this test');
-      });
-      repository = SessionRepository(client: mockClient);
+    test('getSessions should return list of SessionModel on success', () async {
+      final mockResponse = HttpResponse(
+        statusCode: 200,
+        body: [mockSessionData],
+      );
+
+      when(mockDataSource.getSessions())
+          .thenAnswer((_) async => mockResponse);
+
+      final result = await repository.getSessions();
+
+      expect(result, isA<List<SessionModel>>());
+      expect(result.length, equals(1));
+      expect(result.first.id, equals('123'));
+      expect(result.first.psicologoName, equals('Dr. Smith'));
+      expect(result.first.pacienteId, equals('patient123'));
+      expect(result.first.valor, equals('150.00'));
+      expect(result.first.endereco, equals('Rua Example, 123'));
+      expect(result.first.finalizada, equals(false));
+      expect(result.first.data, isA<DateTime>());
     });
 
-    test('getSessions should return list of sessions on successful response', () async {
-      mockClient = MockClient((request) async {
-      
-        expect(request.url.toString(), '$baseUrl/sessions');
-        expect(request.method, 'GET');
+    test('getSessions should throw exception on non-200 status code', () async {
+      final mockResponse = HttpResponse(
+        statusCode: 404,
+        body: {'error': 'Not found'},
+      );
 
-       
-        return http.Response(
-          json.encode([
-            {
-              'id': '1',
-              'psicologoId': 'Dr. Test',
-              'pacienteId': 'patient123',
-              'data': '2024-04-05 14:30:00',
-              'valor': '150.00',
-              'endereco': 'Test Address',
-              'finalizada': 'false',
-            },
-            {
-              'id': '2',
-              'psicologoId': 'Dr. Test 2',
-              'pacienteId': 'patient456',
-              'data': '2024-04-06 15:30:00',
-              'valor': '200.00',
-              'endereco': 'Test Address 2',
-              'finalizada': 'true',
-            },
-          ]),
-          200,
-        );
-      });
-      repository = SessionRepository(client: mockClient);
-
-      final sessions = await repository.getSessions();
-
-      expect(sessions.length, 2);
-      expect(sessions[0].id, '1');
-      expect(sessions[0].psicologoName, 'Dr. Test');
-      expect(sessions[0].finalizada, false);
-      expect(sessions[1].id, '2');
-      expect(sessions[1].psicologoName, 'Dr. Test 2');
-      expect(sessions[1].finalizada, true);
-    });
-
-    test('getSessions should throw exception on 404 response', () async {
-      mockClient = MockClient((request) async {
-        return http.Response('Not Found', 404);
-      });
-      repository = SessionRepository(client: mockClient);
+      when(mockDataSource.getSessions())
+          .thenAnswer((_) async => mockResponse);
 
       expect(
         () => repository.getSessions(),
-        throwsA(isA<Exception>().having(
-          (e) => e.toString(),
-          'message',
-          contains('Sessions not found'),
-        )),
+        throwsA(isA<Exception>()),
       );
     });
 
-    test('getSessions should throw exception on 500 response', () async {
-      mockClient = MockClient((request) async {
-        return http.Response('Server Error', 500);
-      });
-      repository = SessionRepository(client: mockClient);
+    test('getSessions should handle empty response', () async {
+      final mockResponse = HttpResponse(
+        statusCode: 200,
+        body: [],
+      );
+
+      when(mockDataSource.getSessions())
+          .thenAnswer((_) async => mockResponse);
+
+      final result = await repository.getSessions();
+      expect(result, isEmpty);
+    });
+
+    test('getSessions should handle malformed date', () async {
+      final malformedData = Map<String, dynamic>.from(mockSessionData);
+      malformedData['data'] = 'invalid-date';
+
+      final mockResponse = HttpResponse(
+        statusCode: 200,
+        body: [malformedData],
+      );
+
+      when(mockDataSource.getSessions())
+          .thenAnswer((_) async => mockResponse);
 
       expect(
         () => repository.getSessions(),
-        throwsA(isA<Exception>().having(
-          (e) => e.toString(),
-          'message',
-          contains('Server error'),
-        )),
+        throwsA(isA<FormatException>()),
       );
     });
 
-    test('getSessions should throw exception on unexpected status code', () async {
-      mockClient = MockClient((request) async {
-        return http.Response('Bad Request', 400);
-      });
-      repository = SessionRepository(client: mockClient);
-
-      expect(
-        () => repository.getSessions(),
-        throwsA(isA<Exception>().having(
-          (e) => e.toString(),
-          'message',
-          contains('Failed to load sessions with status code: 400'),
-        )),
-      );
-    });
-
-    test('getSessions should throw exception on network error', () async {
-      mockClient = MockClient((request) async {
-        throw Exception('Network error');
-      });
-      repository = SessionRepository(client: mockClient);
-
-      expect(
-        () => repository.getSessions(),
-        throwsA(isA<Exception>().having(
-          (e) => e.toString(),
-          'message',
-          contains('Failed to fetch sessions'),
-        )),
-      );
-    });
-
-    test('getSessions should throw exception on invalid JSON response', () async {
-      mockClient = MockClient((request) async {
-        return http.Response('invalid json', 200);
-      });
-      repository = SessionRepository(client: mockClient);
+    test('getSessions should propagate data source errors', () {
+      when(mockDataSource.getSessions())
+          .thenThrow(Exception('Network error'));
 
       expect(
         () => repository.getSessions(),
@@ -138,4 +107,4 @@ void main() {
       );
     });
   });
-} 
+}

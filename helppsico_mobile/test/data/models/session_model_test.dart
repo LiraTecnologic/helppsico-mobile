@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:helppsico_mobile/data/models/session_model.dart';
+import 'package:helppsico_mobile/domain/entities/session_model.dart';
 
 void main() {
   group('SessionModel', () {
