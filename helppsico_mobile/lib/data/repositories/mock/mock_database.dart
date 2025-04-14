@@ -1,5 +1,5 @@
 
-import 'package:helppsico_mobile/data/models/user_model.dart';
+import 'package:helppsico_mobile/domain/entities/user_model.dart';
 
 class MockDatabase {
   static final List<User> _users = [

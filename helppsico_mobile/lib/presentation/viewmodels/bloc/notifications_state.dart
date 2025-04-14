@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:helppsico_mobile/data/models/notification_model.dart';
+import 'package:helppsico_mobile/domain/entities/notification_model.dart';
 
 //Equatable garante que, se um State tem as propriedades especificadas no override
 // a UI não irá recarregar, garantindo uma melhor performance

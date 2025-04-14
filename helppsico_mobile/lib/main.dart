@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:helppsico_mobile/data/repositories/sessions_repository.dart';
-import 'package:helppsico_mobile/presentation/screens/documents_screen.dart';
-import 'package:helppsico_mobile/presentation/screens/login_screen.dart';
-import 'package:helppsico_mobile/presentation/screens/dashboard_screen.dart';
-import 'package:helppsico_mobile/presentation/screens/notifications_screen.dart';
-import 'package:helppsico_mobile/presentation/screens/sessions_screen.dart';
-import 'package:helppsico_mobile/presentation/viewmodels/cubit/sessions_cubit.dart';
+import 'package:helppsico_mobile/presentation/views/documents_screen.dart';
+import 'package:helppsico_mobile/presentation/views/login_screen.dart';
+import 'package:helppsico_mobile/presentation/views/dashboard_screen.dart';
+import 'package:helppsico_mobile/presentation/views/notifications_screen.dart';
+import 'package:helppsico_mobile/presentation/views/sessions_wrapper.dart';
+
+
 
 void main() {
   runApp(const MyApp());
@@ -25,16 +24,13 @@ class MyApp extends StatelessWidget {
         scaffoldBackgroundColor: Colors.white,
         fontFamily: 'Roboto',
       ),
-      initialRoute: '/notifications',
+      initialRoute: '/login',
       routes: {
         '/notifications': (context) => const NotificationsScreen(),
         '/login': (context) => const LoginScreen(),
         '/menu': (context) => const DashboardScreen(),
         '/documents': (context) => const DocumentsScreen(),
-        '/sessions': (context) => BlocProvider(
-          create: (context) => SessionsCubit(SessionRepository()),
-          child: const SessionsPage(),
-        ),
+        '/sessions': (context) => const SessionsWrapper(),
       },
     );
   }

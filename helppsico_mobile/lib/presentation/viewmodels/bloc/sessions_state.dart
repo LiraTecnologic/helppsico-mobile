@@ -1,6 +1,6 @@
 
 import 'package:equatable/equatable.dart';
-import 'package:helppsico_mobile/data/models/session_model.dart';
+import 'package:helppsico_mobile/domain/entities/session_model.dart';
 
 abstract class SessionsState extends Equatable {
   const SessionsState();
@@ -27,12 +27,11 @@ class SessionsLoaded extends SessionsState{
   List<Object> get props =>[sessions];
 }
 
-class SessionsError extends SessionsState{
+class SessionsError extends SessionsState {
   final String message;
 
   const SessionsError(this.message);
 
-  
-
-
+  @override
+  List<Object> get props => [message];
 }
