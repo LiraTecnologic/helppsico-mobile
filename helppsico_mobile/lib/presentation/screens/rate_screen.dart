@@ -275,9 +275,51 @@ class _AvaliarPsicologoScreenState extends State<AvaliarPsicologoScreen> {
                     const SizedBox(height: 8),
                     Text(review.comment),
                     const SizedBox(height: 4),
-                    Text(
-                      '${review.date.day}/${review.date.month}/${review.date.year}',
-                      style: const TextStyle(color: Colors.grey, fontSize: 12),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          '${review.date.day}/${review.date.month}/${review.date.year}',
+                          style: const TextStyle(color: Colors.grey, fontSize: 12),
+                        ),
+                        if (review.userName == 'Usuário Atual')
+                          IconButton(
+                            icon: const Icon(Icons.delete, color: Colors.red),
+                            onPressed: () {
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                    title: const Text('Confirmar exclusão'),
+                                    content: const Text('Deseja realmente excluir este comentário?'),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () => Navigator.of(context).pop(),
+                                        child: const Text('Cancelar'),
+                                      ),
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                          setState(() {
+                                            MockReviews.deleteReview(review.id);
+                                            _reviews = MockReviews.getReviewsByPsicologoId(widget.psicologoId);
+                                          });
+                                          ScaffoldMessenger.of(context).showSnackBar(
+                                            const SnackBar(
+                                              content: Text('Comentário excluído com sucesso!'),
+                                              backgroundColor: Colors.green,
+                                            ),
+                                          );
+                                        },
+                                        child: const Text('Excluir', style: TextStyle(color: Colors.red)),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
+                            },
+                          ),
+                      ],
                     ),
                   ],
                 ),
