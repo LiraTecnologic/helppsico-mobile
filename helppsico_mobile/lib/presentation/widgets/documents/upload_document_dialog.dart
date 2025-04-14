@@ -19,7 +19,7 @@ class _UploadDocumentDialogState extends State<UploadDocumentDialog> {
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
   final _patientNameController = TextEditingController();
-  DocumentType _selectedType = DocumentType.outros;
+  DocumentType _selectedType = DocumentType.ATESTADO;
   PlatformFile? _selectedFile;
   bool _isLoading = false;
 
@@ -208,18 +208,18 @@ class _UploadDocumentDialogState extends State<UploadDocumentDialog> {
 
   String _getDocumentTypeLabel(DocumentType type) {
     switch (type) {
-      case DocumentType.anamnese:
-        return 'Anamnese';
-      case DocumentType.avaliacao:
-        return 'Avaliação';
-      case DocumentType.relatorio:
-        return 'Relatório';
-      case DocumentType.atestado:
+      case DocumentType.ATESTADO:
         return 'Atestado';
-      case DocumentType.encaminhamento:
-        return 'Encaminhamento';
-      case DocumentType.outros:
-        return 'Outros';
+      case DocumentType.DECLARACAO:
+        return 'Declaração';
+      case DocumentType.RELATORIO_PSICOLOGICO:
+        return 'Relatório Psicológico';
+      case DocumentType.RELATORIO_MULTIPROFISSIONAL:
+        return 'Relatório Multiprofissional';
+      case DocumentType.LAUDO_PSICOLOGICO:
+        return 'Laudo Psicológico';
+      case DocumentType.PARECER_PSICOLOGICO:
+        return 'Parecer Psicológico';
     }
   }
-} 
+}
