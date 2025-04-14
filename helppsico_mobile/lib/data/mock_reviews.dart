@@ -32,6 +32,10 @@ class MockReviews {
     reviews.insert(0, review);
   }
 
+  static void deleteReview(String reviewId) {
+    reviews.removeWhere((review) => review.id == reviewId);
+  }
+
   static List<ReviewModel> getReviewsByPsicologoId(String psicologoId) {
     return reviews.where((review) => review.psicologoId == psicologoId).toList();
   }
