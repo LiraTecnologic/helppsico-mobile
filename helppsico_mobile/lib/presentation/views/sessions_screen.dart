@@ -32,12 +32,12 @@ class _SessionsPageState extends State<SessionsPage> {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
       appBar: CustomAppBar(),
-      floatingActionButton: FloatingActionButton.small(
+      floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.red,
-        child: const Icon(Icons.logout, color: Colors.white),
         onPressed: () {
-          Navigator.of(context).pushReplacementNamed('/login');
+          Navigator.pushReplacementNamed(context, '/login');
         },
+        child: const Icon(Icons.logout),
       ),
       body: SafeArea(
         child: Column(

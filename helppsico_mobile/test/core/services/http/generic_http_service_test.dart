@@ -1,63 +1,216 @@
 import 'dart:convert';
-import 'package:flutter_test/flutter_test.dart';
-import 'package:http/http.dart' as http;
-import 'package:mockito/mockito.dart';
-import 'package:mockito/annotations.dart';
-import 'package:helppsico_mobile/core/services/http/generic_http_service.dart';
 
-@GenerateNiceMocks([MockSpec<http.Client>()])
-import 'generic_http_service_test.mocks.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:helppsico_mobile/core/services/http/generic_http_service.dart';
+import 'package:http/http.dart' as http;
+import 'package:mocktail/mocktail.dart';
+
+class MockHttpClient extends Mock implements http.Client {}
 
 void main() {
-  late MockClient mockClient;
   late GenericHttp genericHttp;
-  const testUrl = 'http://test.com';
+  late MockHttpClient mockClient;
 
   setUp(() {
-    mockClient = MockClient();
+    mockClient = MockHttpClient();
     genericHttp = GenericHttp(client: mockClient);
+    registerFallbackValue(Uri.parse('http://example.com'));
   });
 
   group('GenericHttp', () {
-    test('get should return HttpResponse on success', () async {
-      final responseData = {'key': 'value'};
-      final headers = {'content-type': 'application/json'};
+    group('constructor', () {
+      test('should use provided client when given', () {
+        final client = MockHttpClient();
+        final http = GenericHttp(client: client);
+        
+       
+        expect(http, isA<GenericHttp>());
+      });
 
-      when(mockClient.get(Uri.parse(testUrl), headers: anyNamed('headers')))
-          .thenAnswer((_) async => http.Response(
-                json.encode(responseData),
-                200,
-                headers: headers,
-              ));
-
-      final response = await genericHttp.get(testUrl);
-
-      expect(response.statusCode, equals(200));
-      expect(response.body, equals(responseData));
-      expect(response.headers, equals(headers));
+      test('should create default client when not provided', () {
+        final http = GenericHttp();
+        
+        
+        expect(http, isA<GenericHttp>());
+      });
     });
 
-    test('get should throw exception on error', () async {
-      when(mockClient.get(Uri.parse(testUrl), headers: anyNamed('headers')))
-          .thenThrow(Exception('Network error'));
+    group('get', () {
+      const testUrl = 'http://example.com';
+      final testHeaders = {'Authorization': 'Bearer token'};
+      final testResponseBody = {'data': 'test data'};
+      
+      test('should make GET request with correct parameters', () async {
+        
+        when(() => mockClient.get(any(), headers: any(named: 'headers')))
+            .thenAnswer((_) async => http.Response(
+                  json.encode(testResponseBody),
+                  200,
+                  headers: {'content-type': 'application/json'},
+                ));
 
-      expect(
-        () => genericHttp.get(testUrl),
-        throwsA(isA<Exception>()),
-      );
+        
+        final response = await genericHttp.get(testUrl, headers: testHeaders);
+
+       
+        verify(() => mockClient.get(Uri.parse(testUrl), headers: testHeaders)).called(1);
+        expect(response.statusCode, equals(200));
+        expect(response.body, equals(testResponseBody));
+      });
+
+      test('should handle GET request errors', () async {
+        
+        when(() => mockClient.get(any(), headers: any(named: 'headers')))
+            .thenThrow(Exception('Network error'));
+
+        expect(
+          () => genericHttp.get(testUrl, headers: testHeaders),
+          throwsA(isA<Exception>()),
+        );
+        verify(() => mockClient.get(Uri.parse(testUrl), headers: testHeaders)).called(1);
+      });
+
+      test('should handle GET response with invalid JSON', () async {
+        when(() => mockClient.get(any(), headers: any(named: 'headers')))
+            .thenAnswer((_) async => http.Response(
+                  'invalid json',
+                  200,
+                  headers: {'content-type': 'application/json'},
+                ));
+
+       
+        expect(
+          () => genericHttp.get(testUrl, headers: testHeaders),
+          throwsA(isA<FormatException>()),
+        );
+      });
     });
 
-    test('get should handle invalid JSON response', () async {
-      when(mockClient.get(Uri.parse(testUrl), headers: anyNamed('headers')))
-          .thenAnswer((_) async => http.Response(
-                'invalid json',
-                200,
-              ));
+    group('post', () {
+      const testUrl = 'http://example.com';
+      final testBody = {'name': 'test', 'value': 123};
+      final testHeaders = {'Authorization': 'Bearer token'};
+      final testResponseBody = {'status': 'success'};
+      
+      test('should make POST request with correct parameters', () async {
+        
+        when(() => mockClient.post(
+              any(),
+              headers: any(named: 'headers'),
+              body: any(named: 'body'),
+            )).thenAnswer((_) async => http.Response(
+                  json.encode(testResponseBody),
+                  201,
+                  headers: {'content-type': 'application/json'},
+                ));
 
-      expect(
-        () => genericHttp.get(testUrl),
-        throwsA(isA<FormatException>()),
-      );
+
+        final response = await genericHttp.post(testUrl, testBody, headers: testHeaders);
+
+        
+        final expectedHeaders = {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer token',
+        };
+        
+        verify(() => mockClient.post(
+              Uri.parse(testUrl),
+              headers: expectedHeaders,
+              body: json.encode(testBody),
+            )).called(1);
+            
+        expect(response.statusCode, equals(201));
+        expect(response.body, equals(testResponseBody));
+      });
+
+      test('should make POST request with default headers when none provided', () async {
+        
+        when(() => mockClient.post(
+              any(),
+              headers: any(named: 'headers'),
+              body: any(named: 'body'),
+            )).thenAnswer((_) async => http.Response(
+                  json.encode(testResponseBody),
+                  201,
+                  headers: {'content-type': 'application/json'},
+                ));
+
+
+        final response = await genericHttp.post(testUrl, testBody);
+
+       
+        final expectedHeaders = {
+          'Content-Type': 'application/json',
+        };
+        
+        verify(() => mockClient.post(
+              Uri.parse(testUrl),
+              headers: expectedHeaders,
+              body: json.encode(testBody),
+            )).called(1);
+            
+        expect(response.statusCode, equals(201));
+        expect(response.body, equals(testResponseBody));
+      });
+
+      test('should handle POST request errors', () async {
+        
+        when(() => mockClient.post(
+              any(),
+              headers: any(named: 'headers'),
+              body: any(named: 'body'),
+            )).thenThrow(Exception('Network error'));
+
+       
+        expect(
+          () => genericHttp.post(testUrl, testBody, headers: testHeaders),
+          throwsA(isA<Exception>()),
+        );
+      });
+
+      test('should handle POST response with invalid JSON', () async {
+        
+        when(() => mockClient.post(
+              any(),
+              headers: any(named: 'headers'),
+              body: any(named: 'body'),
+            )).thenAnswer((_) async => http.Response(
+                  'invalid json',
+                  201,
+                  headers: {'content-type': 'application/json'},
+                ));
+
+       
+        expect(
+          () => genericHttp.post(testUrl, testBody, headers: testHeaders),
+          throwsA(isA<FormatException>()),
+        );
+      });
+    });
+
+    group('HttpResponse', () {
+      test('should create instance with required parameters', () {
+        final response = HttpResponse(
+          statusCode: 200,
+          body: {'data': 'test'},
+        );
+
+        expect(response.statusCode, equals(200));
+        expect(response.body, equals({'data': 'test'}));
+        expect(response.headers, isNull);
+      });
+
+      test('should create instance with all parameters', () {
+        final headers = {'content-type': 'application/json'};
+        final response = HttpResponse(
+          statusCode: 200,
+          body: {'data': 'test'},
+          headers: headers,
+        );
+        expect(response.statusCode, equals(200));
+        expect(response.body, equals({'data': 'test'}));
+        expect(response.headers, equals(headers));
+      });
     });
   });
 }
