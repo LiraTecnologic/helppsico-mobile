@@ -1,3 +1,5 @@
+import 'package:helppsico_mobile/core/services/auth/auth_service.dart';
+
 abstract class AuthState {
   const AuthState();
 }
@@ -11,11 +13,11 @@ class AuthLoading extends AuthState {
 }
 
 class AuthSuccess extends AuthState {
-  final Map<String, dynamic> userData;
+  final AuthResponse userData;
   const AuthSuccess(this.userData);
 
-  String get userRole => userData['role'] as String;
-  String get userName => userData['name'] as String;
+  String get userRole => userData.role;
+  String get userName => userData.name;
 }
 
 class AuthFailure extends AuthState {

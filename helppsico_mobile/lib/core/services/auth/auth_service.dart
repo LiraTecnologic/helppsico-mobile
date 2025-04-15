@@ -7,7 +7,7 @@ class AuthService {
 
   AuthService({IGenericHttp? http}) : _http = http ?? GenericHttp();
 
-  Future<Map<String, dynamic>> login(String email, String password) async {
+  Future<AuthResponse> login(String email, String password) async {
     try {
       final response = await _http.post(
         "$_baseUrl/login",
@@ -18,12 +18,13 @@ class AuthService {
       );
 
       if (response.statusCode == 200) {
-        return {
-          'name': email.split('@')[0], 
-          'email': email,
-          'role': 'patient',
-          'message': response.body['message'],
-        };
+
+      return  AuthResponse(
+          name: email.split('@')[0], 
+          email: email,
+          role: 'patient',
+          message: response.body['message'],
+       );
       } else {
         throw Exception(response.body['message'] ?? 'Authentication failed');
       }
@@ -31,4 +32,28 @@ class AuthService {
       throw Exception('Failed to authenticate: ${e.toString()}');
     }
   }
+
 }
+
+ class AuthResponse {
+    final String name;
+    final String email;
+    final String role;
+    final String message;
+
+    AuthResponse({
+      required this.name,
+      required this.email,
+      required this.role,
+      required this.message,
+    });
+
+    factory AuthResponse.fromJson(Map<String, dynamic> json) {
+      return AuthResponse(
+        name: json['name'],
+        email: json['email'],
+        role: json['role'],
+        message: json['message'],
+      );
+    }
+  }
