@@ -60,6 +60,7 @@ class _LoginScreenState extends State<LoginScreen> {
         },
         builder: (context, state) {
           return Scaffold(
+            resizeToAvoidBottomInset: false,
             backgroundColor: Colors.white,
             body: SafeArea(
               child: Stack(
