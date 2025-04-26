@@ -43,6 +43,12 @@ class DocumentListItem extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               IconButton(
+                icon: const Icon(Icons.download),
+                onPressed: () {
+                  // Implementar lógica de download
+                },
+              ),
+              IconButton(
                 icon: Icon(
                   document.isFavorite ? Icons.star : Icons.star_border,
                   color: document.isFavorite ? const Color.fromARGB(255, 243, 240, 33) : null,
