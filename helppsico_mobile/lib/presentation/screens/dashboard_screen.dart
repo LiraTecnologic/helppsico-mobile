@@ -127,12 +127,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   paymentInfo: _nextSession!.paymentInfo,
                   location: _nextSession!.location,
                   crp: _nextSession!.crp,
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const SessionsPage()),
-                    );
-                  },
+                  onTap: null,
                 ),
               const SizedBox(height: 10),
               SizedBox(
@@ -162,12 +157,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   title: _lastDocument!.title,
                   date: "${_lastDocument!.date.day}/${_lastDocument!.date.month}",
                   icon: _getDocumentIcon(_lastDocument!.type),
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const DocumentsScreen()),
-                    );
-                  },
+                  onTap: null,
                 ),
               const SizedBox(height: 10),
               SizedBox(
