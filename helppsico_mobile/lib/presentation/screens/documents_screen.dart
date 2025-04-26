@@ -3,7 +3,6 @@ import 'package:helppsico_mobile/data/mock_documents.dart';
 import 'package:helppsico_mobile/data/models/document_model.dart';
 import 'package:helppsico_mobile/presentation/widgets/documents/document_item.dart';
 import 'package:helppsico_mobile/presentation/widgets/documents/documents_tab_bar.dart';
-import 'package:helppsico_mobile/presentation/widgets/documents/upload_document_dialog.dart';
 import 'package:helppsico_mobile/presentation/widgets/custom_app_bar.dart';
 import 'package:helppsico_mobile/presentation/widgets/drawer/custom_drawer.dart';
 
@@ -99,28 +98,7 @@ class _DocumentsScreenState extends State<DocumentsScreen> with SingleTickerProv
     });
   }
 
-  Future<void> _showUploadDialog() async {
-    await showDialog<DocumentModel>(
-      context: context,
-      builder: (context) => UploadDocumentDialog(
-        onUpload: (document) async {
-          try {
-            await _documentRepository.uploadDocument(document);
-            if (mounted) {
-              _loadDocuments();
-              Navigator.of(context).pop();
-            }
-          } catch (e) {
-            if (mounted) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Erro ao fazer upload do documento: $e')),
-              );
-            }
-          }
-        },
-      ),
-    );
-  }
+
 
   IconData _getDocumentIcon(DocumentType type) {
     switch (type) {
@@ -207,10 +185,7 @@ class _DocumentsScreenState extends State<DocumentsScreen> with SingleTickerProv
               ],
             ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _showUploadDialog,
-        child: const Icon(Icons.add),
-      ),
+      
     );
   }
 
