@@ -5,6 +5,7 @@ import '../../screens/sessions_screen.dart';
 import '../../screens/documents_screen.dart';
 import '../../screens/notifications_screen.dart';
 import '../../screens/login_screen.dart';
+import '../../screens/rate_screen.dart';
 
 class CustomDrawer extends StatelessWidget {
   const CustomDrawer({super.key});
@@ -104,6 +105,25 @@ class CustomDrawer extends StatelessWidget {
                       }
                     },
                   ),
+                  _buildDrawerItem(
+                    context: context,
+                    icon: Icons.star,
+                    title: "Avaliar psicólogo",
+                    onTap: () {
+                      Navigator.pop(context);
+                      if (ModalRoute.of(context)?.settings.name != '/rate') {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const AvaliarPsicologoScreen(
+                              psicologoId: "1",
+                              psicologoNome: "Dr. João Silva",
+                            ),
+                          ),
+                        );
+                      }
+                    },
+                  ),
                 ],
               ),
               Padding(
@@ -146,4 +166,4 @@ class CustomDrawer extends StatelessWidget {
       onTap: onTap,
     );
   }
-} 
+}

@@ -3,8 +3,8 @@ import 'package:http/http.dart' as http;
 import '../models/document_model.dart';
 
 class DocumentRepository {
-  // URL local para desenvolvimento
-  final String baseUrl = 'http://10.0.2.2:7000'; // Para emulador Android
+  
+  final String baseUrl = 'http://10.0.2.2:7000'; 
 
   Future<List<DocumentModel>> getDocuments() async {
     try {
@@ -28,20 +28,20 @@ class DocumentRepository {
 
   Future<DocumentModel> uploadDocument(DocumentModel document) async {
     try {
-      // Criar um FormData para enviar o arquivo
+      
       var request = http.MultipartRequest(
         'POST',
         Uri.parse('$baseUrl/documents'),
       );
 
-      // Adicionar campos do documento
+      
       request.fields['title'] = document.title;
       request.fields['description'] = document.description;
       request.fields['type'] = document.type.toString().split('.').last;
       request.fields['patientId'] = document.patientId;
       request.fields['patientName'] = document.patientName;
 
-      // Adicionar o arquivo se houver
+      
       if (document.fileUrl.isNotEmpty) {
         request.files.add(
           await http.MultipartFile.fromPath(

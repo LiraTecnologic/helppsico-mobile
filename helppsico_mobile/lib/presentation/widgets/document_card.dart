@@ -20,66 +20,47 @@ class DocumentCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Card(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-        elevation: 2,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        elevation: 1,
         child: Container(
-          padding: const EdgeInsets.all(16.0),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(15),
-            border: Border.all(color: Colors.grey.shade200),
-          ),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: AppTheme.secondaryColor.withAlpha(25),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Icon(
-                      icon,
-                      color: AppTheme.secondaryColor,
-                      size: 24,
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        title,
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold
-                        )
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        date,
-                        style: const TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey
-                        )
-                      ),
-                    ],
-                  ),
-                ],
-              ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
                   color: AppTheme.secondaryColor.withAlpha(25),
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: BorderRadius.circular(8),
                 ),
-                child: const Text(
-                  "Ver Mais",
-                  style: TextStyle(
-                    color: AppTheme.secondaryColor,
-                    fontWeight: FontWeight.w500
-                  ),
+                child: Icon(
+                  icon,
+                  color: AppTheme.secondaryColor,
+                  size: 20,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      title,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      date,
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.grey.shade600,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
@@ -88,4 +69,4 @@ class DocumentCard extends StatelessWidget {
       ),
     );
   }
-} 
+}

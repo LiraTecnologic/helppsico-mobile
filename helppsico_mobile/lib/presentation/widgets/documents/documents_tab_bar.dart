@@ -15,12 +15,12 @@ class DocumentsTabBar extends StatelessWidget {
       scrollDirection: Axis.horizontal,
       child: Row(
         children: [
-          _buildTab('Anamnese', DocumentType.anamnese),
-          _buildTab('Avaliação', DocumentType.avaliacao),
-          _buildTab('Relatórios', DocumentType.relatorio),
-          _buildTab('Atestados', DocumentType.atestado),
-          _buildTab('Encaminhamentos', DocumentType.encaminhamento),
-          _buildTab('Outros', DocumentType.outros),
+          _buildTab('Atestados', DocumentType.ATESTADO),
+          _buildTab('Declarações', DocumentType.DECLARACAO),
+          _buildTab('Relatórios Psicológicos', DocumentType.RELATORIO_PSICOLOGICO),
+          _buildTab('Relatórios Multiprofissionais', DocumentType.RELATORIO_MULTIPROFISSIONAL),
+          _buildTab('Laudos Psicológicos', DocumentType.LAUDO_PSICOLOGICO),
+          _buildTab('Pareceres Psicológicos', DocumentType.PARECER_PSICOLOGICO),
         ],
       ),
     );

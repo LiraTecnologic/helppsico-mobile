@@ -11,6 +11,7 @@ import '../../data/mock_sessions.dart';
 import '../../data/models/document_model.dart';
 import '../../data/models/session_model.dart';
 import '../widgets/drawer/custom_drawer.dart';
+import 'package:helppsico_mobile/presentation/widgets/custom_app_bar.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -70,18 +71,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   IconData _getDocumentIcon(DocumentType type) {
     switch (type) {
-      case DocumentType.anamnese:
-        return Icons.note_alt;
-      case DocumentType.avaliacao:
-        return Icons.assessment;
-      case DocumentType.relatorio:
-        return Icons.description;
-      case DocumentType.atestado:
+      case DocumentType.ATESTADO:
         return Icons.medical_services;
-      case DocumentType.encaminhamento:
+      case DocumentType.DECLARACAO:
+        return Icons.description;
+      case DocumentType.RELATORIO_PSICOLOGICO:
+        return Icons.psychology;
+      case DocumentType.RELATORIO_MULTIPROFISSIONAL:
+        return Icons.group;
+      case DocumentType.LAUDO_PSICOLOGICO:
+        return Icons.assessment;
+      case DocumentType.PARECER_PSICOLOGICO:
         return Icons.send;
-      case DocumentType.outros:
-        return Icons.insert_drive_file;
       default:
         return Icons.insert_drive_file;
     }
@@ -103,115 +104,80 @@ class _DashboardScreenState extends State<DashboardScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: AppTheme.primaryColor,
-        iconTheme: const IconThemeData(color: Colors.white),
-        title: Container(
-          padding: const EdgeInsets.all(4),
-          decoration: BoxDecoration(
-            color: Colors.transparent,
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Image.asset(
-            'assets/icons/logo.png',
-            height: 65,
-            width: 65,
-          ),
-        ),
-        centerTitle: true,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.notifications, color: Colors.white),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const NotificationsScreen()),
-              );
-            },
-          ),
-        ],
-      ),
+      appBar: const CustomAppBar(),
       drawer: const CustomDrawer(),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              "Próxima sessão",
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 10),
-            if (_nextSession != null)
-              SessionCard(
-                date: _nextSession!.date,
-                doctorName: _nextSession!.doctorName,
-                sessionType: _nextSession!.sessionType,
-                timeRange: _nextSession!.timeRange,
-                status: _getSessionStatus(_nextSession!.status),
-                paymentInfo: _nextSession!.paymentInfo,
-                location: _nextSession!.location,
-                crp: _nextSession!.crp,
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const SessionsPage()),
-                  );
-                },
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                "Próxima sessão",
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
-            const SizedBox(height: 10),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const SessionsPage()),
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppTheme.secondaryColor,
-                  foregroundColor: Colors.white,
+              const SizedBox(height: 10),
+              if (_nextSession != null)
+                SessionCard(
+                  date: _nextSession!.date,
+                  doctorName: _nextSession!.doctorName,
+                  sessionType: _nextSession!.sessionType,
+                  timeRange: _nextSession!.timeRange,
+                  status: _getSessionStatus(_nextSession!.status),
+                  paymentInfo: _nextSession!.paymentInfo,
+                  location: _nextSession!.location,
+                  crp: _nextSession!.crp,
+                  onTap: null,
                 ),
-                child: const Text("Todas sessões"),
-              ),
-            ),
-            const SizedBox(height: 20),
-            const Text(
-              "Último documento",
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 10),
-            if (_lastDocument != null)
-              DocumentCard(
-                title: _lastDocument!.title,
-                date: "${_lastDocument!.date.day}/${_lastDocument!.date.month}",
-                icon: _getDocumentIcon(_lastDocument!.type),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const DocumentsScreen()),
-                  );
-                },
-              ),
-            const SizedBox(height: 10),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const DocumentsScreen()),
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppTheme.secondaryColor,
-                  foregroundColor: Colors.white,
+              const SizedBox(height: 10),
+              SizedBox(
+                width: 150,
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const SessionsPage()),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppTheme.secondaryColor,
+                    foregroundColor: Colors.white,
+                  ),
+                  child: const Text("Ver mais"),
                 ),
-                child: const Text("Todos documentos"),
               ),
-            ),
-          ],
+              const SizedBox(height: 20),
+              const Text(
+                "Último documento",
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 10),
+              if (_lastDocument != null)
+                DocumentCard(
+                  title: _lastDocument!.title,
+                  date: "${_lastDocument!.date.day}/${_lastDocument!.date.month}",
+                  icon: _getDocumentIcon(_lastDocument!.type),
+                  onTap: null,
+                ),
+              const SizedBox(height: 10),
+              SizedBox(
+                width: 150,
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const DocumentsScreen()),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppTheme.secondaryColor,
+                    foregroundColor: Colors.white,
+                  ),
+                  child: const Text("Ver mais"),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
