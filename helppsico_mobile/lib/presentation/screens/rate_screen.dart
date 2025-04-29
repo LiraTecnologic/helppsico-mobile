@@ -225,7 +225,7 @@ class _AvaliarPsicologoScreenState extends State<AvaliarPsicologoScreen> {
         ),
         child: const Text(
           "Enviar Avaliação",
-          style: TextStyle(fontSize: 18),
+          style: TextStyle(fontSize: 18, color: Colors.white),
         ),
       ),
     );
