@@ -1,6 +1,6 @@
 // lib/widgets/session_card_widget.dart
 import 'package:flutter/material.dart';
-import 'package:helppsico_mobile/data/models/session_model.dart';
+import 'package:helppsico_mobile/domain/entities/session_model.dart';
 
 class SessionCardWidget extends StatelessWidget {
   final String date;

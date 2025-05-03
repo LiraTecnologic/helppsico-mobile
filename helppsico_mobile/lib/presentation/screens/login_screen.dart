@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:helppsico_mobile/presentation/screens/dashboard_screen.dart';
-import 'package:helppsico_mobile/presentation/viewmodels/bloc/auth_state.dart';
+import 'package:helppsico_mobile/presentation/viewmodels/state/auth_state.dart';
 import 'package:helppsico_mobile/presentation/viewmodels/cubit/auth_cubit.dart';
-import 'package:helppsico_mobile/presentation/widgets/custom_button.dart';
-import 'package:helppsico_mobile/presentation/widgets/custom_text_field.dart';
-import 'package:helppsico_mobile/presentation/widgets/text_divider.dart';
-import 'package:helppsico_mobile/presentation/widgets/text_link.dart';
+import 'package:helppsico_mobile/presentation/widgets/common/custom_button.dart';
+import 'package:helppsico_mobile/presentation/widgets/common/custom_text_field.dart';
+import 'package:helppsico_mobile/presentation/widgets/common/text_divider.dart';
+import 'package:helppsico_mobile/presentation/widgets/common/text_link.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);

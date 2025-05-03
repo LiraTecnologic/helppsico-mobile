@@ -1,22 +1,19 @@
-import 'dart:convert';
-import 'package:http/http.dart' as http;
-import '../models/notification_model.dart';
+import '../../domain/entities/notification_entity.dart';
+import '../datasource/notification_datasource.dart';
 
-class NotificationRepository {
-  final String baseUrl = 'http://localhost:7000'; 
+abstract class NotificationRepository {
+  Future<List<NotificationEntity>> getNotifications();
+}
 
-  Future<List<NotificationModel>> getNotifications() async {
+class NotificationRepositoryImpl implements NotificationRepository {
+  final NotificationDatasource _datasource;
+
+  NotificationRepositoryImpl(this._datasource);
+
+  @override
+  Future<List<NotificationEntity>> getNotifications() async {
     try {
-      final response = await http.get(Uri.parse('$baseUrl/notifications'));
-      
-      if (response.statusCode == 200) {
-        final List<dynamic> jsonList = json.decode(response.body);
-        return jsonList
-            .map((json) => NotificationModel.fromJson(json))
-            .toList();
-      } else {
-        throw Exception('Failed to load notifications');
-      }
+      return await _datasource.getNotifications();
     } catch (e) {
       throw Exception('Failed to fetch notifications: $e');
     }

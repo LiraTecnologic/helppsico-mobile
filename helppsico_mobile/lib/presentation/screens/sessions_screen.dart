@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:helppsico_mobile/presentation/widgets/custom_app_bar.dart';
+import 'package:helppsico_mobile/presentation/widgets/common/custom_app_bar.dart';
 import 'package:helppsico_mobile/presentation/widgets/sessions/session_card_widget.dart';
 import 'package:helppsico_mobile/presentation/widgets/sessions/session_tab_bar_widget.dart';
 import 'package:helppsico_mobile/data/mock_sessions.dart';
-import 'package:helppsico_mobile/data/models/session_model.dart';
+import 'package:helppsico_mobile/domain/entities/session_model.dart';
 import 'package:helppsico_mobile/presentation/widgets/drawer/custom_drawer.dart';
 
 class SessionsPage extends StatefulWidget {
