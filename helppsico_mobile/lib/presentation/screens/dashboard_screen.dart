@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../core/theme.dart';
-import '../widgets/session_card.dart';
-import '../widgets/document_card.dart';
+import '../widgets/common/session_card.dart';
+import '../widgets/common/document_card.dart';
 import '../screens/documents_screen.dart';
 import '../screens/sessions_screen.dart';
 import '../screens/notifications_screen.dart';
 import '../screens/login_screen.dart';
-import '../../data/mock_documents.dart';
-import '../../data/mock_sessions.dart';
-import '../../data/models/document_model.dart';
-import '../../data/models/session_model.dart';
+import '../../domain/entities/document_model.dart';
+import '../../domain/entities/session_model.dart';
 import '../widgets/drawer/custom_drawer.dart';
-import 'package:helppsico_mobile/presentation/widgets/custom_app_bar.dart';
+import 'package:helppsico_mobile/presentation/widgets/common/custom_app_bar.dart';
+import '../viewmodels/cubit/dashboard_cubit.dart';
+import '../viewmodels/state/dashboard_state.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -21,52 +22,19 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
-  DocumentModel? _lastDocument;
-  SessionModel? _nextSession;
-  final MockDocumentRepository _documentRepository = MockDocumentRepository();
-  final MockSessionRepository _sessionRepository = MockSessionRepository();
+  late final DashboardCubit _cubit;
 
   @override
   void initState() {
     super.initState();
-    _loadData();
+    _cubit = DashboardCubit();
+    _cubit.loadData();
   }
 
-  Future<void> _loadData() async {
-    try {
-      await Future.wait([
-        _loadLastDocument(),
-        _loadNextSession(),
-      ]);
-    } catch (e) {
-      print('Erro ao carregar dados: $e');
-    }
-  }
-
-  Future<void> _loadLastDocument() async {
-    try {
-      final documents = await _documentRepository.getDocuments();
-      if (documents.isNotEmpty) {
-        setState(() {
-          _lastDocument = documents.first; 
-        });
-      }
-    } catch (e) {
-      print('Erro ao carregar último documento: $e');
-    }
-  }
-
-  Future<void> _loadNextSession() async {
-    try {
-      final nextSession = await _sessionRepository.getNextSession();
-      if (nextSession != null) {
-        setState(() {
-          _nextSession = nextSession;
-        });
-      }
-    } catch (e) {
-      print('Erro ao carregar próxima sessão: $e');
-    }
+  @override
+  void dispose() {
+    _cubit.close();
+    super.dispose();
   }
 
   IconData _getDocumentIcon(DocumentType type) {
@@ -103,81 +71,95 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: const CustomAppBar(),
-      drawer: const CustomDrawer(),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                "Próxima sessão",
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 10),
-              if (_nextSession != null)
-                SessionCard(
-                  date: _nextSession!.date,
-                  doctorName: _nextSession!.doctorName,
-                  sessionType: _nextSession!.sessionType,
-                  timeRange: _nextSession!.timeRange,
-                  status: _getSessionStatus(_nextSession!.status),
-                  paymentInfo: _nextSession!.paymentInfo,
-                  location: _nextSession!.location,
-                  crp: _nextSession!.crp,
-                  onTap: null,
-                ),
-              const SizedBox(height: 10),
-              SizedBox(
-                width: 150,
-                child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const SessionsPage()),
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppTheme.secondaryColor,
-                    foregroundColor: Colors.white,
+    return BlocProvider(
+      create: (context) => _cubit,
+      child: Scaffold(
+        appBar: const CustomAppBar(),
+        drawer: const CustomDrawer(),
+        body: BlocBuilder<DashboardCubit, DashboardState>(
+          builder: (context, state) {
+            if (state is DashboardLoading) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (state is DashboardError) {
+              return Center(child: Text(state.message));
+            } else if (state is DashboardLoaded) {
+              return SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        "Próxima sessão",
+                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 10),
+                      if (state.nextSession != null)
+                        SessionCard(
+                          date: state.nextSession!.date,
+                          doctorName: state.nextSession!.doctorName,
+                          sessionType: state.nextSession!.sessionType,
+                          timeRange: state.nextSession!.timeRange,
+                          status: _getSessionStatus(state.nextSession!.status),
+                          paymentInfo: state.nextSession!.paymentInfo,
+                          location: state.nextSession!.location,
+                          crp: state.nextSession!.crp,
+                          onTap: null,
+                        ),
+                      const SizedBox(height: 10),
+                      SizedBox(
+                        width: 150,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => const SessionsPage()),
+                            );
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppTheme.secondaryColor,
+                            foregroundColor: Colors.white,
+                          ),
+                          child: const Text("Ver mais"),
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      const Text(
+                        "Último documento",
+                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 10),
+                      if (state.lastDocument != null)
+                        DocumentCard(
+                          title: state.lastDocument!.title,
+                          date: "${state.lastDocument!.date.day}/${state.lastDocument!.date.month}",
+                          icon: _getDocumentIcon(state.lastDocument!.type),
+                          onTap: null,
+                        ),
+                      const SizedBox(height: 10),
+                      SizedBox(
+                        width: 150,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => const DocumentsScreen()),
+                            );
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppTheme.secondaryColor,
+                            foregroundColor: Colors.white,
+                          ),
+                          child: const Text("Ver mais"),
+                        ),
+                      ),
+                    ],
                   ),
-                  child: const Text("Ver mais"),
                 ),
-              ),
-              const SizedBox(height: 20),
-              const Text(
-                "Último documento",
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 10),
-              if (_lastDocument != null)
-                DocumentCard(
-                  title: _lastDocument!.title,
-                  date: "${_lastDocument!.date.day}/${_lastDocument!.date.month}",
-                  icon: _getDocumentIcon(_lastDocument!.type),
-                  onTap: null,
-                ),
-              const SizedBox(height: 10),
-              SizedBox(
-                width: 150,
-                child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const DocumentsScreen()),
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppTheme.secondaryColor,
-                    foregroundColor: Colors.white,
-                  ),
-                  child: const Text("Ver mais"),
-                ),
-              ),
-            ],
-          ),
+              );
+            }
+            return const SizedBox.shrink();
+          },
         ),
       ),
     );

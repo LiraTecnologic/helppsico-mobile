@@ -1,6 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:helppsico_mobile/data/repositories/notifications_repository.dart';
-import 'package:helppsico_mobile/presentation/viewmodels/bloc/notifications_state.dart';
+import 'package:helppsico_mobile/presentation/viewmodels/state/notifications_state.dart';
 
 
 

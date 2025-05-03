@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:helppsico_mobile/data/repositories/notifications_repository.dart';
+import 'package:helppsico_mobile/data/datasource/notification_datasource.dart';
 import 'package:helppsico_mobile/presentation/viewmodels/cubit/notifications_cubit.dart';
-import 'package:helppsico_mobile/presentation/viewmodels/bloc/notifications_state.dart';
-import 'package:helppsico_mobile/presentation/widgets/custom_app_bar.dart';
+import 'package:helppsico_mobile/presentation/viewmodels/state/notifications_state.dart';
+import 'package:helppsico_mobile/presentation/widgets/common/custom_app_bar.dart';
 import 'package:helppsico_mobile/presentation/widgets/notifications/notification_card.dart';
 import 'package:helppsico_mobile/presentation/widgets/drawer/custom_drawer.dart';
 
@@ -13,10 +14,11 @@ class NotificationsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create:
-          (context) =>
-              NotificationsCubit(NotificationRepository())
-                ..fetchNotifications(),
+      create: (context) => NotificationsCubit(
+            NotificationRepositoryImpl(
+              NotificationDatasourceImpl(),
+            ),
+          )..fetchNotifications(),
       child: Scaffold(
 
 

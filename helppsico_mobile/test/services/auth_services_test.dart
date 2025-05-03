@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:helppsico_mobile/data/repositories/mock/mock_database.dart';
-import 'package:helppsico_mobile/services/auth/auth_service.dart';
+import 'package:helppsico_mobile/core/services/auth/auth_service.dart';
 
 void main() {
   late AuthService authService;

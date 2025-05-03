@@ -1,8 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:bloc_test/bloc_test.dart';
-import 'package:helppsico_mobile/presentation/viewmodels/bloc/auth_state.dart';
+import 'package:helppsico_mobile/presentation/viewmodels/state/auth_state.dart';
 import 'package:helppsico_mobile/presentation/viewmodels/cubit/auth_cubit.dart';
-import 'package:helppsico_mobile/services/auth/auth_service.dart';
+import 'package:helppsico_mobile/core/services/auth/auth_service.dart';
 
 void main() {
   group('AuthState', () {

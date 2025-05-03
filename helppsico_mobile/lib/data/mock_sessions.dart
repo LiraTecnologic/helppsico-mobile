@@ -1,4 +1,4 @@
-import './models/session_model.dart';
+import '../domain/entities/session_model.dart';
 
 class MockSessionRepository {
   static List<SessionModel> _sessions = [

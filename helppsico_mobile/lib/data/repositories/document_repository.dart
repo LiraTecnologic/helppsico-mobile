@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import '../models/document_model.dart';
+import '../../domain/entities/document_model.dart';
 
 class DocumentRepository {
   

@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../core/theme.dart';
-import '../../data/mock_reviews.dart';
-import '../../data/models/review_model.dart';
+import '../../domain/entities/review_entity.dart';
+import '../viewmodels/cubit/review_cubit.dart';
+import '../viewmodels/state/review_state.dart';
 import '../widgets/drawer/custom_drawer.dart';
-import '../widgets/custom_app_bar.dart';
+import '../widgets/common/custom_app_bar.dart';
 
-class AvaliarPsicologoScreen extends StatefulWidget {
+class AvaliarPsicologoScreen extends StatelessWidget {
   final String psicologoId;
   final String psicologoNome;
 
@@ -16,98 +18,86 @@ class AvaliarPsicologoScreen extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<AvaliarPsicologoScreen> createState() => _AvaliarPsicologoScreenState();
-}
-
-class _AvaliarPsicologoScreenState extends State<AvaliarPsicologoScreen> {
-  int _rating = 0;
-  final TextEditingController _comentarioController = TextEditingController();
-  late List<ReviewModel> _reviews;
-
-  @override
-  void initState() {
-    super.initState();
-    _reviews = MockReviews.getReviewsByPsicologoId(widget.psicologoId);
-  }
-
-  @override
-  void dispose() {
-    _comentarioController.dispose();
-    super.dispose();
-  }
-
-  void _enviarAvaliacao() {
-    if (_rating == 0) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Por favor, selecione uma nota para a avaliação'),
-        ),
-      );
-      return;
-    }
-
-    final newReview = ReviewModel(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
-      psicologoId: widget.psicologoId,
-      userName: 'Usuário Atual',
-      rating: _rating,
-      comment: _comentarioController.text.trim(),
-      date: DateTime.now(),
-    );
-
-    setState(() {
-      MockReviews.addReview(newReview);
-      _reviews = MockReviews.getReviewsByPsicologoId(widget.psicologoId);
-      _rating = 0;
-      _comentarioController.clear();
-    });
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Avaliação enviada com sucesso!'),
-        backgroundColor: Colors.green,
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (context) => ReviewCubit()..initialize(psicologoId, psicologoNome),
+      child: BlocConsumer<ReviewCubit, ReviewState>(
+        listener: (context, state) {
+          if (state is ReviewError) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(state.message)),
+            );
+          } else if (state is ReviewSuccess) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(state.message),
+                backgroundColor: Colors.green,
+              ),
+            );
+          } else if (state is ReviewDeleted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(state.message),
+                backgroundColor: Colors.green,
+              ),
+            );
+          }
+        },
+        builder: (context, state) {
+          if (state is ReviewLoading) {
+            return const Scaffold(
+              body: Center(child: CircularProgressIndicator()),
+            );
+          }
+          
+          return _buildScaffold(context, state);
+        },
       ),
     );
   }
 
-  Widget _buildDrawer(BuildContext context) {
-    return const CustomDrawer();
-  }
-
-  Widget _buildDrawerItem(IconData icon, String title, VoidCallback onTap) {
-    return ListTile(
-      leading: Icon(icon, color: const Color.fromARGB(255, 255, 255, 255)),
-      title: Text(title, style: const TextStyle(color: Color.fromARGB(255, 255, 255, 255))),
-      onTap: onTap,
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget _buildScaffold(BuildContext context, ReviewState state) {
+    List<ReviewEntity> reviews = [];
+    String psicologoNome = this.psicologoNome;
+    
+    if (state is ReviewInitial) {
+      reviews = state.reviews;
+      psicologoNome = state.psicologoNome;
+    } else if (state is ReviewRated) {
+      reviews = state.reviews;
+      psicologoNome = state.psicologoNome;
+    } else if (state is ReviewSuccess) {
+      reviews = state.reviews;
+      psicologoNome = state.psicologoNome;
+    } else if (state is ReviewDeleted) {
+      reviews = state.reviews;
+      psicologoNome = state.psicologoNome;
+    }
+    
     return Scaffold(
       appBar: const CustomAppBar(),
-      drawer: _buildDrawer(context),
+      drawer: const CustomDrawer(),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildPsychologistCard(),
+            _buildPsychologistCard(psicologoNome),
             const SizedBox(height: 20),
-            _buildRatingSection(),
+            _buildRatingSection(context),
             const SizedBox(height: 20),
-            _buildCommentSection(),
+            _buildCommentSection(context),
             const SizedBox(height: 20),
-            _buildSubmitButton(),
+            _buildSubmitButton(context),
             const SizedBox(height: 20),
-            _buildReviewsList(),
+            _buildReviewsList(context, reviews),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildPsychologistCard() {
+  Widget _buildPsychologistCard(String psicologoNome) {
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       elevation: 4,
@@ -121,7 +111,7 @@ class _AvaliarPsicologoScreenState extends State<AvaliarPsicologoScreen> {
             ),
             const SizedBox(height: 10),
             Text(
-              widget.psicologoNome,
+              psicologoNome,
               style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const Text(
@@ -146,44 +136,51 @@ class _AvaliarPsicologoScreenState extends State<AvaliarPsicologoScreen> {
     );
   }
 
-  Widget _buildRatingSection() {
-    return Card(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      elevation: 4,
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              "Como você avalia a consulta?",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+  Widget _buildRatingSection(BuildContext context) {
+    return BlocBuilder<ReviewCubit, ReviewState>(
+      builder: (context, state) {
+        int currentRating = 0;
+        if (state is ReviewRated) {
+          currentRating = state.rating;
+        }
+        
+        return Card(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          elevation: 4,
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  "Como você avalia a consulta?",
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 10),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: List.generate(5, (index) {
+                    return IconButton(
+                      icon: Icon(
+                        index < currentRating ? Icons.star : Icons.star_border,
+                        color: Colors.amber,
+                        size: 40,
+                      ),
+                      onPressed: () {
+                        context.read<ReviewCubit>().setRating(index + 1);
+                      },
+                    );
+                  }),
+                ),
+              ],
             ),
-            const SizedBox(height: 10),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: List.generate(5, (index) {
-                return IconButton(
-                  icon: Icon(
-                    index < _rating ? Icons.star : Icons.star_border,
-                    color: Colors.amber,
-                    size: 40,
-                  ),
-                  onPressed: () {
-                    setState(() {
-                      _rating = index + 1;
-                    });
-                  },
-                );
-              }),
-            ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 
-  Widget _buildCommentSection() {
+  Widget _buildCommentSection(BuildContext context) {
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       elevation: 4,
@@ -198,7 +195,7 @@ class _AvaliarPsicologoScreenState extends State<AvaliarPsicologoScreen> {
             ),
             const SizedBox(height: 10),
             TextField(
-              controller: _comentarioController,
+              controller: context.read<ReviewCubit>().comentarioController,
               maxLines: 3,
               decoration: const InputDecoration(
                 hintText: 'Escreva aqui sua experiência...',
@@ -211,11 +208,11 @@ class _AvaliarPsicologoScreenState extends State<AvaliarPsicologoScreen> {
     );
   }
 
-  Widget _buildSubmitButton() {
+  Widget _buildSubmitButton(BuildContext context) {
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
-        onPressed: _enviarAvaliacao,
+        onPressed: () => context.read<ReviewCubit>().enviarAvaliacao(),
         style: ElevatedButton.styleFrom(
           backgroundColor: AppTheme.primaryColor,
           padding: const EdgeInsets.symmetric(vertical: 16),
@@ -231,7 +228,7 @@ class _AvaliarPsicologoScreenState extends State<AvaliarPsicologoScreen> {
     );
   }
 
-  Widget _buildReviewsList() {
+  Widget _buildReviewsList(BuildContext context, List<ReviewEntity> reviews) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -243,9 +240,9 @@ class _AvaliarPsicologoScreenState extends State<AvaliarPsicologoScreen> {
         ListView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
-          itemCount: _reviews.length,
+          itemCount: reviews.length,
           itemBuilder: (context, index) {
-            final review = _reviews[index];
+            final review = reviews[index];
             return Card(
               margin: const EdgeInsets.only(bottom: 10),
               child: Padding(
@@ -300,16 +297,7 @@ class _AvaliarPsicologoScreenState extends State<AvaliarPsicologoScreen> {
                                       TextButton(
                                         onPressed: () {
                                           Navigator.of(context).pop();
-                                          setState(() {
-                                            MockReviews.deleteReview(review.id);
-                                            _reviews = MockReviews.getReviewsByPsicologoId(widget.psicologoId);
-                                          });
-                                          ScaffoldMessenger.of(context).showSnackBar(
-                                            const SnackBar(
-                                              content: Text('Comentário excluído com sucesso!'),
-                                              backgroundColor: Colors.green,
-                                            ),
-                                          );
+                                          context.read<ReviewCubit>().deleteReview(review.id);
                                         },
                                         child: const Text('Excluir', style: TextStyle(color: Colors.red)),
                                       ),
