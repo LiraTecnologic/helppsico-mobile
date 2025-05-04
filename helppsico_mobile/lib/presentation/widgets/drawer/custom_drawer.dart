@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:helppsico_mobile/presentation/views/dashboard_screen.dart';
 import 'package:helppsico_mobile/presentation/views/documents_screen.dart';
@@ -7,6 +8,7 @@ import 'package:helppsico_mobile/presentation/views/notifications_screen.dart';
 import 'package:helppsico_mobile/presentation/views/rate_screen.dart';
 import 'package:helppsico_mobile/presentation/views/sessions_wrapper.dart';
 import '../../../core/theme.dart';
+import 'package:helppsico_mobile/presentation/viewmodels/cubit/auth_cubit.dart';
 class CustomDrawer extends StatelessWidget {
   const CustomDrawer({super.key});
 
@@ -133,6 +135,8 @@ class CustomDrawer extends StatelessWidget {
                   icon: Icons.logout,
                   title: "Sair",
                   onTap: () {
+                    final authCubit = context.read<AuthCubit>();
+                    authCubit.logout();
                     Navigator.pop(context);
                     Navigator.pushReplacement(
                       context,
