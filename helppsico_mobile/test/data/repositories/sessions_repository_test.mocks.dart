@@ -7,7 +7,7 @@ import 'dart:async' as _i4;
 
 import 'package:helppsico_mobile/core/services/http/generic_http_service.dart'
     as _i2;
-import 'package:helppsico_mobile/data/datasource/sessionsDataSource.dart'
+import 'package:helppsico_mobile/data/datasource/sessions_data_source.dart'
     as _i3;
 import 'package:mockito/mockito.dart' as _i1;
 

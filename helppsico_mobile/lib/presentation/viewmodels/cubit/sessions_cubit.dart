@@ -2,7 +2,8 @@
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:helppsico_mobile/data/repositories/sessions_repository.dart';
-import 'package:helppsico_mobile/presentation/viewmodels/bloc/sessions_state.dart';
+import 'package:helppsico_mobile/presentation/viewmodels/state/sessions_state.dart';
+
 
 class SessionsCubit extends Cubit<SessionsState>{
 

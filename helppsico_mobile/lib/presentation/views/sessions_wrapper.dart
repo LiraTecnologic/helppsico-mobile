@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:helppsico_mobile/core/services/http/generic_http_service.dart';
-import 'package:helppsico_mobile/data/datasource/sessionsDataSource.dart';
+import 'package:helppsico_mobile/data/datasource/sessions_data_source.dart';
 import 'package:helppsico_mobile/data/repositories/sessions_repository.dart';
 import 'package:helppsico_mobile/presentation/viewmodels/cubit/sessions_cubit.dart';
 import 'package:helppsico_mobile/presentation/views/sessions_screen.dart';

@@ -2,7 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:mockito/annotations.dart';
 import 'package:helppsico_mobile/core/services/http/generic_http_service.dart';
-import 'package:helppsico_mobile/data/datasource/sessionsDataSource.dart';
+import 'package:helppsico_mobile/data/datasource/sessions_data_source.dart';
 
 @GenerateNiceMocks([MockSpec<IGenericHttp>()])
 import 'sessions_data_source_test.mocks.dart';

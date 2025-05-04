@@ -1,4 +1,4 @@
-import 'package:helppsico_mobile/data/datasource/sessionsDataSource.dart';
+import 'package:helppsico_mobile/data/datasource/sessions_data_source.dart';
 import '../../domain/entities/session_model.dart';
 
 class SessionRepository {

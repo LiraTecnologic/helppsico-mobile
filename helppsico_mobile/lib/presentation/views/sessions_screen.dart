@@ -2,11 +2,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:helppsico_mobile/domain/entities/session_model.dart';
-import 'package:helppsico_mobile/presentation/widgets/notifications/custom_app_bar.dart';
+import 'package:helppsico_mobile/presentation/viewmodels/state/sessions_state.dart';
+import 'package:helppsico_mobile/presentation/widgets/common/custom_app_bar.dart';
+import 'package:helppsico_mobile/presentation/widgets/drawer/custom_drawer.dart';
 import 'package:helppsico_mobile/presentation/widgets/sessions/session_card_widget.dart';
 import 'package:helppsico_mobile/presentation/widgets/sessions/session_tab_bar_widget.dart';
 import 'package:helppsico_mobile/presentation/viewmodels/cubit/sessions_cubit.dart';
-import 'package:helppsico_mobile/presentation/viewmodels/bloc/sessions_state.dart';
+
 
 
 
@@ -31,7 +33,8 @@ class _SessionsPageState extends State<SessionsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
-      appBar: CustomAppBar(),
+      appBar: const CustomAppBar(),
+      drawer: const CustomDrawer(),
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.red,
         onPressed: () {
