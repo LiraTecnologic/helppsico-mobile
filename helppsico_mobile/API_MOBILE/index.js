@@ -2,7 +2,11 @@ const express = require('express');
 const app = express();
 const port = 7000;
 const cors = require('cors');
-const fs = require('fs');  // Add this line to import the fs module
+const fs = require('fs');
+const jwt = require('jsonwebtoken');
+
+// Chave secreta para assinar os tokens JWT
+const JWT_SECRET = 'helppsico-secret-key-2024';
 
 app.use(cors());
 app.use(express.json());
@@ -494,11 +498,58 @@ app.post('/login', (req, res) => {
     const user = users.find(u => u.email === email && u.password === password);
     
     if (user) {
-      return res.status(200).json({ message: 'User validated successfully' });
+      // Gerar nome do usuário a partir do email
+      const name = email.split('@')[0];
+      
+      // Criar payload do token
+      const payload = {
+        id: user.id,
+        email: user.email,
+        name: name,
+        role: 'patient',
+        // Você pode adicionar mais informações ao payload conforme necessário
+      };
+      
+      // Gerar token JWT
+      const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '24h' });
+      
+      return res.status(200).json({ 
+        message: 'User validated successfully',
+        token: token,
+        user: {
+          id: user.id,
+          name: name,
+          email: user.email,
+          role: 'patient'
+        }
+      });
     } else {
       return res.status(401).json({ message: 'Invalid email or password' });
     }
   });
+});
+
+// Middleware para verificar o token JWT
+const verifyToken = (req, res, next) => {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
+  
+  if (!token) {
+    return res.status(401).json({ message: 'Access denied. No token provided.' });
+  }
+  
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET);
+    req.user = decoded;
+    next();
+  } catch (error) {
+    return res.status(401).json({ message: 'Invalid token' });
+  }
+};
+
+// Rota protegida de exemplo
+app.get('/protected', verifyToken, (req, res) => {
+  res.json({ message: 'This is a protected route', user: req.user });
 });
 
 
