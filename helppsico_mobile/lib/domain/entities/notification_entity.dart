@@ -17,6 +17,8 @@ class NotificationEntity {
     this.actionText,
   });
 
+
+  
   factory NotificationEntity.fromJson(Map<String, dynamic> json) {
     return NotificationEntity(
       id: json['id'],

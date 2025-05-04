@@ -1,21 +1,24 @@
-import '../../domain/entities/notification_entity.dart';
-import '../datasource/notification_datasource.dart';
 
-abstract class NotificationRepository {
-  Future<List<NotificationEntity>> getNotifications();
-}
+import 'package:helppsico_mobile/data/datasource/notification_data_source.dart';
+import 'package:helppsico_mobile/domain/entities/notification_entity.dart';
 
-class NotificationRepositoryImpl implements NotificationRepository {
-  final NotificationDatasource _datasource;
 
-  NotificationRepositoryImpl(this._datasource);
+class NotificationRepository {
+  final NotificationDataSource _notificationDataSource;
+  NotificationRepository(this._notificationDataSource);
 
-  @override
   Future<List<NotificationEntity>> getNotifications() async {
-    try {
-      return await _datasource.getNotifications();
-    } catch (e) {
-      throw Exception('Failed to fetch notifications: $e');
+    final response = await _notificationDataSource.getNotifications();
+   
+    if (response.statusCode == 200) {
+      final List<dynamic> jsonList = response.body;
+      final List<NotificationEntity> notifications = jsonList
+          .map((json) => NotificationEntity.fromJson(json as Map<String, dynamic>))
+          .toList();
+      
+      return notifications;
+    } else {
+      throw Exception('Failed to load notifications');
     }
   }
 }

@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import '../../../core/theme.dart';
-import '../../screens/dashboard_screen.dart';
-import '../../screens/sessions_screen.dart';
-import '../../screens/documents_screen.dart';
-import '../../screens/notifications_screen.dart';
-import '../../screens/login_screen.dart';
-import '../../screens/rate_screen.dart';
 
+import 'package:helppsico_mobile/presentation/views/dashboard_screen.dart';
+import 'package:helppsico_mobile/presentation/views/documents_screen.dart';
+import 'package:helppsico_mobile/presentation/views/login_screen.dart';
+import 'package:helppsico_mobile/presentation/views/notifications_screen.dart';
+import 'package:helppsico_mobile/presentation/views/rate_screen.dart';
+import 'package:helppsico_mobile/presentation/views/sessions_wrapper.dart';
+import '../../../core/theme.dart';
 class CustomDrawer extends StatelessWidget {
   const CustomDrawer({super.key});
 
@@ -72,7 +72,7 @@ class CustomDrawer extends StatelessWidget {
                       if (ModalRoute.of(context)?.settings.name != '/sessions') {
                         Navigator.pushReplacement(
                           context,
-                          MaterialPageRoute(builder: (context) => const SessionsPage()),
+                          MaterialPageRoute(builder: (context) => const SessionsWrapper()),
                         );
                       }
                     },

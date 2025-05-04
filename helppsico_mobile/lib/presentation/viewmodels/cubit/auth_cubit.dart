@@ -1,6 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:helppsico_mobile/presentation/viewmodels/state/auth_state.dart';
+
 import 'package:helppsico_mobile/core/services/auth/auth_service.dart';
+import 'package:helppsico_mobile/presentation/viewmodels/state/auth_state.dart';
 
 
 class AuthCubit extends Cubit<AuthState> {

@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:helppsico_mobile/presentation/screens/documents_screen.dart';
-import 'package:helppsico_mobile/presentation/screens/login_screen.dart';
-import 'package:helppsico_mobile/presentation/screens/dashboard_screen.dart';
-import 'package:helppsico_mobile/presentation/screens/notifications_screen.dart';
+import 'package:helppsico_mobile/presentation/views/documents_screen.dart';
+import 'package:helppsico_mobile/presentation/views/login_screen.dart';
+import 'package:helppsico_mobile/presentation/views/dashboard_screen.dart';
+import 'package:helppsico_mobile/presentation/views/notifications_screen.dart';
+import 'package:helppsico_mobile/presentation/views/rate_screen.dart';
+import 'package:helppsico_mobile/presentation/views/sessions_screen.dart';
+import 'package:helppsico_mobile/presentation/views/sessions_wrapper.dart';
 
-import 'package:helppsico_mobile/presentation/screens/rate_screen.dart';
 
-import 'package:helppsico_mobile/presentation/screens/sessions_screen.dart';
+
+
 
 
 
@@ -16,13 +19,7 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-
-  
-
-
-
-  const MyApp({super.key});
-
+  const MyApp({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +32,7 @@ class MyApp extends StatelessWidget {
         fontFamily: 'Roboto',
       ),
 
-      initialRoute: '/menu',
+      initialRoute: '/login',
 
 
       routes: {
@@ -47,10 +44,9 @@ class MyApp extends StatelessWidget {
           psicologoNome: 'Dra. Ana Martins', 
         ),
         '/documents' : (context) => const DocumentsScreen(),
-        '/sessions' : (context) => const SessionsPage(),
+        '/sessions' : (context) => const SessionsWrapper(),
 
       },
     );
   }
 }
-
