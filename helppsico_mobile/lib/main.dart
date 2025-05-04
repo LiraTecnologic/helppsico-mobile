@@ -3,7 +3,14 @@ import 'package:helppsico_mobile/presentation/views/documents_screen.dart';
 import 'package:helppsico_mobile/presentation/views/login_screen.dart';
 import 'package:helppsico_mobile/presentation/views/dashboard_screen.dart';
 import 'package:helppsico_mobile/presentation/views/notifications_screen.dart';
+import 'package:helppsico_mobile/presentation/views/rate_screen.dart';
+import 'package:helppsico_mobile/presentation/views/sessions_screen.dart';
 import 'package:helppsico_mobile/presentation/views/sessions_wrapper.dart';
+
+
+
+
+
 
 
 
@@ -24,13 +31,21 @@ class MyApp extends StatelessWidget {
         scaffoldBackgroundColor: Colors.white,
         fontFamily: 'Roboto',
       ),
+
       initialRoute: '/login',
+
+
       routes: {
         '/notifications': (context) => const NotificationsScreen(),
         '/login': (context) => const LoginScreen(),
         '/menu': (context) => const DashboardScreen(),
-        '/documents': (context) => const DocumentsScreen(),
-        '/sessions': (context) => const SessionsWrapper(),
+        '/avaliar-psicologo': (context) => const AvaliarPsicologoScreen(
+          psicologoId: '1', 
+          psicologoNome: 'Dra. Ana Martins', 
+        ),
+        '/documents' : (context) => const DocumentsScreen(),
+        '/sessions' : (context) => const SessionsWrapper(),
+
       },
     );
   }

@@ -1,45 +1,16 @@
 import 'package:flutter/material.dart';
-
-class DocumentItem {
-  final String title;
-  final String date;
-  final String fileSize;
-  final String fileType;
-  final bool isFavorite;
-
-  DocumentItem({
-    required this.title,
-    required this.date,
-    required this.fileSize,
-    required this.fileType,
-    required this.isFavorite,
-  });
-
-  DocumentItem copyWith({
-    String? title,
-    String? date,
-    String? fileSize,
-    String? fileType,
-    bool? isFavorite,
-  }) {
-    return DocumentItem(
-      title: title ?? this.title,
-      date: date ?? this.date,
-      fileSize: fileSize ?? this.fileSize,
-      fileType: fileType ?? this.fileType,
-      isFavorite: isFavorite ?? this.isFavorite,
-    );
-  }
-}
+import '../../../domain/entities/document_model.dart';
 
 class DocumentListItem extends StatelessWidget {
-  final DocumentItem document;
+  final DocumentModel document;
   final VoidCallback onFavoritePressed;
+  final VoidCallback onDeletePressed;
 
   const DocumentListItem({
     super.key,
     required this.document,
     required this.onFavoritePressed,
+    required this.onDeletePressed,
   });
 
   @override
@@ -47,9 +18,7 @@ class DocumentListItem extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Container(
-
-        
-        decoration: BoxDecoration( 
+        decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12),
           color: Colors.white,
           boxShadow: [
@@ -61,13 +30,24 @@ class DocumentListItem extends StatelessWidget {
           ],
         ),
         child: ListTile(
-          
           leading: _buildFileTypeIcon(),
           title: Text(document.title),
-          subtitle: Text('${document.date} • ${document.fileSize}'),
+          subtitle: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(document.patientName),
+              Text('${_formatDate(document.date)} • ${document.fileSize}'),
+            ],
+          ),
           trailing: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
+              IconButton(
+                icon: const Icon(Icons.download),
+                onPressed: () {
+                  // Implementar lógica de download
+                },
+              ),
               IconButton(
                 icon: Icon(
                   document.isFavorite ? Icons.star : Icons.star_border,
@@ -75,11 +55,25 @@ class DocumentListItem extends StatelessWidget {
                 ),
                 onPressed: onFavoritePressed,
               ),
-              IconButton(
+              PopupMenuButton<String>(
                 icon: const Icon(Icons.more_vert),
-                onPressed: () {
-                //implementar
+                onSelected: (value) {
+                  if (value == 'delete') {
+                    onDeletePressed();
+                  }
                 },
+                itemBuilder: (BuildContext context) => [
+                  const PopupMenuItem<String>(
+                    value: 'delete',
+                    child: Row(
+                      children: [
+                        Icon(Icons.delete_outline, color: Colors.red),
+                        SizedBox(width: 8),
+                        Text('Excluir'),
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
@@ -89,19 +83,53 @@ class DocumentListItem extends StatelessWidget {
   }
 
   Widget _buildFileTypeIcon() {
+    Color backgroundColor;
+    Color textColor;
+    
+    switch (document.type) {
+      case DocumentType.ATESTADO:
+        backgroundColor = Colors.purple.withOpacity(0.1);
+        textColor = Colors.purple;
+        break;
+      case DocumentType.DECLARACAO:
+        backgroundColor = Colors.blue.withOpacity(0.1);
+        textColor = Colors.blue;
+        break;
+      case DocumentType.RELATORIO_PSICOLOGICO:
+        backgroundColor = Colors.orange.withOpacity(0.1);
+        textColor = Colors.orange;
+        break;
+      case DocumentType.RELATORIO_MULTIPROFISSIONAL:
+        backgroundColor = Colors.green.withOpacity(0.1);
+        textColor = Colors.green;
+        break;
+      case DocumentType.LAUDO_PSICOLOGICO:
+        backgroundColor = Colors.red.withOpacity(0.1);
+        textColor = Colors.red;
+        break;
+      case DocumentType.PARECER_PSICOLOGICO:
+        backgroundColor = Colors.indigo.withOpacity(0.1);
+        textColor = Colors.indigo;
+        break;
+    }
+
     return Container(
       padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
-        color: document.fileType == 'PDF' ? Colors.red.withOpacity(0.1) : Colors.blue.withOpacity(0.1),
+        color: backgroundColor,
         borderRadius: BorderRadius.circular(8),
       ),
       child: Text(
         document.fileType,
         style: TextStyle(
-          color: document.fileType == 'PDF' ? Colors.red : Colors.blue,
+          color: textColor,
           fontWeight: FontWeight.bold,
         ),
       ),
     );
+  }
+
+  String _formatDate(DateTime date) {
+    return '${date.day}/${date.month}/${date.year}';
   }
 }

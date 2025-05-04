@@ -8,6 +8,7 @@ enum SessionStatus {
   completed, // Finalizada
 }
 
+
 class SessionCardWidget extends StatelessWidget {
   final SessionModel session;
 

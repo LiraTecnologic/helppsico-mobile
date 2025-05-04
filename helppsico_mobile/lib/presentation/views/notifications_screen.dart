@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:helppsico_mobile/data/datasource/notificationDataSource.dart';
+import 'package:helppsico_mobile/data/datasource/notification_data_source.dart';
 import 'package:helppsico_mobile/data/repositories/notifications_repository.dart';
 import 'package:helppsico_mobile/presentation/viewmodels/cubit/notifications_cubit.dart';
-import 'package:helppsico_mobile/presentation/viewmodels/bloc/notifications_state.dart';
-import 'package:helppsico_mobile/presentation/widgets/notifications/custom_app_bar.dart';
+import 'package:helppsico_mobile/presentation/viewmodels/state/notifications_state.dart';
+import 'package:helppsico_mobile/presentation/widgets/common/custom_app_bar.dart';
+import 'package:helppsico_mobile/presentation/widgets/drawer/custom_drawer.dart';
 import 'package:helppsico_mobile/presentation/widgets/notifications/notification_card.dart';
 import 'package:helppsico_mobile/core/services/http/generic_http_service.dart';
 import 'package:helppsico_mobile/presentation/views/sessions_wrapper.dart';
@@ -25,10 +26,8 @@ class NotificationsScreen extends StatelessWidget {
                 ..fetchNotifications(),
       child: Scaffold(
         backgroundColor: const Color(0xFFF7F7F7),
-        appBar: CustomAppBar(
-          onMenuPressed: () {},
-          onNotificationPressed: () {},
-        ),
+        appBar: CustomAppBar(),
+        drawer: const CustomDrawer(),
         floatingActionButton: FloatingActionButton.small(
           onPressed: () {
             Navigator.push(

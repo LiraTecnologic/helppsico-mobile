@@ -1,139 +1,145 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:helppsico_mobile/presentation/views/documents_screen.dart';
+import 'package:helppsico_mobile/presentation/views/sessions_wrapper.dart';
 import '../../core/theme.dart';
-import '../widgets/common/session_card.dart';
 import '../widgets/common/document_card.dart';
+import '../../domain/entities/document_model.dart';
+import '../widgets/drawer/custom_drawer.dart';
+import 'package:helppsico_mobile/presentation/widgets/common/custom_app_bar.dart';
+import '../viewmodels/cubit/dashboard_cubit.dart';
+import '../viewmodels/state/dashboard_state.dart';
+import '../widgets/sessions/session_card_widget.dart';
 
-class DashboardScreen extends StatelessWidget {
+class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: AppTheme.primaryColor,
-        iconTheme: const IconThemeData(color: Colors.white),
-        title: Container(
-          padding: const EdgeInsets.all(4),
-          decoration: BoxDecoration(
-            color: Colors.transparent,
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Image.asset(
-            'assets/icons/logo.png',
-            height: 65,
-            width: 65,
-          ),
-        ),
-        centerTitle: true,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.notifications, color: Colors.white),
-            onPressed: () {},
-          ),
-        ],
-      ),
-      drawer: _buildDrawer(context),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              "Próxima sessão",
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 10),
-            const SessionCard(),
-            const SizedBox(height: 10),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: ElevatedButton(
-                onPressed: () {},
-                child: const Text("Todas sessões"),
-              ),
-            ),
-            const SizedBox(height: 20),
-            const Text(
-              "Último documento",
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 10),
-            const DocumentCard(),
-            const SizedBox(height: 10),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: ElevatedButton(
-                onPressed: () {},
-                child: const Text("Documentos"),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
+  State<DashboardScreen> createState() => _DashboardScreenState();
+}
+
+class _DashboardScreenState extends State<DashboardScreen> {
+  late final DashboardCubit _cubit;
+
+  @override
+  void initState() {
+    super.initState();
+    _cubit = DashboardCubit();
+    _cubit.loadData();
   }
 
-  Widget _buildDrawer(BuildContext context) {
-    return SizedBox(
-      width: MediaQuery.of(context).size.width * 0.7,
-      child: Drawer(
-        child: Container(
-          color: AppTheme.primaryColor,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Column(
-                children: [
-                  const SizedBox(height: 20), 
-                  Stack(
+  @override
+  void dispose() {
+    _cubit.close();
+    super.dispose();
+  }
+
+  IconData _getDocumentIcon(DocumentType type) {
+    switch (type) {
+      case DocumentType.ATESTADO:
+        return Icons.medical_services;
+      case DocumentType.DECLARACAO:
+        return Icons.description;
+      case DocumentType.RELATORIO_PSICOLOGICO:
+        return Icons.psychology;
+      case DocumentType.RELATORIO_MULTIPROFISSIONAL:
+        return Icons.group;
+      case DocumentType.LAUDO_PSICOLOGICO:
+        return Icons.assessment;
+      case DocumentType.PARECER_PSICOLOGICO:
+        return Icons.send;
+      default:
+        return Icons.insert_drive_file;
+    }
+  }
+
+
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (context) => _cubit,
+      child: Scaffold(
+        appBar: const CustomAppBar(),
+        drawer: const CustomDrawer(),
+        body: BlocBuilder<DashboardCubit, DashboardState>(
+          builder: (context, state) {
+            if (state is DashboardLoading) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (state is DashboardError) {
+              return Center(child: Text(state.message));
+            } else if (state is DashboardLoaded) {
+              return SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Align(
-                        alignment: Alignment.center,
-                        child: const Text(
-                          "Menu",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 32,
-                            fontWeight: FontWeight.bold,
+                      const Text(
+                        "Próxima sessão",
+                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 10),
+                      if (state.nextSession != null)
+                        SessionCardWidget(
+                          session: state.nextSession!,
+                        ),
+                      const SizedBox(height: 10),
+                      SizedBox(
+                        width: 150,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => const SessionsWrapper()),
+                            );
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppTheme.secondaryColor,
+                            foregroundColor: Colors.white,
                           ),
+                          child: const Text("Ver mais"),
                         ),
                       ),
-                      Positioned(
-                        bottom: 20,
-                        right: 0,
-                        child: IconButton(
-                          icon: const Icon(Icons.menu, color: Colors.white, size: 25),
+                      const SizedBox(height: 20),
+                      const Text(
+                        "Último documento",
+                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 10),
+                      if (state.lastDocument != null)
+                        DocumentCard(
+                          title: state.lastDocument!.title,
+                          date: "${state.lastDocument!.date.day}/${state.lastDocument!.date.month}",
+                          icon: _getDocumentIcon(state.lastDocument!.type),
+                          onTap: null,
+                        ),
+                      const SizedBox(height: 10),
+                      SizedBox(
+                        width: 150,
+                        child: ElevatedButton(
                           onPressed: () {
-                            Navigator.pop(context);
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => const DocumentsScreen()),
+                            );
                           },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppTheme.secondaryColor,
+                            foregroundColor: Colors.white,
+                          ),
+                          child: const Text("Ver mais"),
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 24), 
-                  _buildDrawerItem(Icons.notifications, "Notificações"),
-                  _buildDrawerItem(Icons.calendar_today, "Sessões"),
-                  _buildDrawerItem(Icons.insert_drive_file, "Documentos"),
-                  _buildDrawerItem(Icons.star, "Avaliar psicólogo"),
-                  _buildDrawerItem(Icons.home, "Meu painel"),
-                ],
-              ),
-              Padding(
-                padding: const EdgeInsets.only(bottom: 16.0),
-                child: _buildDrawerItem(Icons.exit_to_app, "Sair"),
-              ),
-            ],
-          ),
+                ),
+              );
+            }
+            return const SizedBox.shrink();
+          },
         ),
       ),
-    );
-  }
-
-  Widget _buildDrawerItem(IconData icon, String title) {
-    return ListTile(
-      leading: Icon(icon, color: const Color.fromARGB(255, 255, 255, 255)),
-      title: Text(title, style: const TextStyle(color: Color.fromARGB(255, 255, 255, 255))),
-      onTap: () {},
     );
   }
 }

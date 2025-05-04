@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:helppsico_mobile/presentation/viewmodels/bloc/auth_state.dart';
 import 'package:helppsico_mobile/presentation/viewmodels/cubit/auth_cubit.dart';
-import 'package:helppsico_mobile/presentation/views/notifications_screen.dart';
+import 'package:helppsico_mobile/presentation/viewmodels/state/auth_state.dart';
+import 'package:helppsico_mobile/presentation/views/dashboard_screen.dart';
+
 import 'package:helppsico_mobile/presentation/widgets/common/custom_button.dart';
 import 'package:helppsico_mobile/presentation/widgets/common/custom_text_field.dart';
 import 'package:helppsico_mobile/presentation/widgets/common/text_divider.dart';
@@ -45,7 +46,7 @@ class _LoginScreenState extends State<LoginScreen> {
             );
             Navigator.of(context).pushReplacement(
               MaterialPageRoute(
-                builder: (context) => const NotificationsScreen(),
+                builder: (context) => const DashboardScreen(),
               ),
             );
           } else if (state is AuthFailure) {
@@ -106,6 +107,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 return null;
                               },
                             ),
+                            const SizedBox(height: 16.0),
                             CustomTextField(
                               controller: _passwordController,
                               hintText: 'Senha',
@@ -142,7 +144,6 @@ class _LoginScreenState extends State<LoginScreen> {
                               child: TextLink(
                                 text: 'Esqueceu a senha?',
                                 onTap: () {
-                                 
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     const SnackBar(
                                       content: Text(
@@ -166,9 +167,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 ),
                                 TextLink(
                                   text: 'Cadastre-se',
-                                  onTap: () {
-                                    
-                                  },
+                                  onTap: () {},
                                 ),
                               ],
                             ),
