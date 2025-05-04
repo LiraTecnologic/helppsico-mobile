@@ -1,0 +1,92 @@
+[
+  {
+    "id": "1",
+    "psicologoName": "Dra. Sofia Mendes",
+    "pacienteId": 1,
+    "data": "2024-04-01T14:30:00Z",
+    "valor": "150.00",
+    "endereco": "Rua das Flores, 123 - Sala 302",
+    "finalizada": false
+  },
+  {
+    "id": "2",
+    "psicologoName": "Dr. Ricardo Santos",
+    "pacienteId": 2,
+    "data": "2024-04-02T10:00:00Z",
+    "valor": "180.00",
+    "endereco": "Avenida Principal, 456 - Consultório 15",
+    "finalizada": true
+  },
+  {
+    "id": "3",
+    "psicologoName": "Dra. Laura Oliveira",
+    "pacienteId": 3,
+    "data": "2024-04-03T16:15:00Z",
+    "valor": "160.00",
+    "endereco": "Rua dos Psicólogos, 789 - Sala 501",
+    "finalizada": false
+  },
+  {
+    "id": "4",
+    "psicologoName": "Dr. Felipe Costa",
+    "pacienteId": 4,
+    "data": "2024-04-04T09:30:00Z",
+    "valor": "170.00",
+    "endereco": "Alameda Saúde, 321 - Consultório 08",
+    "finalizada": false
+  },
+  {
+    "id": "5",
+    "psicologoName": "Dra. Beatriz Lima",
+    "pacienteId": 5,
+    "data": "2024-04-05T15:45:00Z",
+    "valor": "155.00",
+    "endereco": "Rua do Bem-Estar, 654 - Sala 203",
+    "finalizada": true
+  },
+  {
+    "id": "6",
+    "psicologoName": "Dra. Sofia Mendes",
+    "pacienteId": 1,
+    "data": "2024-04-06T11:15:00Z",
+    "valor": "155.00",
+    "endereco": "Rua das Flores, 123 - Sala 302",
+    "finalizada": false
+  },
+  {
+    "id": "7",
+    "psicologoName": "Dr. Ricardo Santos",
+    "pacienteId": 2,
+    "data": "2024-04-07T14:45:00Z",
+    "valor": "175.00",
+    "endereco": "Avenida Principal, 456 - Consultório 15",
+    "finalizada": false
+  },
+  {
+    "id": "8",
+    "psicologoName": "Dra. Laura Oliveira",
+    "pacienteId": 3,
+    "data": "2024-04-08T10:45:00Z",
+    "valor": "165.00",
+    "endereco": "Rua dos Psicólogos, 789 - Sala 501",
+    "finalizada": false
+  },
+  {
+    "id": "9",
+    "psicologoName": "Dr. Felipe Costa",
+    "pacienteId": 4,
+    "data": "2024-04-09T16:00:00Z",
+    "valor": "185.00",
+    "endereco": "Alameda Saúde, 321 - Consultório 08",
+    "finalizada": false
+  },
+  {
+    "id": "10",
+    "psicologoName": "Dra. Beatriz Lima",
+    "pacienteId": 5,
+    "data": "2024-04-10T15:00:00Z",
+    "valor": "160.00",
+    "endereco": "Rua do Bem-Estar, 654 - Sala 203",
+    "finalizada": false
+  }
+]
