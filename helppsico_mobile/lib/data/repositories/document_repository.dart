@@ -3,7 +3,6 @@ import 'package:http/http.dart' as http;
 import '../../domain/entities/document_model.dart';
 
 class DocumentRepository {
-  
   final String baseUrl = 'http://10.0.2.2:7000'; 
 
   Future<List<DocumentModel>> getDocuments() async {
@@ -28,20 +27,17 @@ class DocumentRepository {
 
   Future<DocumentModel> uploadDocument(DocumentModel document) async {
     try {
-      
       var request = http.MultipartRequest(
         'POST',
         Uri.parse('$baseUrl/documents'),
       );
 
-      
       request.fields['title'] = document.title;
       request.fields['description'] = document.description;
       request.fields['type'] = document.type.toString().split('.').last;
       request.fields['patientId'] = document.patientId;
       request.fields['patientName'] = document.patientName;
 
-      
       if (document.fileUrl.isNotEmpty) {
         request.files.add(
           await http.MultipartFile.fromPath(
@@ -101,4 +97,21 @@ class DocumentRepository {
       throw Exception('Erro ao atualizar documento: $e');
     }
   }
-} 
+
+  Future<void> toggleFavorite(String documentId) async {
+    try {
+      final response = await http.put(
+        Uri.parse('$baseUrl/documents/$documentId/toggle-favorite'),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      );
+
+      if (response.statusCode != 200) {
+        throw Exception('Falha ao atualizar favorito: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Erro ao atualizar favorito: $e');
+    }
+  }
+}

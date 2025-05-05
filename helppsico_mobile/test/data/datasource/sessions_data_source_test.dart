@@ -24,17 +24,17 @@ void main() {
         headers: {'content-type': 'application/json'},
       );
 
-      when(mockHttp.get(baseUrl))
+      when(mockHttp.get(dataSource.baseUrl))
           .thenAnswer((_) async => mockResponse);
 
       final result = await dataSource.getSessions();
 
-      verify(mockHttp.get(baseUrl)).called(1);
+      verify(mockHttp.get(dataSource.baseUrl)).called(1);
       expect(result, equals(mockResponse));
     });
 
     test('getSessions should propagate errors from http client', () {
-      when(mockHttp.get(baseUrl))
+      when(mockHttp.get(dataSource.baseUrl))
           .thenThrow(Exception('Network error'));
 
       expect(

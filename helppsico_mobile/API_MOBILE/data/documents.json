@@ -1,0 +1,41 @@
+[
+  {
+    "id": "1",
+    "title": "Relatório Psicológico",
+    "description": "Relatório detalhado do paciente",
+    "date": "2024-01-17T00:00:00.000",
+    "fileSize": "2.4 MB",
+    "fileType": "PDF",
+    "type": "RELATORIO_PSICOLOGICO",
+    "isFavorite": true,
+    "patientId": "1",
+    "patientName": "João Silva",
+    "fileUrl": ""
+  },
+  {
+    "id": "2",
+    "title": "Laudo Psicológico",
+    "description": "Laudo de avaliação psicológica",
+    "date": "2024-01-16T00:00:00.000",
+    "fileSize": "1.2 MB",
+    "fileType": "DOC",
+    "type": "LAUDO_PSICOLOGICO",
+    "isFavorite": false,
+    "patientId": "2",
+    "patientName": "Maria Santos",
+    "fileUrl": ""
+  },
+  {
+    "id": "3",
+    "title": "Atestado",
+    "description": "Atestado para afastamento",
+    "date": "2024-01-15T00:00:00.000",
+    "fileSize": "0.8 MB",
+    "fileType": "PDF",
+    "type": "ATESTADO",
+    "isFavorite": false,
+    "patientId": "1",
+    "patientName": "João Silva",
+    "fileUrl": ""
+  }
+]

@@ -1,4 +1,4 @@
-import 'package:helppsico_mobile/data/datasource/sessions_data_source.dart';
+import 'package:helppsico_mobile/data/datasources/sessions_datasource.dart';
 import '../../domain/entities/session_model.dart';
 
 class SessionRepository {
@@ -14,7 +14,21 @@ class SessionRepository {
       
       return sessions;
     } else {
-      throw Exception('Failed to load sessions');
+      throw Exception('Falha ao carregar sessões');
+    }
+  }
+
+  Future<SessionModel?> getNextSession() async {
+    final response = await _sessionsDataSource.getNextSession();
+    
+    if (response.statusCode == 200) {
+      final dynamic jsonData = response.body;
+      if (jsonData is Map<String, dynamic> && jsonData.isNotEmpty) {
+        return SessionModel.fromJson(jsonData);
+      }
+      return null;
+    } else {
+      throw Exception('Falha ao carregar próxima sessão');
     }
   }
 }

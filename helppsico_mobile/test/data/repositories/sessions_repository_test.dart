@@ -6,15 +6,15 @@ import 'package:helppsico_mobile/data/datasource/sessions_data_source.dart';
 import 'package:helppsico_mobile/data/repositories/sessions_repository.dart';
 import 'package:helppsico_mobile/domain/entities/session_model.dart';
 
-@GenerateNiceMocks([MockSpec<SessionsDataSource>()])
+@GenerateNiceMocks([MockSpec<ISessionsDataSource>()])
 import 'sessions_repository_test.mocks.dart';
 
 void main() {
-  late MockSessionsDataSource mockDataSource;
+  late MockISessionsDataSource mockDataSource;
   late SessionRepository repository;
 
   setUp(() {
-    mockDataSource = MockSessionsDataSource();
+    mockDataSource = MockISessionsDataSource();
     repository = SessionRepository(mockDataSource);
   });
 

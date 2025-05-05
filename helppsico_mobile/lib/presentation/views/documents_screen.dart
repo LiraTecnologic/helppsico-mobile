@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:helppsico_mobile/data/mock_documents.dart';
+import 'package:helppsico_mobile/data/repositories/document_repository.dart';
 import 'package:helppsico_mobile/domain/entities/document_model.dart';
 import 'package:helppsico_mobile/presentation/widgets/documents/document_item.dart';
 import 'package:helppsico_mobile/presentation/widgets/documents/documents_tab_bar.dart';
@@ -15,7 +15,7 @@ class DocumentsScreen extends StatefulWidget {
 
 class _DocumentsScreenState extends State<DocumentsScreen> with SingleTickerProviderStateMixin {
   final TextEditingController _searchController = TextEditingController();
-  final MockDocumentRepository _documentRepository = MockDocumentRepository();
+  final DocumentRepository _documentRepository = DocumentRepository();
   List<DocumentModel> _documents = [];
   List<DocumentModel> _filteredDocuments = [];
   DocumentType? _selectedType;
@@ -63,15 +63,8 @@ class _DocumentsScreenState extends State<DocumentsScreen> with SingleTickerProv
 
   void _toggleFavorite(DocumentModel document) async {
     try {
-      final updatedDocument = document.copyWith(isFavorite: !document.isFavorite);
-      await _documentRepository.updateDocument(updatedDocument);
-      setState(() {
-        final index = _documents.indexWhere((d) => d.id == document.id);
-        if (index != -1) {
-          _documents[index] = updatedDocument;
-        }
-      });
-      _filterDocuments();
+      await _documentRepository.toggleFavorite(document.id);
+      await _loadDocuments(); // Recarrega a lista após atualizar o favorito
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(

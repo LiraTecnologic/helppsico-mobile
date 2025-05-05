@@ -1,0 +1,101 @@
+[
+  {
+    "id": "1",
+    "psicologoId": "Dr. João",
+    "pacienteId": "2",
+    "data": "2023-01-01 00:00:00",
+    "valor": "100.00",
+    "endereco": "Rua 1",
+    "finalizada": "false"
+  },
+  {
+    "id": "2",
+    "psicologoId": "Dra. Maria",
+    "pacienteId": "3",
+    "data": "2023-01-15 00:00:00",
+    "valor": "120.00",
+    "endereco": "Rua 2",
+    "finalizada": "true"
+  },
+  {
+    "id": "3",
+    "psicologoId": "Dr. Pedro",
+    "pacienteId": "4",
+    "data": "2023-02-01 00:00:00",
+    "valor": "150.00",
+    "endereco": "Rua 3",
+    "finalizada": "false"
+  },
+  {
+    "id": "4",
+    "psicologoId": "Dra. Ana",
+    "pacienteId": "5",
+    "data": "2023-02-15 00:00:00",
+    "valor": "130.00",
+    "endereco": "Rua 4",
+    "finalizada": "true"
+  },
+  {
+    "id": "5",
+    "psicologoId": "Dr. Carlos",
+    "pacienteId": "6",
+    "data": "2023-03-01 00:00:00",
+    "valor": "140.00",
+    "endereco": "Rua 5",
+    "finalizada": "false"
+  },
+  {
+    "id": "6",
+    "psicologoId": "Dra. Paula",
+    "pacienteId": "7",
+    "data": "2023-03-15 00:00:00",
+    "valor": "110.00",
+    "endereco": "Rua 6",
+    "finalizada": "true"
+  },
+  {
+    "id": "7",
+    "psicologoId": "Dr. Lucas",
+    "pacienteId": "8",
+    "data": "2023-04-01 00:00:00",
+    "valor": "160.00",
+    "endereco": "Rua 7",
+    "finalizada": "false"
+  },
+  {
+    "id": "8",
+    "psicologoId": "Dra. Julia",
+    "pacienteId": "9",
+    "data": "2023-04-15 00:00:00",
+    "valor": "170.00",
+    "endereco": "Rua 8",
+    "finalizada": "true"
+  },
+  {
+    "id": "9",
+    "psicologoId": "Dr. Miguel",
+    "pacienteId": "10",
+    "data": "2023-05-01 00:00:00",
+    "valor": "180.00",
+    "endereco": "Rua 9",
+    "finalizada": "false"
+  },
+  {
+    "id": "10",
+    "psicologoId": "Dra. Sofia",
+    "pacienteId": "11",
+    "data": "2023-05-15 00:00:00",
+    "valor": "190.00",
+    "endereco": "Rua 10",
+    "finalizada": "true"
+  },
+  {
+    "id": "11",
+    "psicologoId": "Dr. Rafael",
+    "pacienteId": "12",
+    "data": "2023-06-01 00:00:00",
+    "valor": "200.00",
+    "endereco": "Rua 11",
+    "finalizada": "false"
+  }
+]
