@@ -29,6 +29,7 @@ class SessionNotificationCubit extends Cubit<SessionNotificationState> {
     emit(SessionNotificationLoading());
     try {
       tz_data.initializeTimeZones();
+      tz.setLocalLocation(tz.getLocation('America/Sao_Paulo'));
       const AndroidInitializationSettings androidSettings = 
           AndroidInitializationSettings('@mipmap/ic_launcher');
       const DarwinInitializationSettings iosSettings = 
@@ -44,10 +45,11 @@ class SessionNotificationCubit extends Cubit<SessionNotificationState> {
         android: androidSettings,
         iOS: iosSettings,
       );
-      await _notificationsPlugin.initialize(
-        initSettings,
-        onDidReceiveNotificationResponse: _onNotificationTapped,
+     _notificationsPlugin.initialize(
+       initSettings,
+         onDidReceiveNotificationResponse: _onNotificationTapped,
       );
+      
       await _requestPermissions();
       await _createNotificationChannel();
       emit(SessionNotificationSuccess());
@@ -231,4 +233,42 @@ class SessionNotificationCubit extends Cubit<SessionNotificationState> {
       return _defaultSessionDuration;
     }
   }
+
+  Future<void> scheduleTestNotification(DateTime scheduledDate) async {
+  try {
+    final NotificationDetails details = NotificationDetails(
+      android: AndroidNotificationDetails(
+        'sessoes',
+        'Sessões',
+        channelDescription: 'Notificações de teste',
+        importance: Importance.high,
+        priority: Priority.high,
+        icon: '@mipmap/ic_launcher',
+      ),
+      iOS: const DarwinNotificationDetails(
+        presentAlert: true,
+        presentBadge: true,
+        presentSound: true,
+        categoryIdentifier: 'sessoes',
+      ),
+    );
+
+    await _notificationsPlugin.zonedSchedule(
+      999,
+      "Notificação de Teste",
+      "Essa é uma notificação de teste agendada para 10 segundos",
+      tz.TZDateTime.from(scheduledDate, tz.local),
+      details,
+      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+      payload: "teste",
+      
+    );
+
+    print("✅ Notificação de teste agendada para: $scheduledDate");
+
+  } catch (e) {
+    print("❌ Erro ao agendar notificação de teste: $e");
+    emit(SessionNotificationError("Erro no teste de notificação: $e"));
+  }
+}
 }

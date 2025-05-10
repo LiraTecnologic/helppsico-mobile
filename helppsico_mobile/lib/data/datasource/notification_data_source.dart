@@ -1,6 +1,6 @@
 
 import 'package:helppsico_mobile/core/services/http/generic_http_service.dart';
-String baseUrl = "http://localhost:7000/notifications";
+String baseUrl = "http://10.0.2.2:7000/notifications";
 
 abstract class INotificationDataSource {
   Future<HttpResponse> getNotifications();

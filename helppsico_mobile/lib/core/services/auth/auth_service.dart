@@ -7,7 +7,7 @@ import 'package:jwt_decoder/jwt_decoder.dart';
 class AuthService {
   final IGenericHttp _http;
   final SecureStorageService _storage;
-  final String _baseUrl = "http://localhost:7000"; 
+  final String _baseUrl = "http://10.0.2.2:7000"; 
 
   AuthService({
     IGenericHttp? http, 
