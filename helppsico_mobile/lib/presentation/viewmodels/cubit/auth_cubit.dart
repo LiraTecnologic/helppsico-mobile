@@ -17,7 +17,7 @@ class AuthCubit extends Cubit<AuthState> {
     checkAuthStatus();
   }
 
-  // Verificar o status de autenticação atual
+
   Future<void> checkAuthStatus() async {
     final isAuthenticated = await _authService.isAuthenticated();
     
@@ -44,7 +44,7 @@ class AuthCubit extends Cubit<AuthState> {
       final userData = await _authService.login(email, password);
       emit(AuthSuccess(userData));
       
-      // Imprimir informações do usuário após login
+    
       final userInfoPrinter = UserInfoPrinter(
         authService: _authService,
         storage: SecureStorageService(),
@@ -60,7 +60,7 @@ class AuthCubit extends Cubit<AuthState> {
     emit(const AuthInitial());
   }
   
-  // Obter o token JWT atual
+
   Future<String?> getToken() async {
     return await _authService.getToken();
   }

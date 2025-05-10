@@ -30,10 +30,10 @@ class AuthService {
         final token = response.body['token'];
         final userData = response.body['user'];
         
-        // Armazenar o token JWT
+   
         await _storage.saveToken(token);
         
-        // Armazenar os dados do usuário
+    
         await _storage.saveUserData(json.encode(userData));
 
         return AuthResponse(
@@ -52,16 +52,16 @@ class AuthService {
     }
   }
   
-  // Verificar se o usuário está autenticado
+  
   Future<bool> isAuthenticated() async {
     final token = await _storage.getToken();
     if (token == null) return false;
     
-    // Verificar se o token não expirou
+   
     return !JwtDecoder.isExpired(token);
   }
   
-  // Obter informações do usuário a partir do token
+  
   Future<Map<String, dynamic>?> getUserInfo() async {
     final token = await _storage.getToken();
     if (token == null) return null;
@@ -69,7 +69,7 @@ class AuthService {
     return JwtDecoder.decode(token);
   }
   
-  // Adicionar token às requisições
+ 
   Future<Map<String, String>> getAuthHeaders() async {
     final token = await _storage.getToken();
     if (token == null) return {};
@@ -79,8 +79,7 @@ class AuthService {
     };
   }
   
-  // Logout - remover token e dados do usuário
-  Future<void> logout() async {
+    Future<void> logout() async {
     await _storage.clearAll();
   }
 

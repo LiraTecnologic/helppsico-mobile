@@ -23,11 +23,11 @@ class GenericHttp implements IGenericHttp {
   @override
   Future<HttpResponse> get(String url, {Map<String, String>? headers}) async {
     try {
-      // Obter token de autenticação se disponível
+     
       final token = await _storage.getToken();
       final Map<String, String> authHeaders = (token != null) ? {'Authorization': 'Bearer $token'} : {};
       
-      // Mesclar headers
+  
       final Map<String, String> finalHeaders = {
         ...authHeaders,
         ...?headers,
@@ -47,11 +47,11 @@ class GenericHttp implements IGenericHttp {
   @override
   Future<HttpResponse> post(String url, dynamic body, {Map<String, String>? headers}) async {
     try {
-      // Obter token de autenticação se disponível
+      
       final token = await _storage.getToken();
       final Map<String, String> authHeaders = token != null ? {'Authorization': 'Bearer $token'} : {};
       
-      // Mesclar headers
+   
       final Map<String, String> finalHeaders = {
         'Content-Type': 'application/json',
         ...authHeaders,

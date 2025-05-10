@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../../domain/entities/session_model.dart';
+import 'session_notification_switch.dart';
 
 enum SessionStatus {
   open, // Em Aberto
@@ -86,17 +87,25 @@ class SessionCardWidget extends StatelessWidget {
 
             const SizedBox(height: 12),
             Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Icon(
-                  Icons.payments_outlined,
-                  size: 16,
-                  color: Color(0xFF666666),
+                Row(
+                  children: [
+                    const Icon(
+                      Icons.payments_outlined,
+                      size: 16,
+                      color: Color(0xFF666666),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      'R\$ ${session.valor}',
+                      style: TextStyle(color: Colors.grey[600], fontSize: 14),
+                    ),
+                  ],
                 ),
-                const SizedBox(width: 8),
-                Text(
-                  'R\$ ${session.valor}',
-                  style: TextStyle(color: Colors.grey[600], fontSize: 14),
-                ),
+                // Switch para ativar/desativar notificações
+                if (!session.finalizada)
+                  SessionNotificationSwitch(session: session),
               ],
             ),
           ],
