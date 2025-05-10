@@ -2,11 +2,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:helppsico_mobile/data/repositories/document_repository.dart';
 import 'package:helppsico_mobile/data/repositories/sessions_repository.dart';
 import 'package:helppsico_mobile/data/datasources/sessions_datasource.dart';
+import 'package:helppsico_mobile/data/datasources/documents_datasource.dart';
 import 'package:helppsico_mobile/core/services/http/generic_http_service.dart';
 import '../state/dashboard_state.dart';
 
 class DashboardCubit extends Cubit<DashboardState> {
-  final DocumentRepository _documentRepository = DocumentRepository();
+  final DocumentRepository _documentRepository = DocumentRepository(DocumentsDataSource(GenericHttp()));
   final SessionRepository _sessionRepository = SessionRepository(SessionsDataSource(GenericHttp()));
 
 

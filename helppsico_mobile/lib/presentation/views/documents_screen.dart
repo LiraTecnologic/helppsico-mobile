@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:helppsico_mobile/data/repositories/document_repository.dart';
+import 'package:helppsico_mobile/data/datasources/documents_datasource.dart';
+import 'package:helppsico_mobile/core/services/http/generic_http_service.dart';
 import 'package:helppsico_mobile/domain/entities/document_model.dart';
 import 'package:helppsico_mobile/presentation/widgets/documents/document_item.dart';
 import 'package:helppsico_mobile/presentation/widgets/documents/documents_tab_bar.dart';
@@ -15,7 +17,7 @@ class DocumentsScreen extends StatefulWidget {
 
 class _DocumentsScreenState extends State<DocumentsScreen> with SingleTickerProviderStateMixin {
   final TextEditingController _searchController = TextEditingController();
-  final DocumentRepository _documentRepository = DocumentRepository();
+  final DocumentRepository _documentRepository = DocumentRepository(DocumentsDataSource(GenericHttp()));
   List<DocumentModel> _documents = [];
   List<DocumentModel> _filteredDocuments = [];
   DocumentType? _selectedType;

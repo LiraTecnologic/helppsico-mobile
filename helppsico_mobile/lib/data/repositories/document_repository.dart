@@ -1,25 +1,16 @@
-import 'dart:convert';
-import 'package:http/http.dart' as http;
 import '../../domain/entities/document_model.dart';
+import '../datasources/documents_datasource.dart';
 
 class DocumentRepository {
-  final String baseUrl = 'http://10.0.2.2:7000'; 
+  final DocumentsDataSource _dataSource;
+
+  DocumentRepository(this._dataSource);
 
   Future<List<DocumentModel>> getDocuments() async {
     try {
-      final response = await http.get(
-        Uri.parse('$baseUrl/documents'),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      );
-      
-      if (response.statusCode == 200) {
-        final List<dynamic> jsonList = json.decode(response.body);
-        return jsonList.map((json) => DocumentModel.fromJson(json)).toList();
-      } else {
-        throw Exception('Falha ao carregar documentos: ${response.statusCode}');
-      }
+      final response = await _dataSource.getDocuments();
+      final List<dynamic> jsonList = response.body;
+      return jsonList.map((json) => DocumentModel.fromJson(json)).toList();
     } catch (e) {
       throw Exception('Erro ao buscar documentos: $e');
     }
@@ -27,35 +18,16 @@ class DocumentRepository {
 
   Future<DocumentModel> uploadDocument(DocumentModel document) async {
     try {
-      var request = http.MultipartRequest(
-        'POST',
-        Uri.parse('$baseUrl/documents'),
-      );
+      final metadata = {
+        'title': document.title,
+        'description': document.description,
+        'type': document.type.toString().split('.').last,
+        'patientId': document.patientId,
+        'patientName': document.patientName,
+      };
 
-      request.fields['title'] = document.title;
-      request.fields['description'] = document.description;
-      request.fields['type'] = document.type.toString().split('.').last;
-      request.fields['patientId'] = document.patientId;
-      request.fields['patientName'] = document.patientName;
-
-      if (document.fileUrl.isNotEmpty) {
-        request.files.add(
-          await http.MultipartFile.fromPath(
-            'file',
-            document.fileUrl,
-          ),
-        );
-      }
-
-      final response = await request.send();
-      final responseData = await response.stream.bytesToString();
-      final jsonData = json.decode(responseData);
-
-      if (response.statusCode == 201) {
-        return DocumentModel.fromJson(jsonData);
-      } else {
-        throw Exception('Falha ao fazer upload do documento: ${response.statusCode}');
-      }
+      final response = await _dataSource.uploadDocument(document.fileUrl, metadata);
+      return DocumentModel.fromJson(response.body);
     } catch (e) {
       throw Exception('Erro ao fazer upload do documento: $e');
     }
@@ -63,16 +35,7 @@ class DocumentRepository {
 
   Future<void> deleteDocument(String documentId) async {
     try {
-      final response = await http.delete(
-        Uri.parse('$baseUrl/documents/$documentId'),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      );
-
-      if (response.statusCode != 204) {
-        throw Exception('Falha ao deletar documento: ${response.statusCode}');
-      }
+      await _dataSource.deleteDocument(documentId);
     } catch (e) {
       throw Exception('Erro ao deletar documento: $e');
     }
@@ -80,19 +43,11 @@ class DocumentRepository {
 
   Future<DocumentModel> updateDocument(DocumentModel document) async {
     try {
-      final response = await http.put(
-        Uri.parse('$baseUrl/documents/${document.id}'),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: json.encode(document.toJson()),
+      final response = await _dataSource.updateDocument(
+        document.id!,
+        document.toJson(),
       );
-
-      if (response.statusCode == 200) {
-        return DocumentModel.fromJson(json.decode(response.body));
-      } else {
-        throw Exception('Falha ao atualizar documento: ${response.statusCode}');
-      }
+      return DocumentModel.fromJson(response.body);
     } catch (e) {
       throw Exception('Erro ao atualizar documento: $e');
     }
@@ -100,13 +55,7 @@ class DocumentRepository {
 
   Future<void> toggleFavorite(String documentId) async {
     try {
-      final response = await http.put(
-        Uri.parse('$baseUrl/documents/$documentId/toggle-favorite'),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      );
-
+      final response = await _dataSource.toggleFavorite(documentId);
       if (response.statusCode != 200) {
         throw Exception('Falha ao atualizar favorito: ${response.statusCode}');
       }
