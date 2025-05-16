@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:helppsico_mobile/core/services/auth/auth_service.dart';
+import 'package:helppsico_mobile/core/services/notification/notification_service.dart';
 import 'package:helppsico_mobile/presentation/viewmodels/cubit/auth_cubit.dart';
 import 'package:helppsico_mobile/presentation/views/documents_screen.dart';
 import 'package:helppsico_mobile/presentation/views/login_screen.dart';
@@ -12,6 +14,9 @@ import 'package:helppsico_mobile/presentation/views/sessions_wrapper.dart';
 import 'package:helppsico_mobile/presentation/viewmodels/state/auth_state.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  // Inicializa o serviço de notificações
+  NotificationService().init();
   runApp(const MyApp());
 }
 
@@ -38,7 +43,7 @@ class MyApp extends StatelessWidget {
             ),
             home: state is AuthSuccess ? const DashboardScreen() : const LoginScreen(),
             routes: {
-              '/notifications': (context) => const NotificationsScreen(),
+             
               '/login': (context) => const LoginScreen(),
               '/menu': (context) => const DashboardScreen(),
               '/avaliar-psicologo': (context) => const AvaliarPsicologoScreen(
@@ -47,6 +52,7 @@ class MyApp extends StatelessWidget {
               ),
               '/documents' : (context) => const DocumentsScreen(),
               '/sessions' : (context) => const SessionsWrapper(),
+              '/notifications': (context) => const NotificationsScreen(),
             },
           );
         },

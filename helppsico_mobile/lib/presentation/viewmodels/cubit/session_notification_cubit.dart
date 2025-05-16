@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:helppsico_mobile/core/services/notification/notification_service.dart';
 import 'package:helppsico_mobile/domain/entities/session_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timezone/timezone.dart' as tz;
@@ -82,6 +83,8 @@ class SessionNotificationCubit extends Cubit<SessionNotificationState> {
   
   void _onNotificationTapped(NotificationResponse response) {
     print('Notificação tocada: ${response.payload}');
+    // Delega o tratamento para o NotificationService
+    NotificationService().onNotificationReceived(response);
   }
   
   Future<void> scheduleSessionNotifications(SessionModel session) async {
@@ -138,7 +141,7 @@ class SessionNotificationCubit extends Cubit<SessionNotificationState> {
         channelDescription: 'Notificações de sessões agendadas',
         importance: Importance.high,
         priority: Priority.high,
-        icon: '@mipmap/ic_launcher',
+        icon: '@drawable/logonotifications',
       ),
       iOS: const DarwinNotificationDetails(
         presentAlert: true,
@@ -155,6 +158,15 @@ class SessionNotificationCubit extends Cubit<SessionNotificationState> {
       tz.TZDateTime.from(scheduledDate, tz.local),
       details,
       androidScheduleMode:AndroidScheduleMode.exactAllowWhileIdle,
+      payload: payload,
+    );
+    
+    // Salva a notificação no histórico
+    await NotificationService().saveNotification(
+      id: id,
+      title: title,
+      body: body,
+      scheduledDate: scheduledDate,
       payload: payload,
     );
   }
@@ -243,7 +255,7 @@ class SessionNotificationCubit extends Cubit<SessionNotificationState> {
         channelDescription: 'Notificações de teste',
         importance: Importance.high,
         priority: Priority.high,
-        icon: '@mipmap/ic_launcher',
+        icon: '@drawable/logonotifications',
       ),
       iOS: const DarwinNotificationDetails(
         presentAlert: true,
@@ -264,6 +276,15 @@ class SessionNotificationCubit extends Cubit<SessionNotificationState> {
       
     );
 
+    await NotificationService().saveNotification(
+      id: 999,
+      title: "Notificação de Teste",
+      body: "Essa é uma notificação de teste agendada para 10 segundos",
+      scheduledDate: scheduledDate,
+      payload: "teste",
+    );
+
+    // Exibe uma mensagem de sucesso no consol
     print("✅ Notificação de teste agendada para: $scheduledDate");
 
   } catch (e) {
@@ -271,4 +292,8 @@ class SessionNotificationCubit extends Cubit<SessionNotificationState> {
     emit(SessionNotificationError("Erro no teste de notificação: $e"));
   }
 }
+
+  
+  
+
 }

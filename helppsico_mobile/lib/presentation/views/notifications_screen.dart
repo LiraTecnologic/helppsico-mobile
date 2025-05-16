@@ -1,110 +1,139 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:helppsico_mobile/data/datasource/notification_data_source.dart';
-import 'package:helppsico_mobile/data/repositories/notifications_repository.dart';
+import 'package:get_it/get_it.dart';
+import 'package:helppsico_mobile/domain/entities/notification_entity.dart';
 import 'package:helppsico_mobile/presentation/viewmodels/cubit/notifications_cubit.dart';
 import 'package:helppsico_mobile/presentation/viewmodels/state/notifications_state.dart';
 import 'package:helppsico_mobile/presentation/widgets/common/custom_app_bar.dart';
 import 'package:helppsico_mobile/presentation/widgets/drawer/custom_drawer.dart';
 import 'package:helppsico_mobile/presentation/widgets/notifications/notification_card.dart';
-import 'package:helppsico_mobile/core/services/http/generic_http_service.dart';
-import 'package:helppsico_mobile/presentation/views/sessions_wrapper.dart';
 
-final IGenericHttp _http = GenericHttp();
-final _notificationDataSource = NotificationDataSource(_http);
-
-class NotificationsScreen extends StatelessWidget {
+class NotificationsScreen extends StatefulWidget {
   const NotificationsScreen({Key? key}) : super(key: key);
-  
+
+  @override
+  State<NotificationsScreen> createState() => _NotificationsScreenState();
+}
+
+class _NotificationsScreenState extends State<NotificationsScreen> {
+  late NotificationsCubit _notificationsCubit;
+
+  @override
+  void initState() {
+    super.initState();
+    // Use the singleton instance from GetIt
+    _notificationsCubit = GetIt.instance<NotificationsCubit>();
+    _notificationsCubit.loadNotifications();
+  }
+
+  @override
+  void dispose() {
+    _notificationsCubit.close();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create:
-          (context) =>
-          
-              NotificationsCubit(NotificationRepository(_notificationDataSource))
-                ..fetchNotifications(),
+    return BlocProvider.value(
+      value: _notificationsCubit,
       child: Scaffold(
-        backgroundColor: const Color(0xFFF7F7F7),
-        appBar: CustomAppBar(),
         drawer: const CustomDrawer(),
-        floatingActionButton: FloatingActionButton.small(
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const SessionsWrapper()),
-            );
-          },
-          backgroundColor: Theme.of(context).primaryColor,
-          child: const Icon(Icons.calendar_today, size: 20),
+        appBar: const CustomAppBar(
+        
         ),
-        body: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'Notificações',
-                  style: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 16.0),
-                Expanded(
-                  child: BlocBuilder<NotificationsCubit, NotificationsState>(
-                    builder: (context, state) {
-                      if (state is NotificationsLoading) {
-                        return const Center(child: CircularProgressIndicator());
-                      } else if (state is NotificationsError) {
-                        return Center(child: Text(state.message));
-                      } else if (state is NotificationsLoaded) {
-                        return ListView.builder(
-                          itemCount: state.notifications.length,
-                          itemBuilder: (context, index) {
-                            final notification = state.notifications[index];
-                            return NotificationCard(
-                              type: _getNotificationType(notification.type),
-                              date: _formatDate(notification.createdAt),
-                              title: notification.title,
-                              description: notification.message,
-                              actionText:
-                                  notification.actionText ?? 'Ver Detalhes',
-                              onActionPressed: () {},
-                            );
-                          },
-                        );
-                      }
-                      return Container();
-                    },
-                  ),
-                ),
-              ],
-            ),
-          ),
+        body: BlocBuilder<NotificationsCubit, NotificationsState>(
+          builder: (context, state) {
+            if (state is NotificationsLoading) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (state is NotificationsLoaded) {
+              return _buildNotificationsList(state.notifications);
+            } else if (state is NotificationsError) {
+              return Center(child: Text('Erro: ${state.message}'));
+            } else {
+              return const Center(child: Text('Nenhuma notificação encontrada'));
+            }
+          },
+        ),
+        floatingActionButton: BlocBuilder<NotificationsCubit, NotificationsState>(
+          builder: (context, state) {
+            if (state is NotificationsLoaded && state.notifications.isNotEmpty) {
+              return FloatingActionButton(
+                onPressed: () {
+                  _notificationsCubit.clearNotifications();
+                },
+                backgroundColor: const Color(0xFF1042CB),
+                child: const Icon(Icons.delete_sweep, color: Colors.white),
+              );
+            }
+            return const SizedBox.shrink();
+          },
         ),
       ),
     );
   }
 
-  NotificationType _getNotificationType(String? type) {
-    switch (type?.toLowerCase()) {
-      case 'appointment':
-        return NotificationType.appointment;
-      case 'reminder':
-        return NotificationType.reminder;
-      default:
-        return NotificationType.reminder;
+  Widget _buildNotificationsList(List<NotificationEntity> notifications) {
+    if (notifications.isEmpty) {
+      return const Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.notifications_off, size: 64, color: Colors.grey),
+            SizedBox(height: 16),
+            Text(
+              'Nenhuma notificação encontrada',
+              style: TextStyle(fontSize: 16, color: Colors.grey),
+            ),
+          ],
+        ),
+      );
     }
-  }
 
-  String _formatDate(DateTime date) {
-    return '${date.day} ${_getMonth(date.month)} ${date.year}';
-  }
+    return ListView.builder(
+      key: ValueKey<String>('notifications_${notifications.length}_${DateTime.now().millisecondsSinceEpoch}'),
+      itemCount: notifications.length,
+      padding: const EdgeInsets.all(16),
+      itemBuilder: (context, index) {
+       //prevents the list from trying to build an  item that don't exist(comentário meu)
+        if (index >= notifications.length) return null;
 
-  String _getMonth(int month) {
-    const months = [
-      'jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez',
-    ];
-    
-    return months[month - 1];
+        final notification = notifications[index];
+        return Dismissible(
+          key: Key(notification.id.toString()),
+          direction: DismissDirection.endToStart,
+         
+          confirmDismiss: (direction) async {
+            return await showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: const Text('Confirmar'),
+                  content: const Text('Deseja remover esta notificação?'),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.of(context).pop(false),
+                      child: const Text('Cancelar'),
+                    ),
+                    TextButton(
+                      onPressed: () => Navigator.of(context).pop(true),
+                      child: const Text('Remover'),
+                    ),
+                  ],
+                );
+              },
+            );
+          },
+          onDismissed: (direction) async {
+            await _notificationsCubit.removeNotification(notification.id);
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Notificação removida')),
+              );
+            }
+          },
+          child: NotificationCard(notification: notification),
+        );
+      },
+    );
   }
 }
