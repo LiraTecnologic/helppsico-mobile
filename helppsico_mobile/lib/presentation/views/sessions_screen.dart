@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:helppsico_mobile/domain/entities/session_model.dart';
+import 'package:helppsico_mobile/presentation/viewmodels/cubit/session_notification_cubit.dart';
 import 'package:helppsico_mobile/presentation/viewmodels/state/sessions_state.dart';
 import 'package:helppsico_mobile/presentation/widgets/common/custom_app_bar.dart';
 import 'package:helppsico_mobile/presentation/widgets/drawer/custom_drawer.dart';
@@ -35,13 +36,16 @@ class _SessionsPageState extends State<SessionsPage> {
       backgroundColor: const Color(0xFFF5F5F5),
       appBar: const CustomAppBar(),
       drawer: const CustomDrawer(),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.red,
-        onPressed: () {
-          Navigator.pushReplacementNamed(context, '/login');
-        },
-        child: const Icon(Icons.logout),
-      ),
+      floatingActionButton: ElevatedButton(
+        onPressed: () async {
+        final cubit = context.read<SessionNotificationCubit>();
+        final now = DateTime.now().add(const Duration(seconds: 10));
+        
+        await cubit.scheduleTestNotification(now);
+      },
+      child: const Text("Testar Notificação em 10s"),
+    ),
+
       body: SafeArea(
         child: Column(
           children: [

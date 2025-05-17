@@ -2,10 +2,31 @@ const express = require('express');
 const app = express();
 const port = 7000;
 const cors = require('cors');
-const fs = require('fs');  // Add this line to import the fs module
+const fs = require('fs');
+const jwt = require('jsonwebtoken');
+
+// Chave secreta para assinar os tokens JWT
+const JWT_SECRET = 'helppsico-secret-key-2024';
 
 app.use(cors());
 app.use(express.json());
+
+const verifyToken = (req, res, next) => {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
+  
+  if (!token) {
+    return res.status(401).json({ message: 'Access denied. No token provided.' });
+  }
+  
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET);
+    req.user = decoded;
+    next();
+  } catch (error) {
+    return res.status(401).json({ message: 'Invalid token' });
+  }
+};
 
 app.get('/notifications', (req, res) => {
   
@@ -423,58 +444,19 @@ app.get('/notifications', (req, res) => {
 });
   
 
-app.get('/sessions', (req, res) => {
-  res.json([
-    {
-      "id": "1",
-      "psicologoId": "Dra. Sofia Mendes",
-      "pacienteId": "PAC001",
-      "data": "2024-04-01T14:30:00Z",
-      "valor": "150.00",
-      "endereco": "Rua das Flores, 123 - Sala 302",
-      "finalizada": "false"
-    },
-    {
-      "id": "2",
-      "psicologoId": "Dr. Ricardo Santos",
-      "pacienteId": "PAC002",
-      "data": "2024-04-02T10:00:00Z",
-      "valor": "180.00",
-      "endereco": "Avenida Principal, 456 - Consultório 15",
-      "finalizada": "true"
-    },
-    {
-      "id": "3",
-      "psicologoId": "Dra. Laura Oliveira",
-      "pacienteId": "PAC003",
-      "data": "2024-04-03T16:15:00Z",
-      "valor": "160.00",
-      "endereco": "Rua dos Psicólogos, 789 - Sala 501",
-      "finalizada": "false"
-    },
-    {
-      "id": "4",
-      "psicologoId": "Dr. Felipe Costa",
-      "pacienteId": "PAC004",
-      "data": "2024-04-04T09:30:00Z",
-      "valor": "170.00",
-      "endereco": "Alameda Saúde, 321 - Consultório 08",
-      "finalizada": "false"
-    },
-    {
-      "id": "5",
-      "psicologoId": "Dra. Beatriz Lima",
-      "pacienteId": "PAC005",
-      "data": "2024-04-05T15:45:00Z",
-      "valor": "155.00",
-      "endereco": "Rua do Bem-Estar, 654 - Sala 203",
-      "finalizada": "true"
-    },
-  
+app.get('/sessions', verifyToken, (req, res) => {
+  fs.readFile('./sessions.json', 'utf8', (err, data) => {
+    if (err) {
+      return res.status(500).json({ message: 'Error reading sessions database' });
+    }
     
-  ]);
+    const sessions = JSON.parse(data);
+    const userSessions = sessions.filter(session => session.pacienteId === req.user.id);
+    console.log(userSessions); // Adicione esta linha para verificar os dados no console
+    res.json(userSessions);
+  });
 });
-
+   
 
 
 
@@ -494,11 +476,43 @@ app.post('/login', (req, res) => {
     const user = users.find(u => u.email === email && u.password === password);
     
     if (user) {
-      return res.status(200).json({ message: 'User validated successfully' });
+      // Gerar nome do usuário a partir do email
+      const name = email.split('@')[0];
+      
+      // Criar payload do token
+      const payload = {
+        id: user.id,
+        email: user.email,
+        name: name,
+        role: 'patient',
+        // Você pode adicionar mais informações ao payload conforme necessário
+      };
+      
+      // Gerar token JWT
+      const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '24h' });
+      
+      return res.status(200).json({ 
+        message: 'User validated successfully',
+        token: token,
+        user: {
+          id: user.id,
+          name: name,
+          email: user.email,
+          role: 'patient'
+        }
+      });
     } else {
       return res.status(401).json({ message: 'Invalid email or password' });
     }
   });
+});
+
+// Middleware para verificar o token JWT
+
+
+// Rota protegida de exemplo
+app.get('/protected', verifyToken, (req, res) => {
+  res.json({ message: 'This is a protected route', user: req.user });
 });
 
 

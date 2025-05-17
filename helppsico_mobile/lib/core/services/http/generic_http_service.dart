@@ -2,6 +2,7 @@
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
+import 'package:helppsico_mobile/core/services/storage/secure_storage_service.dart';
 
 abstract interface class IGenericHttp {
   Future<HttpResponse> get(String url, {Map<String, String>? headers});
@@ -13,13 +14,26 @@ abstract interface class IGenericHttp {
 
 class GenericHttp implements IGenericHttp {
   final http.Client _client;
+  final SecureStorageService _storage;
 
-  GenericHttp({http.Client? client}) : _client = client ?? http.Client();
+  GenericHttp({http.Client? client, SecureStorageService? storage}) : 
+    _client = client ?? http.Client(),
+    _storage = storage ?? SecureStorageService();
   
   @override
   Future<HttpResponse> get(String url, {Map<String, String>? headers}) async {
     try {
-      final response = await _client.get(Uri.parse(url), headers: headers);
+     
+      final token = await _storage.getToken();
+      final Map<String, String> authHeaders = (token != null) ? {'Authorization': 'Bearer $token'} : {};
+      
+  
+      final Map<String, String> finalHeaders = {
+        ...authHeaders,
+        ...?headers,
+      };
+      
+      final response = await _client.get(Uri.parse(url), headers: finalHeaders);
       return HttpResponse(
         statusCode: response.statusCode,
         body: json.decode(response.body),
@@ -33,14 +47,20 @@ class GenericHttp implements IGenericHttp {
   @override
   Future<HttpResponse> post(String url, dynamic body, {Map<String, String>? headers}) async {
     try {
-      final final_headers = {
+      
+      final token = await _storage.getToken();
+      final Map<String, String> authHeaders = token != null ? {'Authorization': 'Bearer $token'} : {};
+      
+   
+      final Map<String, String> finalHeaders = {
         'Content-Type': 'application/json',
-        ...?headers,//gere os headers dinamicamene 
+        ...authHeaders,
+        ...?headers,
       };
 
       final response = await _client.post(
         Uri.parse(url),
-        headers: final_headers,
+        headers: finalHeaders,
         body: json.encode(body),
       );
 
