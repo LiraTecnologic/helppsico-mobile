@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:helppsico_mobile/data/repositories/document_repository.dart';
-import 'package:helppsico_mobile/data/datasources/documents_datasource.dart';
+import 'package:helppsico_mobile/data/datasource/documents_datasource.dart';
 import 'package:helppsico_mobile/core/services/http/generic_http_service.dart';
 import 'package:helppsico_mobile/domain/entities/document_model.dart';
 import 'package:helppsico_mobile/presentation/widgets/documents/document_item.dart';

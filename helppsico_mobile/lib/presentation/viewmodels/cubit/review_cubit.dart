@@ -13,13 +13,17 @@ class ReviewCubit extends Cubit<ReviewState> {
       : _repository = repository ?? ReviewRepository(),
         super(const ReviewLoading());
 
-  void initialize(String psicologoId, String psicologoNome) {
-    final reviews = _repository.getReviewsByPsicologoId(psicologoId);
-    emit(ReviewInitial(
-      psicologoId: psicologoId,
-      psicologoNome: psicologoNome,
-      reviews: reviews,
-    ));
+  Future<void> initialize(String psicologoId, String psicologoNome) async {
+    try {
+      final reviews = await _repository.getReviewsByPsicologoId(psicologoId);
+      emit(ReviewInitial(
+        psicologoId: psicologoId,
+        psicologoNome: psicologoNome,
+        reviews: reviews,
+      ));
+    } catch (e) {
+      emit(ReviewError(message: 'Erro ao carregar avaliações: ${e.toString()}'));
+    }
   }
 
   void setRating(int rating) {
@@ -46,68 +50,76 @@ class ReviewCubit extends Cubit<ReviewState> {
     }
   }
 
-  void enviarAvaliacao() {
+  Future<void> enviarAvaliacao() async {
     if (_rating == 0) {
       emit(const ReviewError(message: 'Por favor, selecione uma nota para a avaliação'));
       return;
     }
 
     if (state is ReviewInitial || state is ReviewRated) {
-      final currentState = state is ReviewInitial 
-          ? state as ReviewInitial 
-          : (state as ReviewRated);
-      
-      final newReview = ReviewEntity(
-        id: DateTime.now().millisecondsSinceEpoch.toString(),
-        psicologoId: currentState.psicologoId!,
-        userName: 'Usuário Atual',
-        rating: _rating,
-        comment: comentarioController.text.trim(),
-        date: DateTime.now(),
-      );
+      try {
+        final currentState = state is ReviewInitial 
+            ? state as ReviewInitial 
+            : (state as ReviewRated);
+        
+        final newReview = ReviewEntity(
+          id: DateTime.now().millisecondsSinceEpoch.toString(),
+          psicologoId: currentState.psicologoId!,
+          userName: 'Usuário Atual',
+          rating: _rating,
+          comment: comentarioController.text.trim(),
+          date: DateTime.now(),
+        );
 
-      _repository.addReview(newReview);
-      final updatedReviews = _repository.getReviewsByPsicologoId(currentState.psicologoId!);
-      
-      _rating = 0;
-      comentarioController.clear();
-      
-      emit(ReviewSuccess(
-        message: 'Avaliação enviada com sucesso!',
-        psicologoId: currentState.psicologoId!,
-        psicologoNome: currentState.psicologoNome!,
-        reviews: updatedReviews,
-      ));
+        await _repository.addReview(newReview);
+        final updatedReviews = await _repository.getReviewsByPsicologoId(currentState.psicologoId!);
+        
+        _rating = 0;
+        comentarioController.clear();
+        
+        emit(ReviewSuccess(
+          message: 'Avaliação enviada com sucesso!',
+          psicologoId: currentState.psicologoId!,
+          psicologoNome: currentState.psicologoNome!,
+          reviews: updatedReviews,
+        ));
+      } catch (e) {
+        emit(ReviewError(message: 'Erro ao enviar avaliação: ${e.toString()}'));
+      }
     }
   }
 
-  void deleteReview(String reviewId) {
+  Future<void> deleteReview(String reviewId) async {
     if (state is ReviewInitial || state is ReviewRated || state is ReviewSuccess) {
-      ReviewState currentState = state;
-      String psicologoId;
-      String psicologoNome;
-      
-      if (currentState is ReviewInitial) {
-        psicologoId = currentState.psicologoId;
-        psicologoNome = currentState.psicologoNome;
-      } else if (currentState is ReviewRated) {
-        psicologoId = currentState.psicologoId;
-        psicologoNome = currentState.psicologoNome;
-      } else {
-        currentState = currentState as ReviewSuccess;
-        psicologoId = currentState.psicologoId;
-        psicologoNome = currentState.psicologoNome;
+      try {
+        ReviewState currentState = state;
+        String psicologoId;
+        String psicologoNome;
+        
+        if (currentState is ReviewInitial) {
+          psicologoId = currentState.psicologoId;
+          psicologoNome = currentState.psicologoNome;
+        } else if (currentState is ReviewRated) {
+          psicologoId = currentState.psicologoId;
+          psicologoNome = currentState.psicologoNome;
+        } else {
+          currentState = currentState as ReviewSuccess;
+          psicologoId = currentState.psicologoId;
+          psicologoNome = currentState.psicologoNome;
+        }
+        
+        await _repository.deleteReview(reviewId);
+        final updatedReviews = await _repository.getReviewsByPsicologoId(psicologoId);
+        
+        emit(ReviewDeleted(
+          message: 'Comentário excluído com sucesso!',
+          psicologoId: psicologoId,
+          psicologoNome: psicologoNome,
+          reviews: updatedReviews,
+        ));
+      } catch (e) {
+        emit(ReviewError(message: 'Erro ao excluir avaliação: ${e.toString()}'));
       }
-      
-      _repository.deleteReview(reviewId);
-      final updatedReviews = _repository.getReviewsByPsicologoId(psicologoId);
-      
-      emit(ReviewDeleted(
-        message: 'Comentário excluído com sucesso!',
-        psicologoId: psicologoId,
-        psicologoNome: psicologoNome,
-        reviews: updatedReviews,
-      ));
     }
   }
 

@@ -4,11 +4,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:helppsico_mobile/core/services/auth/auth_service.dart';
 import 'package:helppsico_mobile/core/services/notification/notification_service.dart';
 import 'package:helppsico_mobile/presentation/viewmodels/cubit/auth_cubit.dart';
+import 'package:helppsico_mobile/presentation/viewmodels/cubit/review_cubit.dart';
 import 'package:helppsico_mobile/presentation/views/documents_screen.dart';
 import 'package:helppsico_mobile/presentation/views/login_screen.dart';
 import 'package:helppsico_mobile/presentation/views/dashboard_screen.dart';
 import 'package:helppsico_mobile/presentation/views/notifications_screen.dart';
-import 'package:helppsico_mobile/presentation/views/rate_screen.dart';
+import 'package:helppsico_mobile/presentation/views/review_screen.dart';
 import 'package:helppsico_mobile/presentation/views/sessions_screen.dart';
 import 'package:helppsico_mobile/presentation/views/sessions_wrapper.dart';
 import 'package:helppsico_mobile/presentation/viewmodels/state/auth_state.dart';
@@ -25,8 +26,11 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => AuthCubit(),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (context) => AuthCubit()),
+        BlocProvider(create: (context) => ReviewCubit()),
+      ],
       child: BlocConsumer<AuthCubit, AuthState>(
         listener: (context, state) {
           // Podemos adicionar lógica global de autenticação aqui se necessário

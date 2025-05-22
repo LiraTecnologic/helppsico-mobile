@@ -1,0 +1,42 @@
+[
+  {
+    "id": "1747930043412",
+    "psicologoId": "1",
+    "userName": "Usuário Atual",
+    "rating": 3,
+    "comment": "fsdafasfasdfs",
+    "date": "2025-05-22T13:07:23.412"
+  },
+  {
+    "id": "1747611988859",
+    "psicologoId": "1",
+    "userName": "Usuário Atual",
+    "rating": 4,
+    "comment": "fefsdfasdfasfd",
+    "date": "2025-05-18T20:46:28.859"
+  },
+  {
+    "id": "1",
+    "psicologoId": "1",
+    "userName": "João Silva",
+    "rating": 5,
+    "comment": "Excelente profissional! Me ajudou muito com minhas questões de ansiedade.",
+    "date": "2024-01-15T00:00:00.000Z"
+  },
+  {
+    "id": "2",
+    "psicologoId": "1",
+    "userName": "Maria Santos",
+    "rating": 4,
+    "comment": "Muito atenciosa e profissional. Recomendo!",
+    "date": "2024-01-10T00:00:00.000Z"
+  },
+  {
+    "id": "3",
+    "psicologoId": "1",
+    "userName": "Pedro Oliveira",
+    "rating": 5,
+    "comment": "Ótimas sessões, me sinto muito melhor após começar o tratamento.",
+    "date": "2024-01-05T00:00:00.000Z"
+  }
+]

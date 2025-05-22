@@ -28,10 +28,16 @@ const verifyToken = (req, res, next) => {
   }
 };
 
-app.get('/notifications', (req, res) => {
-  
-  
+app.get('/documents', (req, res) => {
+  fs.readFile('./data/documents.json', 'utf8', (err, data) => {
+    if (err) {
+      return res.status(500).json({ message: 'Error reading documents database' });
+    }
+    res.json(JSON.parse(data));
+  });
+});
 
+app.get('/notifications', (req, res) => {
   res.json(
     [
       {
@@ -517,6 +523,73 @@ app.get('/protected', verifyToken, (req, res) => {
 
 
 
+
+// Endpoints para avaliações (reviews)
+app.get('/reviews/:psicologoId', (req, res) => {
+  const { psicologoId } = req.params;
+  
+  fs.readFile('./data/reviews.json', 'utf8', (err, data) => {
+    if (err) {
+      return res.status(500).json({ message: 'Erro ao ler o banco de dados de avaliações' });
+    }
+    
+    const reviews = JSON.parse(data);
+    const filteredReviews = reviews.filter(review => review.psicologoId === psicologoId);
+    res.json(filteredReviews);
+  });
+});
+
+app.post('/reviews', (req, res) => {
+  const newReview = req.body;
+  
+  if (!newReview.id || !newReview.psicologoId || !newReview.userName || !newReview.rating) {
+    return res.status(400).json({ message: 'Dados incompletos para a avaliação' });
+  }
+  
+  fs.readFile('./data/reviews.json', 'utf8', (err, data) => {
+    if (err) {
+      return res.status(500).json({ message: 'Erro ao ler o banco de dados de avaliações' });
+    }
+    
+    const reviews = JSON.parse(data);
+    reviews.unshift(newReview); // Adiciona no início do array
+    
+    fs.writeFile('./data/reviews.json', JSON.stringify(reviews, null, 2), (err) => {
+      if (err) {
+        return res.status(500).json({ message: 'Erro ao salvar a avaliação' });
+      }
+      
+      res.status(201).json({ message: 'Avaliação adicionada com sucesso', review: newReview });
+    });
+  });
+});
+
+app.delete('/reviews/:reviewId', (req, res) => {
+  const { reviewId } = req.params;
+  
+  fs.readFile('./data/reviews.json', 'utf8', (err, data) => {
+    if (err) {
+      return res.status(500).json({ message: 'Erro ao ler o banco de dados de avaliações' });
+    }
+    
+    let reviews = JSON.parse(data);
+    const initialLength = reviews.length;
+    
+    reviews = reviews.filter(review => review.id !== reviewId);
+    
+    if (reviews.length === initialLength) {
+      return res.status(404).json({ message: 'Avaliação não encontrada' });
+    }
+    
+    fs.writeFile('./data/reviews.json', JSON.stringify(reviews, null, 2), (err) => {
+      if (err) {
+        return res.status(500).json({ message: 'Erro ao excluir a avaliação' });
+      }
+      
+      res.json({ message: 'Avaliação excluída com sucesso' });
+    });
+  });
+});
 
 app.listen(port,"0.0.0.0", () => {
   console.log(`Fake API rodando em http://localhost:${port}`);

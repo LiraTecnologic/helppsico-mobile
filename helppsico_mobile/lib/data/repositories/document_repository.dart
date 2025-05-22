@@ -1,5 +1,5 @@
 import '../../domain/entities/document_model.dart';
-import '../datasources/documents_datasource.dart';
+import '../datasource/documents_datasource.dart';
 
 class DocumentRepository {
   final DocumentsDataSource _dataSource;

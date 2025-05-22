@@ -2,3 +2,5 @@
 build/
 /ios
 /android
+/.dart_tool
+/build
