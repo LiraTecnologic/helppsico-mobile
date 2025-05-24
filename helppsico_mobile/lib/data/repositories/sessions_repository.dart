@@ -1,6 +1,5 @@
 
 import 'package:helppsico_mobile/data/datasource/sessions_data_source.dart';
-
 import '../../domain/entities/session_model.dart';
 
 class SessionRepository {
@@ -21,16 +20,26 @@ class SessionRepository {
   }
 
   Future<SessionModel?> getNextSession() async {
-    final response = await _sessionsDataSource.getNextSession();
-    
-    if (response.statusCode == 200) {
-      final dynamic jsonData = response.body;
-      if (jsonData is Map<String, dynamic> && jsonData.isNotEmpty) {
-        return SessionModel.fromJson(jsonData);
+    try {
+      final response = await _sessionsDataSource.getNextSession();
+      print('Response received: ${response.statusCode}');
+      
+      if (response.statusCode == 200) {
+        final dynamic jsonData = response.body;
+        print('JSON data: $jsonData');
+        
+        if (jsonData is Map<String, dynamic> && jsonData.isNotEmpty) {
+          return SessionModel.fromJson(jsonData);
+        }
+        print('No session data found');
+        return null;
+      } else {
+        print('Failed to load next session: ${response.statusCode}');
+        throw Exception('Falha ao carregar próxima sessão');
       }
-      return null;
-    } else {
-      throw Exception('Falha ao carregar próxima sessão');
+    } catch (e) {
+      print('Error encountered: $e');
+      rethrow;
     }
   }
-}
+  }

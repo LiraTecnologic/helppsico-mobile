@@ -34,9 +34,12 @@ class DocumentRepository {
   }
 
   Future<void> deleteDocument(String documentId) async {
+    print('Attempting to delete document with id: $documentId');
     try {
       await _dataSource.deleteDocument(documentId);
+      print('Successfully deleted document with id: $documentId');
     } catch (e) {
+      print('Error when attempting to delete document with id: $documentId: $e');
       throw Exception('Erro ao deletar documento: $e');
     }
   }
@@ -55,11 +58,17 @@ class DocumentRepository {
 
   Future<void> toggleFavorite(String documentId) async {
     try {
+      print('Attempting to toggle favorite for document with id: $documentId');
       final response = await _dataSource.toggleFavorite(documentId);
       if (response.statusCode != 200) {
+        print(
+            'Error when attempting to toggle favorite for document with id: $documentId: ${response.statusCode}');
         throw Exception('Falha ao atualizar favorito: ${response.statusCode}');
+      } else {
+        print('Successfully toggled favorite for document with id: $documentId');
       }
     } catch (e) {
+      print('Error when attempting to toggle favorite for document with id: $documentId: $e');
       throw Exception('Erro ao atualizar favorito: $e');
     }
   }

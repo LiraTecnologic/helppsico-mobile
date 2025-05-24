@@ -1,12 +1,12 @@
+import 'package:helppsico_mobile/data/datasource/review_datasource.dart';
 import '../../domain/entities/review_entity.dart';
-import '../datasource/review_datasource.dart';
-import '../datasource/api_review_datasource.dart';
+
 
 class ReviewRepository {
   final ReviewDataSource _dataSource;
 
   ReviewRepository({ReviewDataSource? dataSource})
-      : _dataSource = dataSource ?? ApiReviewDataSource();
+      : _dataSource = dataSource ?? ReviewDataSource();
 
   Future<List<ReviewEntity>> getReviewsByPsicologoId(String psicologoId) async {
     return await _dataSource.getReviewsByPsicologoId(psicologoId);

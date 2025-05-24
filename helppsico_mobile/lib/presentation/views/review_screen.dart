@@ -7,7 +7,7 @@ import '../viewmodels/state/review_state.dart';
 import '../widgets/drawer/custom_drawer.dart';
 import '../widgets/common/custom_app_bar.dart';
 
-class AvaliarPsicologoScreen extends StatelessWidget {
+class AvaliarPsicologoScreen extends StatefulWidget {
   final String psicologoId;
   final String psicologoNome;
 
@@ -18,9 +18,33 @@ class AvaliarPsicologoScreen extends StatelessWidget {
   }) : super(key: key);
 
   @override
+  _AvaliarPsicologoScreenState createState() => _AvaliarPsicologoScreenState();
+}
+
+class _AvaliarPsicologoScreenState extends State<AvaliarPsicologoScreen> {
+  late final ReviewCubit _reviewCubit;
+
+  @override
+  void initState() {
+    super.initState();
+    _reviewCubit = ReviewCubit.instanceFor(widget.psicologoId, widget.psicologoNome);
+    // A inicialização só deve ocorrer se o cubit estiver em seu estado inicial (ReviewLoading)
+    // para evitar reinicializações desnecessárias se a instância já existia e estava em outro estado.
+    if (_reviewCubit.state is ReviewLoading) {
+      _reviewCubit.initialize(widget.psicologoId, widget.psicologoNome);
+    }
+  }
+
+  @override
+  void dispose() {
+    ReviewCubit.disposeInstance(widget.psicologoId);
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => ReviewCubit()..initialize(psicologoId, psicologoNome),
+    return BlocProvider.value(
+      value: _reviewCubit,
       child: BlocConsumer<ReviewCubit, ReviewState>(
         listener: (context, state) {
           if (state is ReviewError) {
@@ -37,7 +61,7 @@ class AvaliarPsicologoScreen extends StatelessWidget {
           } else if (state is ReviewDeleted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(state.message),
+                content: Text((state.message) as String ),
                 backgroundColor: Colors.green,
               ),
             );
@@ -58,7 +82,8 @@ class AvaliarPsicologoScreen extends StatelessWidget {
 
   Widget _buildScaffold(BuildContext context, ReviewState state) {
     List<ReviewEntity> reviews = [];
-    String psicologoNome = this.psicologoNome;
+    // Use widget.psicologoNome as it's a StatefulWidget now
+    String psicologoNome = widget.psicologoNome;
     
     if (state is ReviewInitial) {
       reviews = state.reviews;
@@ -72,6 +97,10 @@ class AvaliarPsicologoScreen extends StatelessWidget {
     } else if (state is ReviewDeleted) {
       reviews = state.reviews;
       psicologoNome = state.psicologoNome;
+    } else if (state is ReviewError) {
+      // If it's a ReviewError but contains review data (like our specific error case)
+      reviews = state.reviews;
+      psicologoNome = state.psicologoNome ?? widget.psicologoNome; // Fallback to widget's psicologoNome if null
     }
     
     return Scaffold(

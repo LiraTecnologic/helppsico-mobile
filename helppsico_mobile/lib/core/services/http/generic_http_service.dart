@@ -35,7 +35,7 @@ class GenericHttp implements IGenericHttp {
       
       final response = await _client.get(Uri.parse(url), headers: finalHeaders);
       
-      // Check if response is JSON before decoding
+      
       final contentType = response.headers['content-type'];
       dynamic responseBody;
       
@@ -102,14 +102,20 @@ class GenericHttp implements IGenericHttp {
   @override
   Future<HttpResponse> put(String url, dynamic body, {Map<String, String>? headers}) async {
     try {
-      final final_headers = {
+      // Obter token de autenticação
+      final token = await _storage.getToken();
+      final Map<String, String> authHeaders = token != null ? {'Authorization': 'Bearer $token'} : {};
+      
+      // Combinar cabeçalhos
+      final Map<String, String> finalHeaders = {
         'Content-Type': 'application/json',
+        ...authHeaders,
         ...?headers,
       };
 
       final response = await _client.put(
         Uri.parse(url),
-        headers: final_headers,
+        headers: finalHeaders,
         body: json.encode(body),
       );
       
@@ -138,9 +144,20 @@ class GenericHttp implements IGenericHttp {
   @override
   Future<HttpResponse> delete(String url, {Map<String, String>? headers}) async {
     try {
+      // Obter token de autenticação
+      final token = await _storage.getToken();
+      final Map<String, String> authHeaders = token != null ? {'Authorization': 'Bearer $token'} : {};
+      
+      // Combinar cabeçalhos
+      final Map<String, String> finalHeaders = {
+        'Content-Type': 'application/json',
+        ...authHeaders,
+        ...?headers,
+      };
+
       final response = await _client.delete(
         Uri.parse(url),
-        headers: headers,
+        headers: finalHeaders,
       );
       
       // Check if response is JSON before decoding

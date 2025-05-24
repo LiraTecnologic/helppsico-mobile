@@ -1,21 +1,5 @@
 [
   {
-    "id": "1747930043412",
-    "psicologoId": "1",
-    "userName": "Usuário Atual",
-    "rating": 3,
-    "comment": "fsdafasfasdfs",
-    "date": "2025-05-22T13:07:23.412"
-  },
-  {
-    "id": "1747611988859",
-    "psicologoId": "1",
-    "userName": "Usuário Atual",
-    "rating": 4,
-    "comment": "fefsdfasdfasfd",
-    "date": "2025-05-18T20:46:28.859"
-  },
-  {
     "id": "1",
     "psicologoId": "1",
     "userName": "João Silva",

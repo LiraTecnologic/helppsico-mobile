@@ -37,421 +37,64 @@ app.get('/documents', (req, res) => {
   });
 });
 
-app.get('/notifications', (req, res) => {
-  res.json(
-    [
-      {
-        "id": "1",
-        "title": "Dra. Sofia Mendes",
-        "message": "Sua consulta foi confirmada para amanhã às 15:30. Por favor, chegue com 15 minutos de antecedência.",
-        "createdAt": "2024-03-29T15:30:00Z",
-        "isRead": false,
-        "type": "appointment",
-        "actionText": "Ver Detalhes"
-      },
-      {
-        "id": "2",
-        "title": "Avaliação de Progresso",
-        "message": "É hora de preencher seu questionário semanal de acompanhamento. Isso ajudará seu terapeuta a avaliar seu progresso.",
-        "createdAt": "2024-03-28T10:00:00Z",
-        "isRead": true,
-        "type": "reminder",
-        "actionText": "Preencher Agora"
-      },
-      {
-        "id": "3",
-        "title": "Dr. Ricardo Santos",
-        "message": "Sua consulta de quinta-feira foi remarcada para sexta-feira às 14:00, devido a um compromisso urgente do médico.",
-        "createdAt": "2024-03-27T09:15:00Z",
-        "isRead": false,
-        "type": "appointment",
-        "actionText": "Confirmar Alteração"
-      },
-      {
-        "id": "4",
-        "title": "Renovação de Prescrição",
-        "message": "Sua prescrição atual vence em 7 dias. Entre em contato para renovar sua receita.",
-        "createdAt": "2024-03-26T16:45:00Z",
-        "isRead": false,
-        "type": "reminder",
-        "actionText": "Solicitar Renovação"
-      },
-      {
-        "id": "5",
-        "title": "Dra. Laura Oliveira",
-        "message": "Nova vaga disponível para consulta na próxima terça-feira às 10:00. Deseja agendar?",
-        "createdAt": "2024-03-25T11:30:00Z",
-        "isRead": true,
-        "type": "appointment",
-        "actionText": "Agendar Consulta"
-      },
-      {
-        "id": "6",
-        "title": "Lembrete de Exercícios",
-        "message": "Não se esqueça de realizar os exercícios de respiração recomendados pelo seu terapeuta.",
-        "createdAt": "2024-03-24T08:00:00Z",
-        "isRead": true,
-        "type": "reminder",
-        "actionText": "Ver Exercícios"
-      },
-      {
-        "id": "7",
-        "title": "Dr. Felipe Costa",
-        "message": "Sua consulta de acompanhamento está agendada para a próxima semana, segunda-feira às 16:00.",
-        "createdAt": "2024-03-23T14:20:00Z",
-        "isRead": false,
-        "type": "appointment",
-        "actionText": "Adicionar ao Calendário"
-      },
-      {
-        "id": "8",
-        "title": "Atualização do Plano",
-        "message": "Seu plano de tratamento foi atualizado. Confira as novas recomendações do seu terapeuta.",
-        "createdAt": "2024-03-22T17:00:00Z",
-        "isRead": false,
-        "type": "reminder",
-        "actionText": "Visualizar Plano"
-      },
-      {
-        "id": "9",
-        "title": "Dra. Beatriz Lima",
-        "message": "Lembrete: Sua consulta online está marcada para hoje às 18:00. Verifique sua conexão com antecedência.",
-        "createdAt": "2024-03-21T09:30:00Z",
-        "isRead": true,
-        "type": "appointment",
-        "actionText": "Entrar na Consulta"
-      },
-      {
-        "id": "10",
-        "title": "Feedback da Sessão",
-        "message": "Como foi sua última sessão? Sua opinião é importante para melhorarmos nosso atendimento.",
-        "createdAt": "2024-03-20T15:15:00Z",
-        "isRead": false,
-        "type": "reminder",
-        "actionText": "Dar Feedback"
-      },
-      {
-        "id": "11",
-        "title": "Dr. Pedro Silva",
-        "message": "Sua consulta foi agendada para a próxima quinta-feira às 16:00.",
-        "createdAt": "2024-03-18T10:00:00Z",
-        "isRead": false,
-        "type": "appointment",
-        "actionText": "Ver Detalhes"
-      },
-      {
-        "id": "12",
-        "title": "Lembrete de Vacinação",
-        "message": "Lembrete: É hora de tomar a vacina contra a gripe. Entre em contato com o seu terapeuta para agendar.",
-        "createdAt": "2024-03-17T12:00:00Z",
-        "isRead": false,
-        "type": "reminder",
-        "actionText": "Agendar Vacinação"
-      },
-      {
-        "id": "13",
-        "title": "Dra. Maria Luiza",
-        "message": "Sua consulta foi remarcada para amanhã às 17:00. Por favor, chegue com 15 minutos de antecedência.",
-        "createdAt": "2024-03-16T16:30:00Z",
-        "isRead": false,
-        "type": "appointment",
-        "actionText": "Confirmar Alteração"
-      },
-      {
-        "id": "14",
-        "title": "Alteração de Horário",
-        "message": "Sua consulta de hoje foi remarcada para às 15:00.",
-        "createdAt": "2024-03-15T09:00:00Z",
-        "isRead": false,
-        "type": "appointment",
-        "actionText": "Confirmar Alteração"
-      },
-      {
-        "id": "15",
-        "title": "Dr. Paulo Henrique",
-        "message": "Sua consulta de quarta-feira foi cancelada. Entre em contato para remarcar.",
-        "createdAt": "2024-03-14T10:00:00Z",
-        "isRead": false,
-        "type": "appointment",
-        "actionText": "Remarcar Consulta"
-      },
-      {
-        "id": "1",
-        "title": "Dra. Sofia Mendes",
-        "message": "Sua consulta foi confirmada para amanhã às 15:30. Por favor, chegue com 15 minutos de antecedência.",
-        "createdAt": "2024-03-29T15:30:00Z",
-        "isRead": false,
-        "type": "appointment",
-        "actionText": "Ver Detalhes"
-      },
-      {
-        "id": "2",
-        "title": "Avaliação de Progresso",
-        "message": "É hora de preencher seu questionário semanal de acompanhamento. Isso ajudará seu terapeuta a avaliar seu progresso.",
-        "createdAt": "2024-03-28T10:00:00Z",
-        "isRead": true,
-        "type": "reminder",
-        "actionText": "Preencher Agora"
-      },
-      {
-        "id": "3",
-        "title": "Dr. Ricardo Santos",
-        "message": "Sua consulta de quinta-feira foi remarcada para sexta-feira às 14:00, devido a um compromisso urgente do médico.",
-        "createdAt": "2024-03-27T09:15:00Z",
-        "isRead": false,
-        "type": "appointment",
-        "actionText": "Confirmar Alteração"
-      },
-      {
-        "id": "4",
-        "title": "Renovação de Prescrição",
-        "message": "Sua prescrição atual vence em 7 dias. Entre em contato para renovar sua receita.",
-        "createdAt": "2024-03-26T16:45:00Z",
-        "isRead": false,
-        "type": "reminder",
-        "actionText": "Solicitar Renovação"
-      },
-      {
-        "id": "5",
-        "title": "Dra. Laura Oliveira",
-        "message": "Nova vaga disponível para consulta na próxima terça-feira às 10:00. Deseja agendar?",
-        "createdAt": "2024-03-25T11:30:00Z",
-        "isRead": true,
-        "type": "appointment",
-        "actionText": "Agendar Consulta"
-      },
-      {
-        "id": "6",
-        "title": "Lembrete de Exercícios",
-        "message": "Não se esqueça de realizar os exercícios de respiração recomendados pelo seu terapeuta.",
-        "createdAt": "2024-03-24T08:00:00Z",
-        "isRead": true,
-        "type": "reminder",
-        "actionText": "Ver Exercícios"
-      },
-      {
-        "id": "7",
-        "title": "Dr. Felipe Costa",
-        "message": "Sua consulta de acompanhamento está agendada para a próxima semana, segunda-feira às 16:00.",
-        "createdAt": "2024-03-23T14:20:00Z",
-        "isRead": false,
-        "type": "appointment",
-        "actionText": "Adicionar ao Calendário"
-      },
-      {
-        "id": "8",
-        "title": "Atualização do Plano",
-        "message": "Seu plano de tratamento foi atualizado. Confira as novas recomendações do seu terapeuta.",
-        "createdAt": "2024-03-22T17:00:00Z",
-        "isRead": false,
-        "type": "reminder",
-        "actionText": "Visualizar Plano"
-      },
-      {
-        "id": "9",
-        "title": "Dra. Beatriz Lima",
-        "message": "Lembrete: Sua consulta online está marcada para hoje às 18:00. Verifique sua conexão com antecedência.",
-        "createdAt": "2024-03-21T09:30:00Z",
-        "isRead": true,
-        "type": "appointment",
-        "actionText": "Entrar na Consulta"
-      },
-      {
-        "id": "10",
-        "title": "Feedback da Sessão",
-        "message": "Como foi sua última sessão? Sua opinião é importante para melhorarmos nosso atendimento.",
-        "createdAt": "2024-03-20T15:15:00Z",
-        "isRead": false,
-        "type": "reminder",
-        "actionText": "Dar Feedback"
-      },
-      {
-        "id": "11",
-        "title": "Dr. Pedro Silva",
-        "message": "Sua consulta foi agendada para a próxima quinta-feira às 16:00.",
-        "createdAt": "2024-03-18T10:00:00Z",
-        "isRead": false,
-        "type": "appointment",
-        "actionText": "Ver Detalhes"
-      },
-      {
-        "id": "12",
-        "title": "Lembrete de Vacinação",
-        "message": "Lembrete: É hora de tomar a vacina contra a gripe. Entre em contato com o seu terapeuta para agendar.",
-        "createdAt": "2024-03-17T12:00:00Z",
-        "isRead": false,
-        "type": "reminder",
-        "actionText": "Agendar Vacinação"
-      },
-      {
-        "id": "13",
-        "title": "Dra. Maria Luiza",
-        "message": "Sua consulta foi remarcada para amanhã às 17:00. Por favor, chegue com 15 minutos de antecedência.",
-        "createdAt": "2024-03-16T16:30:00Z",
-        "isRead": false,
-        "type": "appointment",
-        "actionText": "Confirmar Alteração"
-      },
-      {
-        "id": "14",
-        "title": "Alteração de Horário",
-        "message": "Sua consulta de hoje foi remarcada para às 15:00.",
-        "createdAt": "2024-03-15T09:00:00Z",
-        "isRead": false,
-        "type": "appointment",
-        "actionText": "Confirmar Alteração"
-      },
-      {
-        "id": "15",
-        "title": "Dr. Paulo Henrique",
-        "message": "Sua consulta de quarta-feira foi cancelada. Entre em contato para remarcar.",
-        "createdAt": "2024-03-14T10:00:00Z",
-        "isRead": false,
-        "type": "appointment",
-        "actionText": "Remarcar Consulta"
-      },
-      {
-        "id": "1",
-        "title": "Dra. Sofia Mendes",
-        "message": "Sua consulta foi confirmada para amanhã às 15:30. Por favor, chegue com 15 minutos de antecedência.",
-        "createdAt": "2024-03-29T15:30:00Z",
-        "isRead": false,
-        "type": "appointment",
-        "actionText": "Ver Detalhes"
-      },
-      {
-        "id": "2",
-        "title": "Avaliação de Progresso",
-        "message": "É hora de preencher seu questionário semanal de acompanhamento. Isso ajudará seu terapeuta a avaliar seu progresso.",
-        "createdAt": "2024-03-28T10:00:00Z",
-        "isRead": true,
-        "type": "reminder",
-        "actionText": "Preencher Agora"
-      },
-      {
-        "id": "3",
-        "title": "Dr. Ricardo Santos",
-        "message": "Sua consulta de quinta-feira foi remarcada para sexta-feira às 14:00, devido a um compromisso urgente do médico.",
-        "createdAt": "2024-03-27T09:15:00Z",
-        "isRead": false,
-        "type": "appointment",
-        "actionText": "Confirmar Alteração"
-      },
-      {
-        "id": "4",
-        "title": "Renovação de Prescrição",
-        "message": "Sua prescrição atual vence em 7 dias. Entre em contato para renovar sua receita.",
-        "createdAt": "2024-03-26T16:45:00Z",
-        "isRead": false,
-        "type": "reminder",
-        "actionText": "Solicitar Renovação"
-      },
-      {
-        "id": "5",
-        "title": "Dra. Laura Oliveira",
-        "message": "Nova vaga disponível para consulta na próxima terça-feira às 10:00. Deseja agendar?",
-        "createdAt": "2024-03-25T11:30:00Z",
-        "isRead": true,
-        "type": "appointment",
-        "actionText": "Agendar Consulta"
-      },
-      {
-        "id": "6",
-        "title": "Lembrete de Exercícios",
-        "message": "Não se esqueça de realizar os exercícios de respiração recomendados pelo seu terapeuta.",
-        "createdAt": "2024-03-24T08:00:00Z",
-        "isRead": true,
-        "type": "reminder",
-        "actionText": "Ver Exercícios"
-      },
-      {
-        "id": "7",
-        "title": "Dr. Felipe Costa",
-        "message": "Sua consulta de acompanhamento está agendada para a próxima semana, segunda-feira às 16:00.",
-        "createdAt": "2024-03-23T14:20:00Z",
-        "isRead": false,
-        "type": "appointment",
-        "actionText": "Adicionar ao Calendário"
-      },
-      {
-        "id": "8",
-        "title": "Atualização do Plano",
-        "message": "Seu plano de tratamento foi atualizado. Confira as novas recomendações do seu terapeuta.",
-        "createdAt": "2024-03-22T17:00:00Z",
-        "isRead": false,
-        "type": "reminder",
-        "actionText": "Visualizar Plano"
-      },
-      {
-        "id": "9",
-        "title": "Dra. Beatriz Lima",
-        "message": "Lembrete: Sua consulta online está marcada para hoje às 18:00. Verifique sua conexão com antecedência.",
-        "createdAt": "2024-03-21T09:30:00Z",
-        "isRead": true,
-        "type": "appointment",
-        "actionText": "Entrar na Consulta"
-      },
-      {
-        "id": "10",
-        "title": "Feedback da Sessão",
-        "message": "Como foi sua última sessão? Sua opinião é importante para melhorarmos nosso atendimento.",
-        "createdAt": "2024-03-20T15:15:00Z",
-        "isRead": false,
-        "type": "reminder",
-        "actionText": "Dar Feedback"
-      },
-      {
-        "id": "11",
-        "title": "Dr. Pedro Silva",
-        "message": "Sua consulta foi agendada para a próxima quinta-feira às 16:00.",
-        "createdAt": "2024-03-18T10:00:00Z",
-        "isRead": false,
-        "type": "appointment",
-        "actionText": "Ver Detalhes"
-      },
-      {
-        "id": "12",
-        "title": "Lembrete de Vacinação",
-        "message": "Lembrete: É hora de tomar a vacina contra a gripe. Entre em contato com o seu terapeuta para agendar.",
-        "createdAt": "2024-03-17T12:00:00Z",
-        "isRead": false,
-        "type": "reminder",
-        "actionText": "Agendar Vacinação"
-      },
-      {
-        "id": "13",
-        "title": "Dra. Maria Luiza",
-        "message": "Sua consulta foi remarcada para amanhã às 17:00. Por favor, chegue com 15 minutos de antecedência.",
-        "createdAt": "2024-03-16T16:30:00Z",
-        "isRead": false,
-        "type": "appointment",
-        "actionText": "Confirmar Alteração"
-      },
-      {
-        "id": "14",
-        "title": "Alteração de Horário",
-        "message": "Sua consulta de hoje foi remarcada para às 15:00.",
-        "createdAt": "2024-03-15T09:00:00Z",
-        "isRead": false,
-        "type": "appointment",
-        "actionText": "Confirmar Alteração"
-      },
-      {
-        "id": "15",
-        "title": "Dr. Paulo Henrique",
-        "message": "Sua consulta de quarta-feira foi cancelada. Entre em contato para remarcar.",
-        "createdAt": "2024-03-14T10:00:00Z",
-        "isRead": false,
-        "type": "appointment",
-        "actionText": "Remarcar Consulta"
-      },
-    ]
-  )
+
+app.put('/documents/:documentId/toggle-favorite', (req, res) => {
+  const documentId = req.params.documentId;
+  
+  fs.readFile('./data/documents.json', 'utf8', (err, data) => {
+    if (err) {
+      return res.status(500).json({ message: 'Error reading documents database' });
+    }
+    
+    let documents = JSON.parse(data);
+    const documentIndex = documents.findIndex(doc => doc.id === documentId);
+    
+    if (documentIndex === -1) {
+      return res.status(404).json({ message: 'Document not found' });
+    }
+    
+    // Toggle the favorite status
+    documents[documentIndex].isFavorite = !documents[documentIndex].isFavorite;
+    
+    fs.writeFile('./data/documents.json', JSON.stringify(documents, null, 2), (err) => {
+      if (err) {
+        return res.status(500).json({ message: 'Error writing to documents database' });
+      }
+      res.status(200).json(documents[documentIndex]);
+    });
+  });
+});
+
+// Adicionar rota para delete
+app.delete('/documents/:documentId', (req, res) => {
+  const documentId = req.params.documentId;
+  
+  fs.readFile('./data/documents.json', 'utf8', (err, data) => {
+    if (err) {
+      return res.status(500).json({ message: 'Error reading documents database' });
+    }
+    
+    let documents = JSON.parse(data);
+    const initialLength = documents.length;
+    documents = documents.filter(doc => doc.id !== documentId);
+    
+    if (documents.length === initialLength) {
+      return res.status(404).json({ message: 'Document not found' });
+    }
+    
+    fs.writeFile('./data/documents.json', JSON.stringify(documents, null, 2), (err) => {
+      if (err) {
+        return res.status(500).json({ message: 'Error writing to documents database' });
+      }
+      res.status(204).send();
+    });
+  });
 });
   
 
+  
 app.get('/sessions', verifyToken, (req, res) => {
-  fs.readFile('./sessions.json', 'utf8', (err, data) => {
+  fs.readFile('./data/sessions.json', 'utf8', (err, data) => {
     if (err) {
       return res.status(500).json({ message: 'Error reading sessions database' });
     }
@@ -460,6 +103,33 @@ app.get('/sessions', verifyToken, (req, res) => {
     const userSessions = sessions.filter(session => session.pacienteId === req.user.id);
     console.log(userSessions); // Adicione esta linha para verificar os dados no console
     res.json(userSessions);
+  });
+});
+
+app.get('/sessions/next', verifyToken, (req, res) => {
+  fs.readFile('./data/sessions.json', 'utf8', (err, data) => {
+    if (err) {
+      console.error('Erro ao ler o banco de dados de sessões:', err);
+      return res.status(500).json({ message: 'Erro ao ler o banco de dados de sessões' });
+    }
+    
+    const sessions = JSON.parse(data);
+    const userSessions = sessions.filter(session => session.pacienteId === req.user.id);
+    
+    console.log('userSessions:', userSessions);
+    
+    if (userSessions.length === 0) {
+      console.log('N o h  sess es encontradas para este usu rio');
+      return res.status(404).json({ message: 'N o h  sess es encontradas para este usu rio' });
+    }
+    
+    // Seleciona uma sess o aleat ria do usu rio
+    const randomIndex = Math.floor(Math.random() * userSessions.length);
+    const randomSession = userSessions[randomIndex];
+    
+    console.log('randomSession:', randomSession);
+    
+    res.json(randomSession);
   });
 });
    
@@ -473,7 +143,7 @@ app.post('/login', (req, res) => {
     return res.status(400).json({ message: 'Email and password are required' });
   }
 
-  fs.readFile('./users.json', 'utf8', (err, data) => {
+  fs.readFile('./data/users.json', 'utf8', (err, data) => {
     if (err) {
       return res.status(500).json({ message: 'Error reading user database' });
     }
@@ -513,10 +183,9 @@ app.post('/login', (req, res) => {
   });
 });
 
-// Middleware para verificar o token JWT
 
 
-// Rota protegida de exemplo
+
 app.get('/protected', verifyToken, (req, res) => {
   res.json({ message: 'This is a protected route', user: req.user });
 });
@@ -524,7 +193,7 @@ app.get('/protected', verifyToken, (req, res) => {
 
 
 
-// Endpoints para avaliações (reviews)
+
 app.get('/reviews/:psicologoId', (req, res) => {
   const { psicologoId } = req.params;
   
@@ -564,29 +233,28 @@ app.post('/reviews', (req, res) => {
   });
 });
 
+// Delete a review
 app.delete('/reviews/:reviewId', (req, res) => {
-  const { reviewId } = req.params;
+  const reviewId = req.params.reviewId;
   
   fs.readFile('./data/reviews.json', 'utf8', (err, data) => {
     if (err) {
-      return res.status(500).json({ message: 'Erro ao ler o banco de dados de avaliações' });
+      return res.status(500).json({ message: 'Error reading reviews database' });
     }
     
     let reviews = JSON.parse(data);
     const initialLength = reviews.length;
-    
     reviews = reviews.filter(review => review.id !== reviewId);
     
     if (reviews.length === initialLength) {
-      return res.status(404).json({ message: 'Avaliação não encontrada' });
+      return res.status(404).json({ message: 'Review not found' });
     }
     
     fs.writeFile('./data/reviews.json', JSON.stringify(reviews, null, 2), (err) => {
       if (err) {
-        return res.status(500).json({ message: 'Erro ao excluir a avaliação' });
+        return res.status(500).json({ message: 'Error writing to reviews database' });
       }
-      
-      res.json({ message: 'Avaliação excluída com sucesso' });
+      res.status(200).json({ message: 'Review deleted successfully' });
     });
   });
 });

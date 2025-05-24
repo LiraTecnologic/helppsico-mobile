@@ -13,12 +13,19 @@ class DocumentsDataSource {
 
   Future<HttpResponse> getDocuments() async {
     try {
+      print('Attempting to fetch documents from $baseUrl/documents');
       final response = await _http.get('$baseUrl/documents');
+      print('Received response with status code: ${response.statusCode}');
+      
       if (response.statusCode != 200) {
+        print('Failed to fetch documents: ${response.statusCode}');
         throw Exception('Falha ao obter documentos: ${response.statusCode}');
       }
+      
+      print('Successfully fetched documents');
       return response;
     } catch (e) {
+      print('Error connecting to server: $e');
       throw Exception('Erro ao conectar com o servidor: $e');
     }
   }
@@ -61,12 +68,15 @@ class DocumentsDataSource {
   Future<HttpResponse> deleteDocument(String documentId) async {
     try {
       final response = await _http.delete('$baseUrl/documents/$documentId');
+      print('Response status: ${response.statusCode}');
+      print('Response body: ${response.body}');
       
       if (response.statusCode != 204) {
         throw Exception('Falha ao deletar documento: ${response.statusCode}');
       }
       return response;
     } catch (e) {
+      print('Error connecting to server: $e');
       throw Exception('Erro ao conectar com o servidor: $e');
     }
   }
@@ -77,12 +87,15 @@ class DocumentsDataSource {
         '$baseUrl/documents/$documentId/toggle-favorite',
         {},
       );
+      print('Response status: ${response.statusCode}');
+      print('Response body: ${response.body}');
       
       if (response.statusCode != 200) {
         throw Exception('Falha ao atualizar favorito: ${response.statusCode}');
       }
       return response;
     } catch (e) {
+      print('Error connecting to server: $e');
       throw Exception('Erro ao conectar com o servidor: $e');
     }
   }
