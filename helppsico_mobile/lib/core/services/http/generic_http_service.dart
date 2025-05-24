@@ -102,11 +102,11 @@ class GenericHttp implements IGenericHttp {
   @override
   Future<HttpResponse> put(String url, dynamic body, {Map<String, String>? headers}) async {
     try {
-      // Obter token de autenticação
+     
       final token = await _storage.getToken();
       final Map<String, String> authHeaders = token != null ? {'Authorization': 'Bearer $token'} : {};
       
-      // Combinar cabeçalhos
+      
       final Map<String, String> finalHeaders = {
         'Content-Type': 'application/json',
         ...authHeaders,
@@ -119,7 +119,7 @@ class GenericHttp implements IGenericHttp {
         body: json.encode(body),
       );
       
-      // Check if response is JSON before decoding
+      
       final contentType = response.headers['content-type'];
       dynamic responseBody;
       
@@ -144,11 +144,11 @@ class GenericHttp implements IGenericHttp {
   @override
   Future<HttpResponse> delete(String url, {Map<String, String>? headers}) async {
     try {
-      // Obter token de autenticação
+      
       final token = await _storage.getToken();
       final Map<String, String> authHeaders = token != null ? {'Authorization': 'Bearer $token'} : {};
       
-      // Combinar cabeçalhos
+     
       final Map<String, String> finalHeaders = {
         'Content-Type': 'application/json',
         ...authHeaders,
