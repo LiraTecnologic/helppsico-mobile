@@ -9,7 +9,7 @@ import '../widgets/drawer/custom_drawer.dart';
 import 'package:helppsico_mobile/presentation/widgets/common/custom_app_bar.dart';
 import '../viewmodels/cubit/dashboard_cubit.dart';
 import '../viewmodels/state/dashboard_state.dart';
-import '../widgets/sessions/session_card_widget.dart';
+import '../widgets/dashboard/dashboard_session_card_widget.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -81,7 +81,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       ),
                       const SizedBox(height: 10),
                       if (state.nextSession != null)
-                        SessionCardWidget(
+                        DashboardSessionCardWidget(
                           session: state.nextSession!,
                         ),
                       const SizedBox(height: 10),

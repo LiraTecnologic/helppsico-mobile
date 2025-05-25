@@ -23,6 +23,8 @@ class ReviewInitial extends ReviewState {
 }
 
 class ReviewLoading extends ReviewState {
+  
+
   const ReviewLoading();
 }
 
@@ -61,25 +63,37 @@ class ReviewSuccess extends ReviewState {
 }
 
 class ReviewDeleted extends ReviewState {
-  final String message;
-  @override
+   @override
   final String psicologoId;
   @override
   final String psicologoNome;
   final List<ReviewEntity> reviews;
-  
-  const ReviewDeleted({
-    required this.message,
+  final int rating;
+  TextEditingController? comentarioController;
+  String? message;
+
+  ReviewDeleted({
     required this.psicologoId,
     required this.psicologoNome,
     required this.reviews,
+    this.rating = 0,
+    this.comentarioController,
+    this.message,
   });
 }
 
 class ReviewError extends ReviewState {
   final String message;
+  @override
+  final String? psicologoId;
+  @override
+  final String? psicologoNome;
+  final List<ReviewEntity> reviews;
   
   const ReviewError({
     required this.message,
+    this.psicologoId,
+    this.psicologoNome,
+    this.reviews = const [], // Default to an empty list if not provided
   });
 }

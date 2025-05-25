@@ -7,8 +7,8 @@ import 'package:helppsico_mobile/core/services/storage/secure_storage_service.da
 abstract interface class IGenericHttp {
   Future<HttpResponse> get(String url, {Map<String, String>? headers});
   Future<HttpResponse> post(String url, dynamic body, {Map<String, String>? headers});
-  // Future<HttpResponse> put(String url, dynamic body, {Map<String, String>? headers});
-  // Future<HttpResponse> delete(String url, {Map<String, String>? headers});
+  Future<HttpResponse> put(String url, dynamic body, {Map<String, String>? headers});
+  Future<HttpResponse> delete(String url, {Map<String, String>? headers});
 }
 
 
@@ -34,9 +34,22 @@ class GenericHttp implements IGenericHttp {
       };
       
       final response = await _client.get(Uri.parse(url), headers: finalHeaders);
+      
+      
+      final contentType = response.headers['content-type'];
+      dynamic responseBody;
+      
+      try {
+        responseBody = contentType?.contains('application/json') == true 
+          ? json.decode(response.body) 
+          : response.body;
+      } catch (e) {
+        responseBody = response.body;
+      }
+      
       return HttpResponse(
         statusCode: response.statusCode,
-        body: json.decode(response.body),
+        body: responseBody,
         headers: response.headers,
       );
     } catch(e) {
@@ -63,18 +76,112 @@ class GenericHttp implements IGenericHttp {
         headers: finalHeaders,
         body: json.encode(body),
       );
-
+      
+      // Check if response is JSON before decoding
+      final contentType = response.headers['content-type'];
+      dynamic responseBody;
+      
+      try {
+        responseBody = contentType?.contains('application/json') == true 
+          ? json.decode(response.body) 
+          : response.body;
+      } catch (e) {
+        responseBody = response.body;
+      }
+      
       return HttpResponse(
         statusCode: response.statusCode,
-        body: json.decode(response.body),
+        body: responseBody,
         headers: response.headers,
       );
-    } catch (e) {
+    } catch(e) {
+      rethrow;
+    }
+  }
+
+  @override
+  Future<HttpResponse> put(String url, dynamic body, {Map<String, String>? headers}) async {
+    try {
+     
+      final token = await _storage.getToken();
+      final Map<String, String> authHeaders = token != null ? {'Authorization': 'Bearer $token'} : {};
+      
+      
+      final Map<String, String> finalHeaders = {
+        'Content-Type': 'application/json',
+        ...authHeaders,
+        ...?headers,
+      };
+
+      final response = await _client.put(
+        Uri.parse(url),
+        headers: finalHeaders,
+        body: json.encode(body),
+      );
+      
+      
+      final contentType = response.headers['content-type'];
+      dynamic responseBody;
+      
+      try {
+        responseBody = contentType?.contains('application/json') == true 
+          ? json.decode(response.body) 
+          : response.body;
+      } catch (e) {
+        responseBody = response.body;
+      }
+      
+      return HttpResponse(
+        statusCode: response.statusCode,
+        body: responseBody,
+        headers: response.headers,
+      );
+    } catch(e) {
+      rethrow;
+    }
+  }
+
+  @override
+  Future<HttpResponse> delete(String url, {Map<String, String>? headers}) async {
+    try {
+      
+      final token = await _storage.getToken();
+      final Map<String, String> authHeaders = token != null ? {'Authorization': 'Bearer $token'} : {};
+      
+     
+      final Map<String, String> finalHeaders = {
+        'Content-Type': 'application/json',
+        ...authHeaders,
+        ...?headers,
+      };
+
+      final response = await _client.delete(
+        Uri.parse(url),
+        headers: finalHeaders,
+      );
+      
+      // Check if response is JSON before decoding
+      final contentType = response.headers['content-type'];
+      dynamic responseBody;
+      
+      try {
+        responseBody = contentType?.contains('application/json') == true 
+          ? response.body.isEmpty ? {} : json.decode(response.body)
+          : response.body;
+      } catch (e) {
+        responseBody = response.body;
+      }
+      
+      return HttpResponse(
+        statusCode: response.statusCode,
+        body: responseBody,
+        headers: response.headers,
+      );
+    } catch(e) {
       rethrow;
     }
   }
 }
-
 
 class HttpResponse {
   final int statusCode;

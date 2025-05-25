@@ -6,7 +6,7 @@ import 'package:helppsico_mobile/presentation/views/documents_screen.dart';
 import 'package:helppsico_mobile/presentation/views/login_screen.dart';
 import 'package:helppsico_mobile/presentation/views/notifications_screen.dart';
 
-import 'package:helppsico_mobile/presentation/views/rate_screen.dart';
+import 'package:helppsico_mobile/presentation/views/review_screen.dart';
 import 'package:helppsico_mobile/presentation/views/sessions_wrapper.dart';
 import '../../../core/theme.dart';
 import 'package:helppsico_mobile/presentation/viewmodels/cubit/auth_cubit.dart';
