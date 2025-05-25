@@ -1,110 +1,120 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mockito/mockito.dart';
-import 'package:mockito/annotations.dart';
 import 'package:helppsico_mobile/core/services/http/generic_http_service.dart';
 import 'package:helppsico_mobile/data/datasource/sessions_data_source.dart';
 import 'package:helppsico_mobile/data/repositories/sessions_repository.dart';
 import 'package:helppsico_mobile/domain/entities/session_model.dart';
+import 'package:mockito/annotations.dart';
+import 'package:mockito/mockito.dart';
 
-@GenerateNiceMocks([MockSpec<ISessionsDataSource>()])
-import 'sessions_repository_test.mocks.dart';
+import 'sessions_repository_test.mocks.dart'; 
 
+@GenerateMocks([SessionsDataSource])
 void main() {
-  late MockISessionsDataSource mockDataSource;
+  late MockSessionsDataSource mockDataSource;
   late SessionRepository repository;
 
   setUp(() {
-    mockDataSource = MockISessionsDataSource();
+    mockDataSource = MockSessionsDataSource();
     repository = SessionRepository(mockDataSource);
   });
 
-  group('SessionRepository', () {
-    final mockSessionData = {
-      'id': '123',
-      'psicologoId': 'Dr. Smith',
-      'pacienteId': 'patient123',
-      'data': '2024-01-01T10:00:00.000Z',
-      'valor': '150.00',
-      'endereco': 'Rua Example, 123',
-      'finalizada': 'false'
-    };
+  final tSessionJson = {
+    'id': '1',
+    'psicologoName': 'Dr. Teste',
+    'pacienteId': 'p1',
+    'data': '2024-07-20T10:00:00Z',
+    'valor': '150.00',
+    'endereco': 'Rua Teste, 123',
+    'finalizada': false,
+  };
 
-    test('getSessions should return list of SessionModel on success', () async {
-      final mockResponse = HttpResponse(
-        statusCode: 200,
-        body: [mockSessionData],
-      );
+  final tSessionModel = SessionModel.fromJson(tSessionJson);
+
+  final tSessionsListJson = [tSessionJson, tSessionJson];
+  final tSessionsListModel = [tSessionModel, tSessionModel];
+
+  group('getSessions', () {
+    test('should return list of SessionModel when call to data source is successful (200)', () async {
 
       when(mockDataSource.getSessions())
-          .thenAnswer((_) async => mockResponse);
+          .thenAnswer((_) async => HttpResponse(statusCode: 200, body: tSessionsListJson));
 
       final result = await repository.getSessions();
 
       expect(result, isA<List<SessionModel>>());
-      expect(result.length, equals(1));
-      expect(result.first.id, equals('123'));
-      expect(result.first.psicologoName, equals('Dr. Smith'));
-      expect(result.first.pacienteId, equals('patient123'));
-      expect(result.first.valor, equals('150.00'));
-      expect(result.first.endereco, equals('Rua Example, 123'));
-      expect(result.first.finalizada, equals(false));
-      expect(result.first.data, isA<DateTime>());
+      expect(result.length, tSessionsListModel.length);
+      expect(result.first.id, tSessionModel.id);
+      verify(mockDataSource.getSessions()).called(1);
     });
 
-    test('getSessions should throw exception on non-200 status code', () async {
-      final mockResponse = HttpResponse(
-        statusCode: 404,
-        body: {'error': 'Not found'},
-      );
+    test('should throw an exception when call to data source is unsuccessful (non-200)', () async {
 
       when(mockDataSource.getSessions())
-          .thenAnswer((_) async => mockResponse);
+          .thenAnswer((_) async => HttpResponse(statusCode: 404, body: 'Not Found'));
 
-      expect(
-        () => repository.getSessions(),
-        throwsA(isA<Exception>()),
-      );
+      expect(() => repository.getSessions(), throwsA(isA<Exception>()));
+      verify(mockDataSource.getSessions()).called(1);
     });
 
-    test('getSessions should handle empty response', () async {
-      final mockResponse = HttpResponse(
-        statusCode: 200,
-        body: [],
-      );
+    test('should throw an exception when data source call throws an error', () async {
 
-      when(mockDataSource.getSessions())
-          .thenAnswer((_) async => mockResponse);
+      when(mockDataSource.getSessions()).thenThrow(Exception('DataSource Error'));
 
-      final result = await repository.getSessions();
-      expect(result, isEmpty);
+      expect(() => repository.getSessions(), throwsA(isA<Exception>()));
+      verify(mockDataSource.getSessions()).called(1);
+    });
+  });
+
+  group('getNextSession', () {
+    test('should return SessionModel when call to data source is successful (200) and body is not empty', () async {
+
+      when(mockDataSource.getNextSession())
+          .thenAnswer((_) async => HttpResponse(statusCode: 200, body: tSessionJson));
+     
+      final result = await repository.getNextSession();
+
+      expect(result, isA<SessionModel>());
+      expect(result?.id, tSessionModel.id);
+      verify(mockDataSource.getNextSession()).called(1);
     });
 
-    test('getSessions should handle malformed date', () async {
-      final malformedData = Map<String, dynamic>.from(mockSessionData);
-      malformedData['data'] = 'invalid-date';
+    test('should return null when call to data source is successful (200) but body is empty map', () async {
 
-      final mockResponse = HttpResponse(
-        statusCode: 200,
-        body: [malformedData],
-      );
+      when(mockDataSource.getNextSession())
+          .thenAnswer((_) async => HttpResponse(statusCode: 200, body: {}));
+     
+      final result = await repository.getNextSession();
 
-      when(mockDataSource.getSessions())
-          .thenAnswer((_) async => mockResponse);
-
-      expect(
-        () => repository.getSessions(),
-        throwsA(isA<FormatException>()),
-      );
+      expect(result, isNull);
+      verify(mockDataSource.getNextSession()).called(1);
     });
 
-    test('getSessions should propagate data source errors', () {
-      when(mockDataSource.getSessions())
-          .thenThrow(Exception('Network error'));
+    test('should return null when call to data source is successful (200) but body is null', () async {
 
-      expect(
-        () => repository.getSessions(),
-        throwsA(isA<Exception>()),
-      );
+      when(mockDataSource.getNextSession())
+          .thenAnswer((_) async => HttpResponse(statusCode: 200, body: null));
+     
+      final result = await repository.getNextSession();
+
+      expect(result, isNull);
+      verify(mockDataSource.getNextSession()).called(1);
+    });
+
+    test('should throw an exception when call to data source is unsuccessful (non-200)', () async {
+
+      when(mockDataSource.getNextSession())
+          .thenAnswer((_) async => HttpResponse(statusCode: 500, body: 'Server Error'));
+
+      expect(() => repository.getNextSession(), throwsA(isA<Exception>()));
+      verify(mockDataSource.getNextSession()).called(1);
+    });
+
+    test('should rethrow exception when data source call throws an error', () async {
+
+      when(mockDataSource.getNextSession()).thenThrow(Exception('DataSource Error'));
+
+      expect(() => repository.getNextSession(), throwsA(isA<Exception>()));
+      verify(mockDataSource.getNextSession()).called(1);
     });
   });
 }
