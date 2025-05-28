@@ -3,11 +3,13 @@ import 'dart:convert';
 import 'package:helppsico_mobile/core/services/http/generic_http_service.dart';
 import 'package:helppsico_mobile/core/services/storage/secure_storage_service.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
+import 'package:helppsico_mobile/domain/entities/user_model.dart';
 
 class AuthService {
   final IGenericHttp _http;
   final SecureStorageService _storage;
-  final String _baseUrl = "https://api-mobile-render.onrender.com"; 
+  // Atualizado para a nova API Java
+  final String _baseUrl = "http://localhost:8080"; // Ajuste conforme necessário para o ambiente de produção
 
   AuthService({
     IGenericHttp? http, 
@@ -19,36 +21,63 @@ class AuthService {
   Future<AuthResponse> login(String email, String password) async {
     try {
       final response = await _http.post(
-        "$_baseUrl/login",
+        "$_baseUrl/login/paciente",
         {
           'email': email,
-          'password': password,
+          'senha': password, // Alterado de 'password' para 'senha' conforme API Java
         },
       );
 
       if (response.statusCode == 200) {
-        final token = response.body['token'];
-        final userData = response.body['user'];
+        // A API Java encapsula todas as respostas em um objeto ResponseDto<T> com o dado principal no campo 'dado'
+        final responseData = response.body['dado'];
         
-   
+        if (responseData == null) {
+          throw Exception('Dados de resposta inválidos');
+        }
+        
+        final token = responseData['token'];
+        final userId = responseData['idUsuario']?.toString();
+        final userEmail = responseData['email'];
+        
+        if (token == null || userId == null || userEmail == null) {
+          throw Exception('Dados de autenticação incompletos');
+        }
+        
+        // Salva o token para autenticação
         await _storage.saveToken(token);
         
-    
-        await _storage.saveUserData(json.encode(userData));
+        // Salva os dados do usuário individualmente para fácil acesso
+        await _storage.saveUserId(userId);
+        await _storage.saveUserEmail(userEmail);
+        
+        // Cria um objeto User com os dados disponíveis
+        final user = User(
+          id: userId,
+          name: userEmail.split('@')[0], // Usa parte do email como nome temporário
+          email: userEmail,
+          password: '', // Não armazenamos a senha
+          role: 'PACIENTE', // Papel fixo para esta implementação
+        );
+        
+        // Salva os dados completos do usuário como JSON
+        await _storage.saveUserData(json.encode(user.toJson()));
 
         return AuthResponse(
-          id: userData['id'],
-          name: userData['name'], 
-          email: userData['email'],
-          role: userData['role'],
-          message: response.body['message'],
+          id: int.parse(userId),
+          name: user.name, 
+          email: userEmail,
+          role: 'PACIENTE',
+          message: 'Login realizado com sucesso',
           token: token,
         );
       } else {
-        throw Exception(response.body['message'] ?? 'Authentication failed');
+        // Tratamento de erro conforme o formato da API Java
+        final errorMessage = response.body['mensagem'] ?? 'Falha na autenticação';
+        throw Exception(errorMessage);
       }
     } catch (e) {
-      throw Exception('Failed to authenticate: ${e.toString()}');
+      throw Exception('Falha ao autenticar: ${e.toString()}');
     }
   }
   
@@ -63,10 +92,35 @@ class AuthService {
   
   
   Future<Map<String, dynamic>?> getUserInfo() async {
-    final token = await _storage.getToken();
-    if (token == null) return null;
-    
-    return JwtDecoder.decode(token);
+    try {
+      // Verifica se há um token válido
+      final token = await _storage.getToken();
+      if (token == null) return null;
+      
+      // Obtém os dados do usuário armazenados
+      final userData = await _storage.getUserData();
+      if (userData != null) {
+        return json.decode(userData);
+      }
+      
+      // Se não tiver dados armazenados, tenta extrair do token
+      final userId = await _storage.getUserId();
+      final userEmail = await _storage.getUserEmail();
+      
+      if (userId != null && userEmail != null) {
+        return {
+          'id': userId,
+          'email': userEmail,
+          'role': 'PACIENTE',
+        };
+      }
+      
+      // Se não tiver dados específicos, usa o payload do token
+      return JwtDecoder.decode(token);
+    } catch (e) {
+      print('Erro ao obter informações do usuário: $e');
+      return null;
+    }
   }
   
  
@@ -74,8 +128,10 @@ class AuthService {
     final token = await _storage.getToken();
     if (token == null) return {};
     
+    // Formato de autenticação para a API Java
     return {
       'Authorization': 'Bearer $token',
+      'Content-Type': 'application/json',
     };
   }
   

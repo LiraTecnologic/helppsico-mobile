@@ -7,16 +7,50 @@ class SessionRepository {
   SessionRepository(this._sessionsDataSource);
 
   Future<List<SessionModel>> getSessions() async {
-    final response = await _sessionsDataSource.getSessions();
-    
-    if (response.statusCode == 200) {
-      final List<dynamic> jsonList = response.body;
-      final List<SessionModel> sessions = jsonList.map((json) => SessionModel.fromJson(json as Map<String, dynamic>)).toList();
+    try {
+      final response = await _sessionsDataSource.getSessions();
       
-      return sessions;
-    } else {
-      throw Exception('Falha ao carregar sessões');
+      if (response.statusCode == 200) {
+        // A API Java encapsula as respostas em um objeto ResponseDto<T> com o dado principal no campo 'dado'
+        final responseData = response.body['dado'];
+        
+        if (responseData == null) {
+          return [];
+        }
+        
+        // A API retorna uma página de consultas
+        final consultasPage = responseData;
+        final List<dynamic> consultas = consultasPage['content'] ?? [];
+        
+        // Converte cada consulta para o modelo SessionModel
+        final List<SessionModel> sessions = consultas.map((json) {
+          // Adapta o formato da API Java para o formato esperado pelo app
+          final adaptedJson = _adaptConsultaToSessionModel(json);
+          return SessionModel.fromJson(adaptedJson);
+        }).toList();
+        
+        return sessions;
+      } else {
+        final errorMessage = response.body['mensagem'] ?? 'Falha ao carregar sessões';
+        throw Exception(errorMessage);
+      }
+    } catch (e) {
+      print('Erro ao buscar sessões: $e');
+      throw Exception('Falha ao carregar sessões: $e');
     }
+  }
+  
+  /// Adapta o formato da ConsultaDto da API Java para o formato esperado pelo SessionModel
+  Map<String, dynamic> _adaptConsultaToSessionModel(Map<String, dynamic> consultaDto) {
+    return {
+      'id': consultaDto['id']?.toString() ?? '',
+      'psicologoName': consultaDto['nomePsicologo'] ?? '',
+      'pacienteId': consultaDto['idPaciente']?.toString() ?? '',
+      'data': consultaDto['dataHora'] ?? DateTime.now().toIso8601String(),
+      'valor': consultaDto['valor']?.toString() ?? '',
+      'endereco': consultaDto['endereco'] ?? '',
+      'finalizada': consultaDto['finalizada'] ?? false,
+    };
   }
 
   Future<SessionModel?> getNextSession() async {
@@ -29,13 +63,16 @@ class SessionRepository {
         print('JSON data: $jsonData');
         
         if (jsonData is Map<String, dynamic> && jsonData.isNotEmpty) {
-          return SessionModel.fromJson(jsonData);
+          // Adapta o formato da API Java para o formato esperado pelo app
+          final adaptedJson = _adaptConsultaToSessionModel(jsonData);
+          return SessionModel.fromJson(adaptedJson);
         }
         print('No session data found');
         return null;
       } else {
-        print('Failed to load next session: ${response.statusCode}');
-        throw Exception('Falha ao carregar próxima sessão');
+        final errorMessage = response.body['mensagem'] ?? 'Falha ao carregar próxima sessão';
+        print('Failed to load next session: ${response.statusCode} - $errorMessage');
+        throw Exception(errorMessage);
       }
     } catch (e) {
       print('Error encountered: $e');
