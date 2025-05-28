@@ -9,11 +9,58 @@ class DocumentRepository {
   Future<List<DocumentModel>> getDocuments() async {
     try {
       final response = await _dataSource.getDocuments();
-      final List<dynamic> jsonList = response.body;
-      return jsonList.map((json) => DocumentModel.fromJson(json)).toList();
+      
+      // Verifica se a resposta é uma lista ou um objeto paginado
+      if (response.body is List) {
+        final List<dynamic> jsonList = response.body;
+        return jsonList.map((json) => _adaptSolicitacaoToDocumentModel(json)).toList();
+      } else if (response.body is Map && response.body.containsKey('content')) {
+        // Resposta paginada da API Java
+        final List<dynamic> jsonList = response.body['content'] ?? [];
+        return jsonList.map((json) => _adaptSolicitacaoToDocumentModel(json)).toList();
+      } else {
+        // Caso a resposta não seja nem lista nem objeto paginado
+        return [];
+      }
     } catch (e) {
+      print('Erro ao buscar documentos: $e');
       throw Exception('Erro ao buscar documentos: $e');
     }
+  }
+  
+  /// Adapta o formato da SolicitacaoDocumentoDto da API Java para o formato esperado pelo DocumentModel
+  DocumentModel _adaptSolicitacaoToDocumentModel(Map<String, dynamic> solicitacaoDto) {
+    // Mapeia o tipo de documento da API Java para o enum DocumentType
+    DocumentType _mapDocumentType(String? tipo) {
+      if (tipo == null) return DocumentType.other;
+      
+      switch (tipo.toUpperCase()) {
+        case 'LAUDO':
+          return DocumentType.report;
+        case 'RECEITA':
+          return DocumentType.prescription;
+        case 'ATESTADO':
+          return DocumentType.certificate;
+        case 'EXAME':
+          return DocumentType.exam;
+        default:
+          return DocumentType.other;
+      }
+    }
+    
+    return DocumentModel(
+      id: solicitacaoDto['id']?.toString() ?? '',
+      title: solicitacaoDto['titulo'] ?? '',
+      description: solicitacaoDto['descricao'] ?? '',
+      date: solicitacaoDto['dataCriacao'] ?? DateTime.now().toIso8601String(),
+      fileSize: solicitacaoDto['tamanhoArquivo']?.toString() ?? '0',
+      fileType: solicitacaoDto['tipoArquivo'] ?? '',
+      type: _mapDocumentType(solicitacaoDto['tipo']),
+      isFavorite: solicitacaoDto['favorito'] ?? false,
+      patientId: solicitacaoDto['idPaciente']?.toString() ?? '',
+      patientName: solicitacaoDto['nomePaciente'] ?? '',
+      fileUrl: solicitacaoDto['urlArquivo'] ?? '',
+    );
   }
 
   Future<DocumentModel> uploadDocument(DocumentModel document) async {
@@ -27,8 +74,9 @@ class DocumentRepository {
       };
 
       final response = await _dataSource.uploadDocument(document.fileUrl, metadata);
-      return DocumentModel.fromJson(response.body);
+      return _adaptSolicitacaoToDocumentModel(response.body);
     } catch (e) {
+      print('Erro ao fazer upload do documento: $e');
       throw Exception('Erro ao fazer upload do documento: $e');
     }
   }
@@ -50,8 +98,9 @@ class DocumentRepository {
         document.id!,
         document.toJson(),
       );
-      return DocumentModel.fromJson(response.body);
+      return _adaptSolicitacaoToDocumentModel(response.body);
     } catch (e) {
+      print('Erro ao atualizar documento: $e');
       throw Exception('Erro ao atualizar documento: $e');
     }
   }

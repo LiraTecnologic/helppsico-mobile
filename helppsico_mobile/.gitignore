@@ -3,4 +3,8 @@ build/
 /ios
 /android
 /.dart_tool
-/build
+/linux
+/macos
+/windows
+/.flutter-plugins
+/.flutter-plugins-dependencies
