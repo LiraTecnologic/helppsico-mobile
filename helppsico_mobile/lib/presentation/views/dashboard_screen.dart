@@ -42,8 +42,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
         return Icons.description;
       case DocumentType.RELATORIO_PSICOLOGICO:
         return Icons.psychology;
-      case DocumentType.RELATORIO_MULTIPROFISSIONAL:
-        return Icons.group;
       case DocumentType.LAUDO_PSICOLOGICO:
         return Icons.assessment;
       case DocumentType.PARECER_PSICOLOGICO:

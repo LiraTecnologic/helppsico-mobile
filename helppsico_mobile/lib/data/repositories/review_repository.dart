@@ -1,7 +1,8 @@
+import 'package:helppsico_mobile/core/services/auth/auth_service.dart';
+import 'package:helppsico_mobile/core/services/http/generic_http_service.dart';
+import 'package:helppsico_mobile/core/services/storage/secure_storage_service.dart' show SecureStorageService;
 import 'package:helppsico_mobile/data/datasource/review_datasource.dart';
-import 'package:helppsico_mobile/data/services/auth_service.dart';
-import 'package:helppsico_mobile/data/services/generic_http_service.dart';
-import 'package:helppsico_mobile/data/services/secure_storage_service.dart';
+
 import '../../domain/entities/review_entity.dart';
 
 
@@ -15,7 +16,7 @@ class ReviewRepository {
     AuthService? authService,
   }) : _dataSource = dataSource ?? 
        ReviewDataSource(
-         http ?? GenericHttpService(),
+         http ?? GenericHttp(),
          secureStorage ?? SecureStorageService(),
          authService ?? AuthService(),
        );

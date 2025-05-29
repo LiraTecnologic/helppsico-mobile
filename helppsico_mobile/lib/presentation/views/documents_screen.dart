@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:helppsico_mobile/core/services/auth/auth_service.dart';
+import 'package:helppsico_mobile/core/services/storage/secure_storage_service.dart';
 import 'package:helppsico_mobile/data/repositories/document_repository.dart';
 import 'package:helppsico_mobile/data/datasource/documents_datasource.dart';
 import 'package:helppsico_mobile/core/services/http/generic_http_service.dart';
@@ -17,7 +19,7 @@ class DocumentsScreen extends StatefulWidget {
 
 class _DocumentsScreenState extends State<DocumentsScreen> with SingleTickerProviderStateMixin {
   final TextEditingController _searchController = TextEditingController();
-  final DocumentRepository _documentRepository = DocumentRepository(DocumentsDataSource(GenericHttp()));
+  final DocumentRepository _documentRepository = DocumentRepository(DocumentsDataSource(GenericHttp(),SecureStorageService(), AuthService()));
   List<DocumentModel> _documents = [];
   List<DocumentModel> _filteredDocuments = [];
   DocumentType? _selectedType;
@@ -103,8 +105,6 @@ class _DocumentsScreenState extends State<DocumentsScreen> with SingleTickerProv
         return Icons.description;
       case DocumentType.RELATORIO_PSICOLOGICO:
         return Icons.psychology;
-      case DocumentType.RELATORIO_MULTIPROFISSIONAL:
-        return Icons.group;
       case DocumentType.LAUDO_PSICOLOGICO:
         return Icons.assessment;
       case DocumentType.PARECER_PSICOLOGICO:

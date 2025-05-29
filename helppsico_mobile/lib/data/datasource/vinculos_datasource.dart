@@ -7,6 +7,7 @@ abstract class IVinculosDataSource {
   Future<HttpResponse> getVinculoByPacienteId();
   Future<HttpResponse> solicitarVinculo(String psicologoId);
   Future<HttpResponse> cancelarVinculo(String vinculoId);
+
 }
 
 class VinculosDataSource implements IVinculosDataSource {
@@ -35,8 +36,8 @@ class VinculosDataSource implements IVinculosDataSource {
       }
       
       // Como fallback, tenta obter do AuthService
-      final user = await _authService.getCurrentUser();
-      return user?.id;
+      final userId2 = await _authService.getCurrentUser();
+      return userId2;
     } catch (e) {
       print('Erro ao obter ID do paciente: $e');
       return null;

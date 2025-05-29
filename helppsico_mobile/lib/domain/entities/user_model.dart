@@ -26,7 +26,7 @@ class User {
       id: json['id']?.toString() ?? '',
       name: json['name'] ?? '',
       email: json['email'] ?? '',
-      password: '', // Não armazenamos a senha
+      password: '', 
       role: json['role'] ?? 'PACIENTE',
       cpf: json['cpf'],
       telefone: json['telefone'],

@@ -7,7 +7,7 @@ class VinculoModel {
   final String psicologoCrp;
   final double valorConsulta;
   final String fotoUrl;
-  final String status; // PENDENTE, ATIVO, RECUSADO, CANCELADO
+  final String status; 
   
   VinculoModel({
     required this.id,

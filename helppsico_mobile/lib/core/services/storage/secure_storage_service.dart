@@ -1,32 +1,24 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
-/// A service for storing and retrieving user data and authentication tokens.
-///
-/// This service provides methods to manage authentication tokens and user data
-/// using SharedPreferences for easy access across the application.
 class SecureStorageService {
   late SharedPreferences _prefs;
   
-  /// Key used for storing the JWT authentication token
+
   static const String _tokenKey = 'jwt_token';
-  
-  /// Key used for storing the user data
   static const String _userDataKey = 'user_data';
-  
-  /// Key used for storing the user ID
   static const String _userIdKey = 'user_id';
-  
-  /// Key used for storing the user email
   static const String _userEmailKey = 'user_email';
 
-  /// Creates a new instance of [SecureStorageService].
-  ///
-  /// Initializes SharedPreferences instance.
-  SecureStorageService() {
-    _initPrefs();
+
+
+  SecureStorageService._();
+
+  static Future <SecureStorageService> create() async {
+    final instance = SecureStorageService._();
+    await instance._initPrefs();
+    return instance;
   }
-  
-  /// Initializes SharedPreferences instance
+ 
   Future<void> _initPrefs() async {
     _prefs = await SharedPreferences.getInstance();
   }

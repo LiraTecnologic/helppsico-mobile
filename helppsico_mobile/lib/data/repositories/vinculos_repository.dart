@@ -14,7 +14,7 @@ class VinculosRepository {
     AuthService? authService,
   }) : _dataSource = dataSource ?? 
        VinculosDataSource(
-         http ?? GenericHttpService(),
+         http ?? GenericHttp(),
          storage: secureStorage ?? SecureStorageService(),
          authService: authService ?? AuthService(),
        );

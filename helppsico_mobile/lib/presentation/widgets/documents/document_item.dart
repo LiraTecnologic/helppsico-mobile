@@ -99,10 +99,6 @@ class DocumentListItem extends StatelessWidget {
         backgroundColor = Colors.orange.withOpacity(0.1);
         textColor = Colors.orange;
         break;
-      case DocumentType.RELATORIO_MULTIPROFISSIONAL:
-        backgroundColor = Colors.green.withOpacity(0.1);
-        textColor = Colors.green;
-        break;
       case DocumentType.LAUDO_PSICOLOGICO:
         backgroundColor = Colors.red.withOpacity(0.1);
         textColor = Colors.red;

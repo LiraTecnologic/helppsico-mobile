@@ -7,16 +7,20 @@ import 'package:helppsico_mobile/domain/entities/user_model.dart';
 
 class AuthService {
   final IGenericHttp _http;
-  final SecureStorageService _storage;
+  late  SecureStorageService _storage;
   // Atualizado para a nova API Java
   final String _baseUrl = "http://localhost:8080"; // Ajuste conforme necessário para o ambiente de produção
 
   AuthService({
     IGenericHttp? http, 
-    SecureStorageService? storage
+   
   }) : 
     _http = http ?? GenericHttp(),
-    _storage = storage ?? SecureStorageService();
+//
+@override
+ Future<void> initStorage() async {
+    _storage =  await SecureStorageService.create();
+  }
 
   Future<AuthResponse> login(String email, String password) async {
     try {
@@ -24,7 +28,7 @@ class AuthService {
         "$_baseUrl/login/paciente",
         {
           'email': email,
-          'senha': password, // Alterado de 'password' para 'senha' conforme API Java
+          'senha': password, // Alterado de 'password'' para 'senha' conforme API Java
         },
       );
 
@@ -142,7 +146,14 @@ class AuthService {
   Future <String> getToken() async {
     return await _storage.getToken()?? '';
   }
+
+  Future <String?> getCurrentUser() async {
+    return await _storage.getUserId();
+  }
 }
+
+
+
 
 class AuthResponse {
   final int id;

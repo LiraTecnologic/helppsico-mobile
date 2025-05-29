@@ -1,4 +1,4 @@
-import 'dart:convert';
+
 import 'package:helppsico_mobile/core/services/http/generic_http_service.dart';
 import 'package:helppsico_mobile/core/services/auth/auth_service.dart';
 import 'package:helppsico_mobile/core/services/storage/secure_storage_service.dart';
@@ -6,7 +6,7 @@ import 'package:helppsico_mobile/core/services/storage/secure_storage_service.da
 class DocumentsDataSource {
   String get baseUrl {
     const bool isAndroid = bool.fromEnvironment('dart.vm.android');
-    // Atualiza para a URL da API Java
+
     return isAndroid ? 'http://10.0.2.2:8080' : 'http://localhost:8080';
   }
   
@@ -16,16 +16,16 @@ class DocumentsDataSource {
   
   DocumentsDataSource(this._http, this._secureStorage, this._authService);
 
-  /// Obtém o ID do paciente logado
+  
   Future<String> _getPacienteId() async {
     try {
-      // Primeiro tenta obter do SecureStorage
+   
       final userId = await _secureStorage.getUserId();
       if (userId != null && userId.isNotEmpty) {
         return userId;
       }
       
-      // Se não encontrar, tenta obter do AuthService
+  
       final userInfo = await _authService.getUserInfo();
       return userInfo?['id'] ?? '';
     } catch (e) {
@@ -53,13 +53,13 @@ class DocumentsDataSource {
         throw Exception(errorMessage);
       }
       
-      // A API Java encapsula as respostas em um objeto ResponseDto<T> com o dado principal no campo 'dado'
+   
       final responseData = response.body;
       if (responseData == null || !responseData.containsKey('dado')) {
         throw Exception('Formato de resposta inválido');
       }
       
-      // Adapta o formato da resposta para o esperado pelo app
+  
       final adaptedResponse = HttpResponse(
         statusCode: response.statusCode,
         body: responseData['dado'],
@@ -80,13 +80,13 @@ class DocumentsDataSource {
         throw Exception('ID do paciente não encontrado');
       }
       
-      // Adapta os metadados para o formato esperado pela API Java
+
       final solicitacaoDocumentoDto = {
         'idPaciente': pacienteId,
         'titulo': metadata['title'] ?? '',
         'descricao': metadata['description'] ?? '',
         'tipo': metadata['type'] ?? 'OUTRO',
-        'urlArquivo': filePath, // Na API Java, esperamos que o arquivo já esteja hospedado em algum lugar
+        'urlArquivo': filePath, 
       };
       
       final response = await _http.post(
@@ -99,13 +99,12 @@ class DocumentsDataSource {
         throw Exception(errorMessage);
       }
       
-      // A API Java encapsula as respostas em um objeto ResponseDto<T> com o dado principal no campo 'dado'
+
       final responseData = response.body;
       if (responseData == null || !responseData.containsKey('dado')) {
         throw Exception('Formato de resposta inválido');
       }
       
-      // Adapta o formato da resposta para o esperado pelo app
       final adaptedResponse = HttpResponse(
         statusCode: response.statusCode,
         body: responseData['dado'],
@@ -124,7 +123,7 @@ class DocumentsDataSource {
         throw Exception('ID do paciente não encontrado');
       }
       
-      // Adapta os dados para o formato esperado pela API Java
+  
       final solicitacaoDocumentoDto = {
         'id': documentId,
         'idPaciente': pacienteId,
@@ -144,13 +143,13 @@ class DocumentsDataSource {
         throw Exception(errorMessage);
       }
       
-      // A API Java encapsula as respostas em um objeto ResponseDto<T> com o dado principal no campo 'dado'
+     
       final responseData = response.body;
       if (responseData == null || !responseData.containsKey('dado')) {
         throw Exception('Formato de resposta inválido');
       }
       
-      // Adapta o formato da resposta para o esperado pelo app
+    
       final adaptedResponse = HttpResponse(
         statusCode: response.statusCode,
         body: responseData['dado'],
@@ -180,9 +179,9 @@ class DocumentsDataSource {
         throw Exception(errorMessage);
       }
       
-      // Cria uma resposta adaptada para manter a compatibilidade
+
       final adaptedResponse = HttpResponse(
-        statusCode: 204, // Mantém o código 204 para compatibilidade
+        statusCode: 204, 
         body: {},
       );
       
@@ -200,7 +199,7 @@ class DocumentsDataSource {
         throw Exception('ID do paciente não encontrado');
       }
       
-      // Na API Java, o endpoint para favoritar é diferente
+ 
       final response = await _http.put(
         '$baseUrl/solicitacoes-documentos/$documentId/favorito',
         {},
@@ -215,13 +214,13 @@ class DocumentsDataSource {
         throw Exception(errorMessage);
       }
       
-      // A API Java encapsula as respostas em um objeto ResponseDto<T> com o dado principal no campo 'dado'
+
       final responseData = response.body;
       if (responseData == null || !responseData.containsKey('dado')) {
         throw Exception('Formato de resposta inválido');
       }
       
-      // Adapta o formato da resposta para o esperado pelo app
+
       final adaptedResponse = HttpResponse(
         statusCode: response.statusCode,
         body: responseData['dado'],

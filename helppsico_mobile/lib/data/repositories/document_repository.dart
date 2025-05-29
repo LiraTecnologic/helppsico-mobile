@@ -10,16 +10,16 @@ class DocumentRepository {
     try {
       final response = await _dataSource.getDocuments();
       
-      // Verifica se a resposta é uma lista ou um objeto paginado
+    
       if (response.body is List) {
         final List<dynamic> jsonList = response.body;
         return jsonList.map((json) => _adaptSolicitacaoToDocumentModel(json)).toList();
       } else if (response.body is Map && response.body.containsKey('content')) {
-        // Resposta paginada da API Java
+    
         final List<dynamic> jsonList = response.body['content'] ?? [];
         return jsonList.map((json) => _adaptSolicitacaoToDocumentModel(json)).toList();
       } else {
-        // Caso a resposta não seja nem lista nem objeto paginado
+      
         return [];
       }
     } catch (e) {
@@ -31,20 +31,20 @@ class DocumentRepository {
   /// Adapta o formato da SolicitacaoDocumentoDto da API Java para o formato esperado pelo DocumentModel
   DocumentModel _adaptSolicitacaoToDocumentModel(Map<String, dynamic> solicitacaoDto) {
     // Mapeia o tipo de documento da API Java para o enum DocumentType
-    DocumentType _mapDocumentType(String? tipo) {
-      if (tipo == null) return DocumentType.other;
+    DocumentType _mapDocumentType(String tipo) {
+  
       
       switch (tipo.toUpperCase()) {
         case 'LAUDO':
-          return DocumentType.report;
+          return DocumentType.LAUDO_PSICOLOGICO;
         case 'RECEITA':
-          return DocumentType.prescription;
+          return DocumentType.DECLARACAO;
         case 'ATESTADO':
-          return DocumentType.certificate;
+          return DocumentType.ATESTADO;
         case 'EXAME':
-          return DocumentType.exam;
+          return DocumentType.RELATORIO_PSICOLOGICO;
         default:
-          return DocumentType.other;
+          return DocumentType.ATESTADO;
       }
     }
     
