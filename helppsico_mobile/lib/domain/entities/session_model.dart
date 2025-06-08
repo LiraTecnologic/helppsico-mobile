@@ -1,6 +1,6 @@
 class SessionModel {
   final String id;
-  final String psicologoName;
+final String psicologoName;
   final String pacienteId;
   final DateTime data;
   final String valor;

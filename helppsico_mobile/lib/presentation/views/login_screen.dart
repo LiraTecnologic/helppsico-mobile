@@ -32,10 +32,11 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => AuthCubit(),
-      child: BlocConsumer<AuthCubit, AuthState>(
+    print('[LoginScreen] Build method called.');
+    // Removed local BlocProvider<AuthCubit>, will use the one from MyApp
+    return BlocConsumer<AuthCubit, AuthState>(
         listener: (context, state) {
+          print('[LoginScreen] AuthState listener: $state');
           if (state is AuthSuccess) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
@@ -44,11 +45,14 @@ class _LoginScreenState extends State<LoginScreen> {
                 behavior: SnackBarBehavior.floating,
               ),
             );
+            print('[LoginScreen] AuthSuccess: Navigating to DashboardScreen.');
             Navigator.of(context).pushReplacement(
               MaterialPageRoute(
                 builder: (context) => const DashboardScreen(),
               ),
             );
+          } else if (state is AuthFailure) {
+            print('[LoginScreen] AuthFailure: ${state.message}');
           } else if (state is AuthFailure) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
@@ -130,6 +134,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                     onPressed: () {
                                       if (_formKey.currentState?.validate() ??
                                           false) {
+                                        print('[LoginScreen] Login button pressed. Email: ${_emailController.text}');
                                         context.read<AuthCubit>().login(
                                               _emailController.text,
                                               _passwordController.text,
@@ -192,7 +197,7 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           );
         },
-      ),
-    );
+      );
+    
   }
 }

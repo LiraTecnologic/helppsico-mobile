@@ -1,78 +1,99 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../data/repositories/review_repository.dart';
+import 'dart:convert';
+import 'package:get_it/get_it.dart';
+import 'package:helppsico_mobile/core/services/storage/secure_storage_service.dart';
 import '../../../domain/entities/review_entity.dart';
 import '../state/review_state.dart';
 import 'dart:math';
 
-
-
-
-
 class ReviewCubit extends Cubit<ReviewState> {
-  static final Map<String, ReviewCubit> _instances = {};
-  static final Map<String, int> _refCounts = {};
+  static ReviewCubit? _instance;
 
   final ReviewRepository _repository;
+  final SecureStorageService _secureStorageService;
   final TextEditingController comentarioController = TextEditingController();
   int _rating = 0;
-  final String _instanceId = Random().nextInt(10000).toString(); 
+  final String _instanceId = Random().nextInt(10000).toString();
 
- 
-  ReviewCubit._internal(this._repository, String psicologoId, String psicologoNome)
+  String? _currentPsicologoId;
+  String? _currentPsicologoNome;
+
+  ReviewCubit._internal(this._repository, this._secureStorageService)
       : super(const ReviewLoading()) {
-    print('[ReviewCubit-$_instanceId] Instância INTERNA criada para $psicologoId, estado inicial: $state');
-    
+    print('[ReviewCubit-$_instanceId] Instância INTERNA criada, estado inicial: $state');
+    print('[ReviewCubit] Instance created with initial state: ReviewInitial');
   }
 
-
-  factory ReviewCubit.instanceFor(String psicologoId, String psicologoNome, {ReviewRepository? repository}) {
-    if (!_instances.containsKey(psicologoId)) {
-      print('[ReviewCubitFactory] Criando NOVA instância para $psicologoId');
-      _instances[psicologoId] = ReviewCubit._internal(
+  factory ReviewCubit.instance({
+    ReviewRepository? repository,
+    SecureStorageService? secureStorageService,
+  }) {
+    if (_instance == null) {
+      print('[ReviewCubitFactory] Criando NOVA instância única');
+      _instance = ReviewCubit._internal(
         repository ?? ReviewRepository(),
-        psicologoId,
-        psicologoNome,
+        secureStorageService ?? GetIt.instance<SecureStorageService>(),
       );
-      _refCounts[psicologoId] = 0;
-      
     } else {
-      print('[ReviewCubitFactory] Reutilizando instância EXISTENTE para $psicologoId');
+      print('[ReviewCubitFactory] Reutilizando instância EXISTENTE única');
     }
-    _refCounts[psicologoId] = (_refCounts[psicologoId] ?? 0) + 1;
-    print('[ReviewCubitFactory] Contagem de referência para $psicologoId: ${_refCounts[psicologoId]}');
-    return _instances[psicologoId]!;
+    return _instance!;
   }
 
-  static void disposeInstance(String psicologoId) {
-    if (_instances.containsKey(psicologoId)) {
-      _refCounts[psicologoId] = (_refCounts[psicologoId] ?? 1) - 1;
-      print('[ReviewCubitFactory] Contagem de referência para $psicologoId após dispose: ${_refCounts[psicologoId]}');
-      if (_refCounts[psicologoId]! <= 0) {
-        print('[ReviewCubitFactory] Fechando e removendo instância para $psicologoId');
-        _instances[psicologoId]!.close();
-        _instances.remove(psicologoId);
-        _refCounts.remove(psicologoId);
-      } else {
-        print('[ReviewCubitFactory] Instância para $psicologoId ainda em uso, não fechada.');
-      }
+  // Optional: if you need a way to dispose the singleton, e.g., for tests or app lifecycle events
+  static void disposeInstance() {
+    if (_instance != null) {
+      print('[ReviewCubitFactory] Fechando e removendo instância única');
+      _instance!.close();
+      _instance = null;
     }
   }
 
-
-  Future<void> initialize (String psicologoId, String psicologoNome) async {
-    print('[ReviewCubit-$_instanceId] initialize chamado com psicologoId: $psicologoId, psicologoNome: $psicologoNome, estado atual: $state');
+  Future<void> initialize() async {
+    print('[ReviewCubit-$_instanceId] initialize chamado, estado atual: $state');
+    print('[ReviewCubit] loadReviews called');
+    emit(const ReviewLoading());
+    print('[ReviewCubit] Emitted ReviewLoading state');
     try {
+      final psicologoDataString = await _secureStorageService.getPsicologoData();
+      if (psicologoDataString == null) {
+        print('[ReviewCubit-$_instanceId] Dados do psicólogo não encontrados no storage.');
+        emit(const ReviewError(message: 'Dados do psicólogo não encontrados. Faça login novamente.'));
+        return;
+      }
+
+      final psicologoData = json.decode(psicologoDataString);
+      final psicologoId = psicologoData['id'] as String?;
+      final psicologoNome = psicologoData['nome'] as String?;
+
+      if (psicologoId == null || psicologoNome == null) {
+        print('[ReviewCubit-$_instanceId] ID ou nome do psicólogo ausentes nos dados do storage.');
+        emit(const ReviewError(message: 'Informações do psicólogo incompletas. Faça login novamente.'));
+        return;
+      }
+
+      _currentPsicologoId = psicologoId;
+      _currentPsicologoNome = psicologoNome;
+      print('[ReviewCubit-$_instanceId] Psicólogo ID: $psicologoId, Nome: $psicologoNome');
+
+      print('[ReviewCubit] Calling repository.getReviews()');
       final reviews = await _repository.getReviewsByPsicologoId(psicologoId);
       print('[ReviewCubit-$_instanceId] Reviews carregadas: ${reviews.length} avaliações');
+      print('[ReviewCubit] Repository returned ${reviews.length} reviews');
       emit(ReviewInitial(
         psicologoId: psicologoId,
         psicologoNome: psicologoNome,
         reviews: reviews,
       ));
       print('[ReviewCubit-$_instanceId] [initialize] Estado atual após inicialização: $state');
+      print('[ReviewCubit] Emitted ReviewLoaded state with ${reviews.length} reviews');
     } catch (e) {
-      emit(ReviewError(message: 'Erro ao carregar avaliações: ${e.toString()}'));
+      print('[ReviewCubit-$_instanceId] Erro ao inicializar: ${e.toString()}');
+      print('[ReviewCubit] Error loading reviews: $e');
+      emit(ReviewError(message: 'Erro ao carregar dados para avaliação: ${e.toString()}'));
+      print('[ReviewCubit] Emitted ReviewError state: ${e.toString()}');
     }
   }
 
@@ -130,6 +151,7 @@ class ReviewCubit extends Cubit<ReviewState> {
 
   Future<void> enviarAvaliacao() async {
     print('[ReviewCubit-$_instanceId] enviarAvaliacao chamado com rating: $_rating, comentário: ${comentarioController.text}, estado atual: $state');
+    print('[ReviewCubit] addReview called with review: id=${DateTime.now().millisecondsSinceEpoch.toString()}, rating=$_rating');
     try {
       if (_rating == 0) {
         if (state is ReviewInitial || state is ReviewRated) {
@@ -160,74 +182,52 @@ class ReviewCubit extends Cubit<ReviewState> {
         return;
       }
 
-      String psicologoId;
-      String psicologoNome;
-      List<ReviewEntity> currentReviews;
-  
-      if (currentState is ReviewInitial) {
-        psicologoId = currentState.psicologoId;
-        psicologoNome = currentState.psicologoNome;
-        currentReviews = currentState.reviews;
-      } else {
-        final ratedState = currentState as ReviewRated;
-        psicologoId = ratedState.psicologoId;
-        psicologoNome = ratedState.psicologoNome;
-        currentReviews = ratedState.reviews;
+      if (_currentPsicologoId == null || _currentPsicologoNome == null) {
+        emit(const ReviewError(message: 'Informações do psicólogo não disponíveis para enviar avaliação.'));
+        return;
       }
-  
+
       final newReview = ReviewEntity(
         id: DateTime.now().millisecondsSinceEpoch.toString(),
-        psicologoId: psicologoId,
-        userName: 'Usuário Atual',
+        psicologoId: _currentPsicologoId!,
+        userName: 'Usuário Atual', // Idealmente, obter o nome do usuário logado
         rating: _rating,
         comment: comment.isEmpty ? "Sem comentário" : comment,
         date: DateTime.now(),
       );
-  
-      psicologoId = _getCurrentPsicologoId();
 
+      print('[ReviewCubit] Calling repository.addReview()');
       await _repository.addReview(newReview);
-      final updatedReviews = await _repository.getReviewsByPsicologoId(psicologoId);
-      
+      print('[ReviewCubit] Review added successfully, reloading reviews');
+      final updatedReviews = await _repository.getReviewsByPsicologoId(_currentPsicologoId!); // Corrigido para usar _currentPsicologoId
+
       _rating = 0;
       comentarioController.clear();
-      
+
       emit(ReviewSuccess(
         message: 'Avaliação enviada com sucesso!',
-        psicologoId: psicologoId,
-        psicologoNome: psicologoNome,
+        psicologoId: _currentPsicologoId!,
+        psicologoNome: _currentPsicologoNome!,
         reviews: updatedReviews,
       ));
     } catch (e) {
+      print('[ReviewCubit] Error adding review: $e');
       emit(ReviewError(
         message: 'Erro ao enviar avaliação: ${e.toString()}'
       ));
+      print('[ReviewCubit] Emitted ReviewError state: ${e.toString()}');
     }
   }
 
 
   String _getCurrentPsicologoId() {
-    print('[ReviewCubit-$_instanceId] _getCurrentPsicologoId chamado, state: $state');
-    if (state is ReviewInitial) {
-      return (state as ReviewInitial).psicologoId;
-    } else if (state is ReviewRated) {
-      return (state as ReviewRated).psicologoId;
-    } else if (state is ReviewSuccess) {
-      return (state as ReviewSuccess).psicologoId;
-    }
-    return '';
+    if (_currentPsicologoId == null) throw Exception("PsicologoId não inicializado no ReviewCubit");
+    return _currentPsicologoId!;
   }
 
   String _getCurrentPsicologoNome() {
-    print('[ReviewCubit-$_instanceId] _getCurrentPsicologoNome chamado, state: $state');
-    if (state is ReviewInitial) {
-      return (state as ReviewInitial).psicologoNome;
-    } else if (state is ReviewRated) {
-      return (state as ReviewRated).psicologoNome;
-    } else if (state is ReviewSuccess) {
-      return (state as ReviewSuccess).psicologoNome;
-    }
-    return '';
+    if (_currentPsicologoNome == null) throw Exception("PsicologoNome não inicializado no ReviewCubit");
+    return _currentPsicologoNome!;
   }
 
   List<ReviewEntity> _getCurrentReviews() {
@@ -244,6 +244,7 @@ class ReviewCubit extends Cubit<ReviewState> {
 
   Future<void> deleteReview(String reviewId) async {
     print('[ReviewCubit-$_instanceId] deleteReview chamado para reviewId: $reviewId, estado atual: $state');
+    print('[ReviewCubit] deleteReview called with reviewId: $reviewId');
 
     if (state is ReviewInitial || state is ReviewRated || state is ReviewSuccess || state is ReviewDeleted) {
       try {
@@ -272,7 +273,9 @@ class ReviewCubit extends Cubit<ReviewState> {
           psicologoNome = errorState.psicologoNome!; 
         }
         
+        print('[ReviewCubit] Calling repository.deleteReview()');
         await _repository.deleteReview(reviewId);
+        print('[ReviewCubit] Review deleted successfully, reloading reviews');
 
          print("[ReviewCubit-$_instanceId] psicologoId: $psicologoId,  psicologoNome: $psicologoNome,  reviewId: $reviewId");
         final updatedReviews = await _repository.getReviewsByPsicologoId(psicologoId);
@@ -284,7 +287,9 @@ class ReviewCubit extends Cubit<ReviewState> {
           reviews: updatedReviews,
         ));
       } catch (e) {
+        print('[ReviewCubit] Error deleting review: $e');
         emit(ReviewError(message: 'Erro ao excluir avaliação: ${e.toString()}'));
+        print('[ReviewCubit] Emitted ReviewError state: ${e.toString()}');
       }
     } else if (state is ReviewLoading) {
       print('[ReviewCubit-$_instanceId] deleteReview: Tentativa de exclusão durante o estado de carregamento. Operação não permitida.');
@@ -293,6 +298,21 @@ class ReviewCubit extends Cubit<ReviewState> {
       
       print('[ReviewCubit-$_instanceId] deleteReview: Chamado em estado inesperado $state. Operação ignorada.');
       emit(ReviewError(message: 'Erro ao excluir avaliação: estado inesperado do sistema.'));
+    }
+  }
+
+  Future<Map<String, String>?> getPsicologoInfo() async {
+    print('[ReviewCubit] getPsicologoInfo called');
+    try {
+      print('[ReviewCubit] Calling repository.getPsicologoInfo()');
+      final psicologoInfo = {'id': _currentPsicologoId ?? '', 'nome': _currentPsicologoNome ?? ''};
+      print('[ReviewCubit] Retrieved psicologo info: $psicologoInfo');
+      return psicologoInfo;
+    } catch (e) {
+      print('[ReviewCubit] Error getting psicologo info: $e');
+      emit(ReviewError(message: e.toString()));
+      print('[ReviewCubit] Emitted ReviewError state: ${e.toString()}');
+      return null;
     }
   }
 

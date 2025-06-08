@@ -114,16 +114,8 @@ class CustomDrawer extends StatelessWidget {
                     title: "Avaliar psicólogo",
                     onTap: () {
                       Navigator.pop(context);
-                      if (ModalRoute.of(context)?.settings.name != '/rate') {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const AvaliarPsicologoScreen(
-                              psicologoId: "1",
-                              psicologoNome: "Dr. João Silva",
-                            ),
-                          ),
-                        );
+                      if (ModalRoute.of(context)?.settings.name != '/avaliar-psicologo') {
+                        Navigator.of(context).pushReplacementNamed('/avaliar-psicologo');
                       }
                     },
                   ),

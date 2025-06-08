@@ -1,3 +1,4 @@
+import 'package:get_it/get_it.dart';
 import 'package:helppsico_mobile/core/services/http/generic_http_service.dart';
 import 'package:helppsico_mobile/core/services/storage/secure_storage_service.dart';
 import 'package:helppsico_mobile/core/services/auth/auth_service.dart';
@@ -16,7 +17,7 @@ class VinculosDataSource implements IVinculosDataSource {
   final AuthService _authService;
   
   VinculosDataSource(this._http, {SecureStorageService? storage, AuthService? authService})
-      : _secureStorage = storage ?? SecureStorageService(),
+      : _secureStorage = GetIt.instance.get<SecureStorageService>(),
         _authService = authService ?? AuthService();
 
   @override
@@ -26,16 +27,16 @@ class VinculosDataSource implements IVinculosDataSource {
     return '$host/vinculos';
   }
 
-  /// Obtém o ID do paciente a partir do armazenamento
+  
   Future<String?> _getPacienteId() async {
     try {
-      // Primeiro tenta obter do SecureStorage
+    
       final userId = await _secureStorage.getUserId();
       if (userId != null && userId.isNotEmpty) {
         return userId;
       }
       
-      // Como fallback, tenta obter do AuthService
+    
       final userId2 = await _authService.getCurrentUser();
       return userId2;
     } catch (e) {
@@ -51,7 +52,7 @@ class VinculosDataSource implements IVinculosDataSource {
       throw Exception('Não foi possível obter o ID do paciente');
     }
     
-    // Endpoint para obter o vínculo do paciente com o psicólogo
+   
     final url = '$baseUrl/paciente/$pacienteId';
     final headers = await _authService.getAuthHeaders();
     

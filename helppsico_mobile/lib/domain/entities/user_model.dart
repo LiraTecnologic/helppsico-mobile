@@ -1,3 +1,5 @@
+import 'psicologo_entity.dart';
+
 class User {
   final String id;
   final String name;
@@ -8,6 +10,7 @@ class User {
   final String? telefone;
   final String? dataNascimento;
   final String? endereco;
+  final Psicologo? psicologo;
 
   User({
     required this.id,
@@ -19,6 +22,7 @@ class User {
     this.telefone,
     this.dataNascimento,
     this.endereco,
+    this.psicologo,
   });
 
   factory User.fromJson(Map<String, dynamic> json) {
@@ -32,6 +36,9 @@ class User {
       telefone: json['telefone'],
       dataNascimento: json['dataNascimento'],
       endereco: json['endereco'],
+      psicologo: json['psicologo'] != null
+          ? Psicologo.fromJson(json['psicologo'] as Map<String, dynamic>)
+          : null,
     );
   }
 
@@ -44,5 +51,6 @@ class User {
         if (telefone != null) 'telefone': telefone,
         if (dataNascimento != null) 'dataNascimento': dataNascimento,
         if (endereco != null) 'endereco': endereco,
+        if (psicologo != null) 'psicologo': psicologo!.toJson(),
       };
 }

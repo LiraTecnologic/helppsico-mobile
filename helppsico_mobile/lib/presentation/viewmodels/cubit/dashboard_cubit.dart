@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get_it/get_it.dart';
 import 'package:helppsico_mobile/core/services/auth/auth_service.dart';
 import 'package:helppsico_mobile/core/services/storage/secure_storage_service.dart';
 import 'package:helppsico_mobile/data/datasource/sessions_data_source.dart';
@@ -16,7 +17,7 @@ class DashboardCubit extends Cubit<DashboardState> {
 
   final DocumentRepository _documentRepository = DocumentRepository(DocumentsDataSource(
    GenericHttp(),
-   SecureStorageService(), 
+   GetIt.instance.get<SecureStorageService>(),
    AuthService()));
    
   final SessionRepository _sessionRepository = SessionRepository(SessionsDataSource(GenericHttp()));

@@ -8,17 +8,15 @@ import '../widgets/drawer/custom_drawer.dart';
 import '../widgets/common/custom_app_bar.dart';
 
 class AvaliarPsicologoScreen extends StatefulWidget {
-  final String psicologoId;
-  final String psicologoNome;
-
-  const AvaliarPsicologoScreen({
-    Key? key,
-    required this.psicologoId,
-    required this.psicologoNome,
-  }) : super(key: key);
+  const AvaliarPsicologoScreen({Key? key}) : super(key: key);
+ 
+  
 
   @override
-  _AvaliarPsicologoScreenState createState() => _AvaliarPsicologoScreenState();
+  _AvaliarPsicologoScreenState createState() {
+    print('[AvaliarPsicologoScreen] createState called');
+    return _AvaliarPsicologoScreenState();
+  }
 }
 
 class _AvaliarPsicologoScreenState extends State<AvaliarPsicologoScreen> {
@@ -26,23 +24,30 @@ class _AvaliarPsicologoScreenState extends State<AvaliarPsicologoScreen> {
 
   @override
   void initState() {
+    print('[AvaliarPsicologoScreen] initState called');
     super.initState();
-    _reviewCubit = ReviewCubit.instanceFor(widget.psicologoId, widget.psicologoNome);
-    // A inicialização só deve ocorrer se o cubit estiver em seu estado inicial (ReviewLoading)
-    // para evitar reinicializações desnecessárias se a instância já existia e estava em outro estado.
-    if (_reviewCubit.state is ReviewLoading) {
-      _reviewCubit.initialize(widget.psicologoId, widget.psicologoNome);
+    _reviewCubit = ReviewCubit.instance();
+    // A inicialização agora é chamada sem parâmetros e buscará os dados do storage.
+    // Verifica se o estado é Loading ou se é a primeira vez que o cubit é inicializado
+    // para evitar múltiplas chamadas de initialize se a tela for reconstruída.
+    if (_reviewCubit.state is ReviewLoading || _reviewCubit.state is ReviewInitial && (_reviewCubit.state as ReviewInitial).psicologoId.isEmpty) {
+      print('[AvaliarPsicologoScreen] Calling ReviewCubit.initialize()');
+      _reviewCubit.initialize();
     }
   }
 
   @override
   void dispose() {
-    ReviewCubit.disposeInstance(widget.psicologoId);
+    // Com a instância única, o dispose pode ser gerenciado de forma diferente
+    // ou chamado em um ponto mais global se necessário, ou não chamado aqui
+    // se a instância deve persistir durante a vida útil da app após o login.
+    // ReviewCubit.disposeInstance(); // Descomente se desejar limpar a instância ao sair da tela.
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    print('[AvaliarPsicologoScreen] build called');
     return BlocProvider.value(
       value: _reviewCubit,
       child: BlocConsumer<ReviewCubit, ReviewState>(
@@ -68,7 +73,9 @@ class _AvaliarPsicologoScreenState extends State<AvaliarPsicologoScreen> {
           }
         },
         builder: (context, state) {
+          print('[AvaliarPsicologoScreen] BlocBuilder called with state: ${state.runtimeType}');
           if (state is ReviewLoading) {
+            print('[AvaliarPsicologoScreen] Rendering loading state');
             return const Scaffold(
               body: Center(child: CircularProgressIndicator()),
             );
@@ -82,9 +89,8 @@ class _AvaliarPsicologoScreenState extends State<AvaliarPsicologoScreen> {
 
   Widget _buildScaffold(BuildContext context, ReviewState state) {
     List<ReviewEntity> reviews = [];
-    // Use widget.psicologoNome as it's a StatefulWidget now
-    String psicologoNome = widget.psicologoNome;
-    
+    String psicologoNome = "Psicólogo"; // Default name
+
     if (state is ReviewInitial) {
       reviews = state.reviews;
       psicologoNome = state.psicologoNome;
@@ -98,9 +104,10 @@ class _AvaliarPsicologoScreenState extends State<AvaliarPsicologoScreen> {
       reviews = state.reviews;
       psicologoNome = state.psicologoNome;
     } else if (state is ReviewError) {
-      // If it's a ReviewError but contains review data (like our specific error case)
       reviews = state.reviews;
-      psicologoNome = state.psicologoNome ?? widget.psicologoNome; // Fallback to widget's psicologoNome if null
+      // Se o nome do psicólogo não estiver no estado de erro, usa o padrão.
+      // Isso pode acontecer se o cubit falhar ao carregar os dados do psicólogo.
+      psicologoNome = state.psicologoNome ?? "Psicólogo"; 
     }
     
     return Scaffold(
@@ -241,7 +248,10 @@ class _AvaliarPsicologoScreenState extends State<AvaliarPsicologoScreen> {
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
-        onPressed: () => context.read<ReviewCubit>().enviarAvaliacao(),
+        onPressed: () {
+        print('[AvaliarPsicologoScreen] Send review button pressed');
+        context.read<ReviewCubit>().enviarAvaliacao();
+      },
         style: ElevatedButton.styleFrom(
           backgroundColor: AppTheme.primaryColor,
           padding: const EdgeInsets.symmetric(vertical: 16),
@@ -312,6 +322,7 @@ class _AvaliarPsicologoScreenState extends State<AvaliarPsicologoScreen> {
                           IconButton(
                             icon: const Icon(Icons.delete, color: Colors.red),
                             onPressed: () {
+                              print('[AvaliarPsicologoScreen] Delete button pressed for review: ${review.id}');
                               showDialog(
                                 context: context,
                                 builder: (BuildContext context) {
@@ -320,14 +331,18 @@ class _AvaliarPsicologoScreenState extends State<AvaliarPsicologoScreen> {
                                     content: const Text('Deseja realmente excluir este comentário?'),
                                     actions: [
                                       TextButton(
-                                        onPressed: () => Navigator.of(context).pop(),
+                                        onPressed: () {
+                                          print('[AvaliarPsicologoScreen] Delete dialog cancelled');
+                                          Navigator.of(context).pop();
+                                        },
                                         child: const Text('Cancelar'),
                                       ),
                                       TextButton(
                                         onPressed: () {
-                                          Navigator.of(context).pop();
-                                          context.read<ReviewCubit>().deleteReview(review.id);
-                                        },
+                          print('[AvaliarPsicologoScreen] Delete confirmed for reviewId: ${review.id}');
+                          Navigator.of(context).pop();
+                          context.read<ReviewCubit>().deleteReview(review.id);
+                        },
                                         child: const Text('Excluir', style: TextStyle(color: Colors.red)),
                                       ),
                                     ],

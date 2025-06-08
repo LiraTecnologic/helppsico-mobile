@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 import 'package:helppsico_mobile/core/services/auth/auth_service.dart';
 import 'package:helppsico_mobile/core/services/storage/secure_storage_service.dart';
 import 'package:helppsico_mobile/data/repositories/document_repository.dart';
@@ -19,7 +20,7 @@ class DocumentsScreen extends StatefulWidget {
 
 class _DocumentsScreenState extends State<DocumentsScreen> with SingleTickerProviderStateMixin {
   final TextEditingController _searchController = TextEditingController();
-  final DocumentRepository _documentRepository = DocumentRepository(DocumentsDataSource(GenericHttp(),SecureStorageService(), AuthService()));
+  final DocumentRepository _documentRepository = DocumentRepository(DocumentsDataSource(GenericHttp(),GetIt.instance.get<SecureStorageService>(), AuthService()));
   List<DocumentModel> _documents = [];
   List<DocumentModel> _filteredDocuments = [];
   DocumentType? _selectedType;
@@ -68,7 +69,7 @@ class _DocumentsScreenState extends State<DocumentsScreen> with SingleTickerProv
   void _toggleFavorite(DocumentModel document) async {
     try {
       await _documentRepository.toggleFavorite(document.id);
-      await _loadDocuments(); // Recarrega a lista após atualizar o favorito
+      await _loadDocuments(); 
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(

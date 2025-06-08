@@ -8,6 +8,7 @@ class SecureStorageService {
   static const String _userDataKey = 'user_data';
   static const String _userIdKey = 'user_id';
   static const String _userEmailKey = 'user_email';
+  static const String _psicologoDataKey = 'psicologo_data';
 
 
 
@@ -23,10 +24,6 @@ class SecureStorageService {
     _prefs = await SharedPreferences.getInstance();
   }
 
-
-  /// Saves the authentication token.
-  ///
-  /// @param token The JWT token to be stored
   Future<void> saveToken(String token) async {
     try {
       await _prefs.setString(_tokenKey, token);
@@ -36,9 +33,6 @@ class SecureStorageService {
   }
 
 
-  /// Retrieves the stored authentication token.
-  ///
-  /// @return The stored token or null if no token exists
   Future<String?> getToken() async {
     try {
       return _prefs.getString(_tokenKey);
@@ -48,9 +42,6 @@ class SecureStorageService {
   }
 
 
-  /// Checks if a valid token exists in storage.
-  ///
-  /// @return true if a non-empty token exists, false otherwise
   Future<bool> hasToken() async {
     try {
       final token = await getToken();
@@ -60,8 +51,7 @@ class SecureStorageService {
     }
   }
 
-
-  /// Deletes the stored authentication token.
+  
   Future<void> deleteToken() async {
     try {
       await _prefs.remove(_tokenKey);
@@ -70,9 +60,6 @@ class SecureStorageService {
     }
   }
 
-  /// Saves user data.
-  ///
-  /// @param userData The user data to be stored as a JSON string
   Future<void> saveUserData(String userData) async {
     try {
       await _prefs.setString(_userDataKey, userData);
@@ -82,9 +69,6 @@ class SecureStorageService {
   }
 
 
-  /// Retrieves the stored user data.
-  ///
-  /// @return The stored user data as a JSON string or null if no data exists
   Future<String?> getUserData() async {
     try {
       return _prefs.getString(_userDataKey);
@@ -94,7 +78,6 @@ class SecureStorageService {
   }
 
 
-  /// Deletes the stored user data.
   Future<void> deleteUserData() async {
     try {
       await _prefs.remove(_userDataKey);
@@ -103,9 +86,6 @@ class SecureStorageService {
     }
   }
 
-  /// Saves user ID.
-  ///
-  /// @param userId The user ID to be stored
   Future<void> saveUserId(String userId) async {
     try {
       await _prefs.setString(_userIdKey, userId);
@@ -114,10 +94,6 @@ class SecureStorageService {
     }
   }
 
-
-  /// Retrieves the stored user ID.
-  ///
-  /// @return The stored user ID or null if no ID exists
   Future<String?> getUserId() async {
     try {
       return _prefs.getString(_userIdKey);
@@ -126,10 +102,6 @@ class SecureStorageService {
     }
   }
 
-
-  /// Saves user email.
-  ///
-  /// @param email The user email to be stored
   Future<void> saveUserEmail(String email) async {
     try {
       await _prefs.setString(_userEmailKey, email);
@@ -139,9 +111,6 @@ class SecureStorageService {
   }
 
 
-  /// Retrieves the stored user email.
-  ///
-  /// @return The stored user email or null if no email exists
   Future<String?> getUserEmail() async {
     try {
       return _prefs.getString(_userEmailKey);
@@ -150,15 +119,37 @@ class SecureStorageService {
     }
   }
 
-  /// Clears all stored data.
-  ///
-  /// This method removes all user-related data from storage.
+  Future<void> savePsicologoData(String psicologoData) async {
+    try {
+      await _prefs.setString(_psicologoDataKey, psicologoData);
+    } catch (e) {
+      throw Exception('Failed to save psicologo data: $e');
+    }
+  }
+
+  Future<String?> getPsicologoData() async {
+    try {
+      return _prefs.getString(_psicologoDataKey);
+    } catch (e) {
+      throw Exception('Failed to retrieve psicologo data: $e');
+    }
+  }
+
+  Future<void> deletePsicologoData() async {
+    try {
+      await _prefs.remove(_psicologoDataKey);
+    } catch (e) {
+      throw Exception('Failed to delete psicologo data: $e');
+    }
+  }
+
   Future<void> clearAll() async {
     try {
       await _prefs.remove(_tokenKey);
       await _prefs.remove(_userDataKey);
       await _prefs.remove(_userIdKey);
       await _prefs.remove(_userEmailKey);
+      await _prefs.remove(_psicologoDataKey);
     } catch (e) {
       throw Exception('Failed to clear storage: $e');
     }

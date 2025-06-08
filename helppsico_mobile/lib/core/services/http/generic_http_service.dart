@@ -1,6 +1,7 @@
 
 import 'dart:convert';
 
+import 'package:get_it/get_it.dart';
 import 'package:http/http.dart' as http;
 import 'package:helppsico_mobile/core/services/storage/secure_storage_service.dart';
 
@@ -18,7 +19,7 @@ class GenericHttp implements IGenericHttp {
 
   GenericHttp({http.Client? client, SecureStorageService? storage}) : 
     _client = client ?? http.Client(),
-    _storage = storage ?? SecureStorageService();
+    _storage =  GetIt.instance.get<SecureStorageService>();
   
   @override
   Future<HttpResponse> get(String url, {Map<String, String>? headers}) async {
@@ -77,7 +78,7 @@ class GenericHttp implements IGenericHttp {
         body: json.encode(body),
       );
       
-      // Check if response is JSON before decoding
+
       final contentType = response.headers['content-type'];
       dynamic responseBody;
       

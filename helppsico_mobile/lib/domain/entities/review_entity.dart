@@ -13,5 +13,7 @@ class ReviewEntity {
     required this.rating,
     required this.comment,
     required this.date,
-  });
+  }) {
+    print('[ReviewEntity] Created - id: $id, psicologoId: $psicologoId, userName: $userName, rating: $rating, comment: ${comment.length > 50 ? comment.substring(0, 50) + '...' : comment}');
+  }
 }

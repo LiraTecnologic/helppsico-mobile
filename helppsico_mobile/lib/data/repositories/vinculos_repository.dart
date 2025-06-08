@@ -1,3 +1,4 @@
+import 'package:get_it/get_it.dart';
 import 'package:helppsico_mobile/core/services/auth/auth_service.dart';
 import 'package:helppsico_mobile/core/services/http/generic_http_service.dart';
 import 'package:helppsico_mobile/core/services/storage/secure_storage_service.dart';
@@ -15,17 +16,17 @@ class VinculosRepository {
   }) : _dataSource = dataSource ?? 
        VinculosDataSource(
          http ?? GenericHttp(),
-         storage: secureStorage ?? SecureStorageService(),
+         storage: secureStorage ?? GetIt.instance.get<SecureStorageService>(),
          authService: authService ?? AuthService(),
        );
 
-  /// Obtém o vínculo do paciente logado com um psicólogo
+
   Future<VinculoModel?> getVinculoPaciente() async {
     try {
       final response = await _dataSource.getVinculoByPacienteId();
       
       if (response.statusCode == 200 && response.body != null) {
-        // A API Java encapsula as respostas em um objeto ResponseDto<T> com o dado principal no campo 'dado'
+
         final responseData = response.body;
         if (responseData == null || !responseData.containsKey('dado')) {
           return null;
@@ -41,13 +42,13 @@ class VinculosRepository {
     }
   }
 
-  /// Solicita um novo vínculo com um psicólogo
+
   Future<VinculoModel?> solicitarVinculo(String psicologoId) async {
     try {
       final response = await _dataSource.solicitarVinculo(psicologoId);
       
       if ((response.statusCode == 200 || response.statusCode == 201) && response.body != null) {
-        // A API Java encapsula as respostas em um objeto ResponseDto<T> com o dado principal no campo 'dado'
+   
         final responseData = response.body;
         if (responseData == null || !responseData.containsKey('dado')) {
           return null;
@@ -63,7 +64,7 @@ class VinculosRepository {
     }
   }
 
-  /// Cancela um vínculo existente
+
   Future<bool> cancelarVinculo(String vinculoId) async {
     try {
       final response = await _dataSource.cancelarVinculo(vinculoId);
@@ -74,9 +75,9 @@ class VinculosRepository {
     }
   }
 
-  /// Adapta o formato do VinculoDto da API Java para o formato esperado pelo VinculoModel
+
   VinculoModel _adaptVinculoDtoToModel(Map<String, dynamic> vinculoDto) {
-    // Extrai os dados do psicólogo do vínculo
+
     final psicologo = vinculoDto['psicologo'] ?? {};
     final paciente = vinculoDto['paciente'] ?? {};
     
