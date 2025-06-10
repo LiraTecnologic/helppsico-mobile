@@ -7,61 +7,66 @@ class DocumentRepository {
   DocumentRepository(this._dataSource);
 
   Future<List<DocumentModel>> getDocuments() async {
-    try {
-      final response = await _dataSource.getDocuments();
-      
+  try {
+    print('DocumentRepository.getDocuments(): Entrando\n');
+    final response = await _dataSource.getDocuments();
+
+   
+    final body = response.body as Map<String, dynamic>;
+    print('DocumentRepository.getDocuments(): Response.body keys: ${body.keys}\n');
+
+   
+    final List<dynamic> rawList = body['content'] as List<dynamic>;
+
+    print('DocumentRepository.getDocuments(): encontrou ${rawList.length} itens em dado.content\n');
+
     
-      if (response.body is List) {
-        final List<dynamic> jsonList = response.body;
-        return jsonList.map((json) => _adaptSolicitacaoToDocumentModel(json)).toList();
-      } else if (response.body is Map && response.body.containsKey('content')) {
-    
-        final List<dynamic> jsonList = response.body['content'] ?? [];
-        return jsonList.map((json) => _adaptSolicitacaoToDocumentModel(json)).toList();
-      } else {
-      
-        return [];
-      }
-    } catch (e) {
-      print('Erro ao buscar documentos: $e');
-      throw Exception('Erro ao buscar documentos: $e');
+    return rawList
+        .map((json) => _adaptDocumentToDocumentModel(json as Map<String, dynamic>))
+        .toList();
+  } catch (e) {
+    print('DocumentRepository.getDocuments(): Erro ao buscar documentos: $e');
+    throw Exception('Erro ao buscar documentos: $e');
+  }
+}
+  
+  DocumentModel _adaptDocumentToDocumentModel(Map<String, dynamic> dto) {
+  DocumentType _mapDocumentType(String finalidade) {
+    switch (finalidade.toUpperCase()) {
+      case 'LAUDO':
+        return DocumentType.LAUDO_PSICOLOGICO;
+      case 'RECEITA':
+        return DocumentType.DECLARACAO;
+      case 'ATESTADO':
+        return DocumentType.ATESTADO;
+      case 'EXAME':
+        return DocumentType.RELATORIO_PSICOLOGICO;
+      default:
+        return DocumentType.PARECER_PSICOLOGICO;
     }
   }
-  
-  /// Adapta o formato da SolicitacaoDocumentoDto da API Java para o formato esperado pelo DocumentModel
-  DocumentModel _adaptSolicitacaoToDocumentModel(Map<String, dynamic> solicitacaoDto) {
-    // Mapeia o tipo de documento da API Java para o enum DocumentType
-    DocumentType _mapDocumentType(String tipo) {
-  
-      
-      switch (tipo.toUpperCase()) {
-        case 'LAUDO':
-          return DocumentType.LAUDO_PSICOLOGICO;
-        case 'RECEITA':
-          return DocumentType.DECLARACAO;
-        case 'ATESTADO':
-          return DocumentType.ATESTADO;
-        case 'EXAME':
-          return DocumentType.RELATORIO_PSICOLOGICO;
-        default:
-          return DocumentType.ATESTADO;
-      }
-    }
-    
-    return DocumentModel(
-      id: solicitacaoDto['id']?.toString() ?? '',
-      title: solicitacaoDto['titulo'] ?? '',
-      description: solicitacaoDto['descricao'] ?? '',
-      date: solicitacaoDto['dataCriacao'] ?? DateTime.now().toIso8601String(),
-      fileSize: solicitacaoDto['tamanhoArquivo']?.toString() ?? '0',
-      fileType: solicitacaoDto['tipoArquivo'] ?? '',
-      type: _mapDocumentType(solicitacaoDto['tipo']),
-      isFavorite: solicitacaoDto['favorito'] ?? false,
-      patientId: solicitacaoDto['idPaciente']?.toString() ?? '',
-      patientName: solicitacaoDto['nomePaciente'] ?? '',
-      fileUrl: solicitacaoDto['urlArquivo'] ?? '',
-    );
-  }
+
+  // Pega o paciente aninhado
+  final paciente = dto['paciente'] as Map<String, dynamic>?;
+
+  // Usa dataEmissao como data “principal”
+  final rawDate = dto['dataEmissao'] as String? ?? DateTime.now().toIso8601String();
+  final parsedDate = DateTime.tryParse(rawDate) ?? DateTime.now();
+
+  return DocumentModel(
+    id: dto['id'] as String? ?? '',
+    title: dto['finalidade'] as String? ?? '',           // ex: “string” no seu JSON
+    description: dto['descricao'] as String? ?? '',
+    date: parsedDate,
+    fileSize: '',                                        // não vem no JSON
+    fileType: '',                                        // não vem no JSON
+    type: _mapDocumentType(dto['finalidade'] as String? ?? ''),
+    isFavorite: false,                                   // não há no JSON
+    patientId: paciente?['id'] as String? ?? '',
+    patientName: paciente?['nome'] as String? ?? '',
+    fileUrl: '',                                         // não vem no JSON
+  );
+}
 
   Future<DocumentModel> uploadDocument(DocumentModel document) async {
     try {
@@ -74,7 +79,7 @@ class DocumentRepository {
       };
 
       final response = await _dataSource.uploadDocument(document.fileUrl, metadata);
-      return _adaptSolicitacaoToDocumentModel(response.body);
+      return _adaptDocumentToDocumentModel(response.body);
     } catch (e) {
       print('Erro ao fazer upload do documento: $e');
       throw Exception('Erro ao fazer upload do documento: $e');
@@ -98,7 +103,7 @@ class DocumentRepository {
         document.id!,
         document.toJson(),
       );
-      return _adaptSolicitacaoToDocumentModel(response.body);
+      return _adaptDocumentToDocumentModel(response.body);
     } catch (e) {
       print('Erro ao atualizar documento: $e');
       throw Exception('Erro ao atualizar documento: $e');

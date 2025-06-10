@@ -103,55 +103,85 @@ class ReviewDataSource  {
      return await _getPsicologoInfo();
    }
   
-  Future<List<ReviewEntity>> getReviewsByPsicologoId(String psicologoId) async {
-    print('[ReviewDataSource] getReviewsByPsicologoId called with psicologoId: $psicologoId');
-    try {
-      print('[ReviewDataSource] Making API call to get reviews for psicologo: $psicologoId');
-      final response = await _http.get('$baseUrl/avaliacoes/psicologo/$psicologoId');
-      
-      print('[ReviewDataSource] Reviews API response status: ${response.statusCode}');
-      if (response.statusCode == 200) {
-        print('[ReviewDataSource] Reviews API response body: ${response.body}');
+    Future<List<ReviewEntity>> getReviewsByPsicologoId(String psicologoId) async {
+      print('[ReviewDataSource] getReviewsByPsicologoId called with psicologoId: $psicologoId');
+      try {
+        print('[ReviewDataSource] Making API call to get reviews for psicologo: $psicologoId');
+        final response = await _http.get('$baseUrl/avaliacoes/psicologo/$psicologoId');
         
-        final responseData = response.body;
-        if (responseData == null || !responseData.containsKey('dado')) {
-          print('[ReviewDataSource] Invalid response format - missing dado field');
-          throw Exception('Formato de resposta inv lido');
+        print('[ReviewDataSource] Reviews API response status: ${response.statusCode}');
+        if (response.statusCode == 200) {
+          print('[ReviewDataSource] Reviews API response body: ${response.body}');
+          
+          final responseData = response.body;
+          if (responseData == null || !responseData.containsKey('dado')) {
+            print('[ReviewDataSource] Invalid response format - missing dado field');
+            throw Exception('Formato de resposta inv lido');
+          }
+          
+          final avaliacoesPage = responseData['dado'];
+          final List<dynamic> avaliacoes = avaliacoesPage['content'] ?? [];
+          print('[ReviewDataSource] Found ${avaliacoes.length} reviews in response');
+          
+          final reviewEntities = avaliacoes.map((json) => _adaptAvaliacaoToReviewEntity(json)).toList();
+          print('[ReviewDataSource] Converted to ${reviewEntities.length} ReviewEntity objects');
+          return reviewEntities;
+        } else {
+          final errorMessage = response.body['mensagem'] ?? 'Falha ao carregar avalia es';
+          print('[ReviewDataSource] API error: $errorMessage');
+          throw Exception('Erro ao buscar avalia es: $errorMessage');
         }
-        
-        final avaliacoesPage = responseData['dado'];
-        final List<dynamic> avaliacoes = avaliacoesPage['content'] ?? [];
-        print('[ReviewDataSource] Found ${avaliacoes.length} reviews in response');
-        
-        final reviewEntities = avaliacoes.map((json) => _adaptAvaliacaoToReviewEntity(json)).toList();
-        print('[ReviewDataSource] Converted to ${reviewEntities.length} ReviewEntity objects');
-        return reviewEntities;
-      } else {
-        final errorMessage = response.body['mensagem'] ?? 'Falha ao carregar avalia es';
-        print('[ReviewDataSource] API error: $errorMessage');
-        throw Exception('Erro ao buscar avalia es: $errorMessage');
+      } catch (e) {
+        print('[ReviewDataSource] Exception in getReviewsByPsicologoId: $e');
+        throw Exception('Erro de conex o: $e');
       }
-    } catch (e) {
-      print('[ReviewDataSource] Exception in getReviewsByPsicologoId: $e');
-      throw Exception('Erro de conex o: $e');
     }
-  }
   
-  ReviewEntity _adaptAvaliacaoToReviewEntity(Map<String, dynamic> avaliacaoDto) {
-    print('[ReviewDataSource] Adapting avaliacaoDto to ReviewEntity: $avaliacaoDto');
-    final reviewEntity = ReviewEntity(
-      id: avaliacaoDto['id']?.toString() ?? '',
-      psicologoId: avaliacaoDto['idPsicologo']?.toString() ?? '',
-      userName: avaliacaoDto['nomePaciente'] ?? '',
-      rating: avaliacaoDto['nota'] ?? 0,
-      comment: avaliacaoDto['comentario'] ?? '',
-      date: avaliacaoDto['dataCriacao'] != null ? 
-          DateTime.parse(avaliacaoDto['dataCriacao']) : 
-          DateTime.now(),
-    );
-    print('[ReviewDataSource] Created ReviewEntity: id=${reviewEntity.id}, userName=${reviewEntity.userName}, rating=${reviewEntity.rating}');
-    return reviewEntity;
+  ReviewEntity _adaptAvaliacaoToReviewEntity(Map<String, dynamic> dto) {
+  print('[ReviewDataSource] Adaptando JSON para ReviewEntity: $dto');
+
+  // Extrai dados do psicólogo
+  final psicologo = dto['psicologo'] as Map<String, dynamic>? ?? {};
+  final psicologoId = psicologo['id']?.toString() ?? '';
+  
+  // Extrai dados do paciente
+  final paciente = dto['paciente'] as Map<String, dynamic>? ?? {};
+  final pacienteId = paciente['id']?.toString() ?? '';
+  final pacienteNome = paciente['nome']?.toString() ?? '';
+
+  // Extrai demais campos
+  final rating = (dto['nota'] is num) ? (dto['nota'] as num).toInt() : 0;
+  final comment = dto['comentario']?.toString() ?? '';
+
+  // Usa data de criação se existir; senão, agora()
+  DateTime date;
+  if (dto.containsKey('dataCriacao') && dto['dataCriacao'] != null) {
+    date = DateTime.parse(dto['dataCriacao']);
+  } else {
+    date = DateTime.now();
   }
+
+  final entity = ReviewEntity(
+    id: dto['id']?.toString() ?? '',
+    psicologoId: psicologoId,
+    pacienteId: pacienteId,
+    userName: pacienteNome,
+    rating: rating,
+    comment: comment,
+    date: date,
+  );
+
+  print(
+    '[ReviewDataSource] ReviewEntity montada: '
+    'id=${entity.id}, '
+    'psicologoId=${entity.psicologoId}, '
+    'pacienteId=${entity.pacienteId}, '
+    'userName=${entity.userName}, '
+    'rating=${entity.rating}'
+  );
+  return entity;
+}
+
   Future<void> addReview(ReviewEntity review) async {
     print('[ReviewDataSource] addReview called with review: id=${review.id}, psicologoId=${review.psicologoId}, rating=${review.rating}');
     try {

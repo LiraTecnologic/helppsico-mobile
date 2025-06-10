@@ -144,23 +144,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                   ),
                             const SizedBox(height: 16.0),
                             const TextDivider(text: 'ou'),
-                            const SizedBox(height: 16.0),
-                            Center(
-                              child: TextLink(
-                                text: 'Esqueceu a senha?',
-                                onTap: () {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content: Text(
-                                          'Funcionalidade em desenvolvimento'),
-                                      behavior: SnackBarBehavior.floating,
-                                    ),
-                                  );
-                                },
-                              ),
-                            ),
                             const SizedBox(height: 48.0),
-                            Row(
+                            Center(
+                              child:   Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 const Text(
@@ -176,6 +162,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                 ),
                               ],
                             ),
+                            ),
+                            const SizedBox(height: 48.0),
+                          
                           ],
                         ),
                       ),

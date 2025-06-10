@@ -74,6 +74,7 @@ class AuthService {
           psicologo = Psicologo(
             id: psicologoInfo['id'] ?? '',
             nome: psicologoInfo['nome'] ?? '',
+            crp: psicologoInfo['crp']?? '',
           );
           
           // Salvar dados do psicólogo separadamente

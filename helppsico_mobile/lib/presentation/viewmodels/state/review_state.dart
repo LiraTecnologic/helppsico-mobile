@@ -6,6 +6,12 @@ abstract class ReviewState {
   
   String? get psicologoId => null;
   String? get psicologoNome => null;
+  String? get psicologoCrp => null;
+
+  int get get_rating => 0;
+
+  List<ReviewEntity> get reviews => const  [];
+
 }
 
 class ReviewInitial extends ReviewState {
@@ -13,9 +19,15 @@ class ReviewInitial extends ReviewState {
   final String psicologoId;
   @override
   final String psicologoNome;
+  @override
+  final String psicolgoCrp;
+
   final List<ReviewEntity> reviews;
+  @override
+  int get get_rating => 0;
   
   const ReviewInitial({
+    required this.psicolgoCrp,
     required this.psicologoId,
     required this.psicologoNome,
     required this.reviews,
@@ -44,6 +56,10 @@ class ReviewRated extends ReviewState {
     required this.rating,
     required this.comentarioController,
   });
+
+  @override
+  int get get_rating  => this.rating;
+ 
 }
 
 class ReviewSuccess extends ReviewState {
@@ -53,13 +69,18 @@ class ReviewSuccess extends ReviewState {
   @override
   final String psicologoNome;
   final List<ReviewEntity> reviews;
+  final int rating;
   
   const ReviewSuccess({
     required this.message,
     required this.psicologoId,
     required this.psicologoNome,
     required this.reviews,
+    required this.rating,
   });
+
+  @override
+  int get get_rating  => this.rating;
 }
 
 class ReviewDeleted extends ReviewState {
@@ -76,10 +97,14 @@ class ReviewDeleted extends ReviewState {
     required this.psicologoId,
     required this.psicologoNome,
     required this.reviews,
-    this.rating = 0,
+    required this.rating,
     this.comentarioController,
     this.message,
   });
+
+
+  @override
+  int get get_rating  => this.rating;
 }
 
 class ReviewError extends ReviewState {
@@ -96,4 +121,7 @@ class ReviewError extends ReviewState {
     this.psicologoNome,
     this.reviews = const [], // Default to an empty list if not provided
   });
+
+  @override
+  int get get_rating  => 0;
 }

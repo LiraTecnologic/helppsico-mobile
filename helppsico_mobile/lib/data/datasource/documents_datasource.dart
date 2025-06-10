@@ -41,11 +41,12 @@ class DocumentsDataSource {
         throw Exception('ID do paciente não encontrado');
       }
       
-      final endpoint = '$baseUrl/solicitacoes-documentos/paciente/$pacienteId';
+      final endpoint = '$baseUrl/documentos/$pacienteId';
       print('Attempting to fetch documents from $endpoint');
       
       final response = await _http.get(endpoint);
-      print('Received response with status code: ${response.statusCode}');
+      print('Received response with status code: ${response.statusCode}\n');
+      print("[DocumentsDataSource] Response body: ${response.body}\n");
       
       if (response.statusCode != 200) {
         print('Failed to fetch documents: ${response.statusCode}');

@@ -27,9 +27,7 @@ class _AvaliarPsicologoScreenState extends State<AvaliarPsicologoScreen> {
     print('[AvaliarPsicologoScreen] initState called');
     super.initState();
     _reviewCubit = ReviewCubit.instance();
-    // A inicialização agora é chamada sem parâmetros e buscará os dados do storage.
-    // Verifica se o estado é Loading ou se é a primeira vez que o cubit é inicializado
-    // para evitar múltiplas chamadas de initialize se a tela for reconstruída.
+    
     if (_reviewCubit.state is ReviewLoading || _reviewCubit.state is ReviewInitial && (_reviewCubit.state as ReviewInitial).psicologoId.isEmpty) {
       print('[AvaliarPsicologoScreen] Calling ReviewCubit.initialize()');
       _reviewCubit.initialize();
@@ -38,10 +36,7 @@ class _AvaliarPsicologoScreenState extends State<AvaliarPsicologoScreen> {
 
   @override
   void dispose() {
-    // Com a instância única, o dispose pode ser gerenciado de forma diferente
-    // ou chamado em um ponto mais global se necessário, ou não chamado aqui
-    // se a instância deve persistir durante a vida útil da app após o login.
-    // ReviewCubit.disposeInstance(); // Descomente se desejar limpar a instância ao sair da tela.
+    
     super.dispose();
   }
 
@@ -89,11 +84,13 @@ class _AvaliarPsicologoScreenState extends State<AvaliarPsicologoScreen> {
 
   Widget _buildScaffold(BuildContext context, ReviewState state) {
     List<ReviewEntity> reviews = [];
-    String psicologoNome = "Psicólogo"; // Default name
+    String psicologoNome = "Psicólogo";
+    String psicologoCrp = "xx/xxxx";
 
     if (state is ReviewInitial) {
       reviews = state.reviews;
       psicologoNome = state.psicologoNome;
+      psicologoCrp = state.psicolgoCrp;
     } else if (state is ReviewRated) {
       reviews = state.reviews;
       psicologoNome = state.psicologoNome;
@@ -105,8 +102,6 @@ class _AvaliarPsicologoScreenState extends State<AvaliarPsicologoScreen> {
       psicologoNome = state.psicologoNome;
     } else if (state is ReviewError) {
       reviews = state.reviews;
-      // Se o nome do psicólogo não estiver no estado de erro, usa o padrão.
-      // Isso pode acontecer se o cubit falhar ao carregar os dados do psicólogo.
       psicologoNome = state.psicologoNome ?? "Psicólogo"; 
     }
     
@@ -118,7 +113,7 @@ class _AvaliarPsicologoScreenState extends State<AvaliarPsicologoScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildPsychologistCard(psicologoNome),
+            _buildPsychologistCard(psicologoNome,psicologoCrp ,reviews.length),
             const SizedBox(height: 20),
             _buildRatingSection(context),
             const SizedBox(height: 20),
@@ -133,7 +128,9 @@ class _AvaliarPsicologoScreenState extends State<AvaliarPsicologoScreen> {
     );
   }
 
-  Widget _buildPsychologistCard(String psicologoNome) {
+  Widget _buildPsychologistCard(String psicologoNome ,String psicolgoCrp,int reviewsCount ) {
+    
+
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       elevation: 4,
@@ -150,22 +147,17 @@ class _AvaliarPsicologoScreenState extends State<AvaliarPsicologoScreen> {
               psicologoNome,
               style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
-            const Text(
-              "Psicóloga Clínica • CRP 06/12345",
-              style: TextStyle(color: Colors.grey),
+             Text(
+              "Psicólogo(a) • CRP $psicolgoCrp",
+              style: const TextStyle(color: Colors.grey),
             ),
             const SizedBox(height: 10),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: List.generate(5, (index) => 
-                Icon(
-                  Icons.star,
-                  color: index < 4 ? Colors.amber : Colors.grey,
-                ),
-              ),
+              
             ),
             const SizedBox(height: 5),
-            const Text("(42 avaliações)", style: TextStyle(color: Colors.grey)),
+            Text("(${reviewsCount}) avaliações", style: const TextStyle(color: Colors.grey)),
           ],
         ),
       ),
@@ -176,9 +168,18 @@ class _AvaliarPsicologoScreenState extends State<AvaliarPsicologoScreen> {
     return BlocBuilder<ReviewCubit, ReviewState>(
       builder: (context, state) {
         int currentRating = 0;
-        if (state is ReviewRated) {
-          currentRating = state.rating;
-        }
+       if (state is ReviewRated) {
+        currentRating = state.rating;
+      } else if (state is ReviewDeleted) {
+        // —> usar o rating que estava no Cubit antes de deletar
+        currentRating = state.rating; 
+        // (ou, se preferir, resetar pra zero: currentRating = 0;)
+      }else if (state is ReviewSuccess) {
+        currentRating = state.rating;
+      }
+
+      print("[AvaliarPsicologoScreen] Current rating: $currentRating with state: ${state.runtimeType}");
+
         
         return Card(
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -268,6 +269,9 @@ class _AvaliarPsicologoScreenState extends State<AvaliarPsicologoScreen> {
   }
 
   Widget _buildReviewsList(BuildContext context, List<ReviewEntity> reviews) {
+    final cubit = context.read<ReviewCubit>();
+    final String currentPacienteId = cubit.currentPacienteId!;
+    
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -318,7 +322,7 @@ class _AvaliarPsicologoScreenState extends State<AvaliarPsicologoScreen> {
                           '${review.date.day}/${review.date.month}/${review.date.year}',
                           style: const TextStyle(color: Colors.grey, fontSize: 12),
                         ),
-                        if (review.userName == 'Usuário Atual')
+                        if (review.pacienteId == currentPacienteId)
                           IconButton(
                             icon: const Icon(Icons.delete, color: Colors.red),
                             onPressed: () {
@@ -341,7 +345,7 @@ class _AvaliarPsicologoScreenState extends State<AvaliarPsicologoScreen> {
                                         onPressed: () {
                           print('[AvaliarPsicologoScreen] Delete confirmed for reviewId: ${review.id}');
                           Navigator.of(context).pop();
-                          context.read<ReviewCubit>().deleteReview(review.id);
+                          cubit.deleteReview(review.id);
                         },
                                         child: const Text('Excluir', style: TextStyle(color: Colors.red)),
                                       ),
