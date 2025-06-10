@@ -20,7 +20,7 @@ class PsicologoService {
     }
 
     final response = await _http.get(
-      'http://localhost:8080/vinculos/listar/paciente/$pacienteId',
+      'http://10.0.2.2:8080/vinculos/listar/paciente/$pacienteId',
       headers: {'Authorization': 'Bearer $token'},
     );
 

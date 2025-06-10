@@ -19,9 +19,7 @@ class SessionsLoaded extends SessionsState{
   final List<SessionModel> sessions;
 
   const SessionsLoaded(this.sessions);
-  //Equivalente à:
-  //const SessionsLoaded(List<NotificationModel> sessions)
-  //: this.sessions = sessions;
+  
 
   @override
   List<Object> get props =>[sessions];

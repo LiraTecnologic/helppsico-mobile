@@ -1,25 +1,24 @@
+import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SecureStorageService {
   late SharedPreferences _prefs;
-  
 
   static const String _tokenKey = 'jwt_token';
   static const String _userDataKey = 'user_data';
   static const String _userIdKey = 'user_id';
   static const String _userEmailKey = 'user_email';
   static const String _psicologoDataKey = 'psicologo_data';
-
-
+  static const String _favoriteDocumentsKey = 'favorite_documents'; 
 
   SecureStorageService._();
 
-  static Future <SecureStorageService> create() async {
+  static Future<SecureStorageService> create() async {
     final instance = SecureStorageService._();
     await instance._initPrefs();
     return instance;
   }
- 
+
   Future<void> _initPrefs() async {
     _prefs = await SharedPreferences.getInstance();
   }
@@ -32,7 +31,6 @@ class SecureStorageService {
     }
   }
 
-
   Future<String?> getToken() async {
     try {
       return _prefs.getString(_tokenKey);
@@ -40,7 +38,6 @@ class SecureStorageService {
       throw Exception('Failed to retrieve token: $e');
     }
   }
-
 
   Future<bool> hasToken() async {
     try {
@@ -51,7 +48,6 @@ class SecureStorageService {
     }
   }
 
-  
   Future<void> deleteToken() async {
     try {
       await _prefs.remove(_tokenKey);
@@ -68,7 +64,6 @@ class SecureStorageService {
     }
   }
 
-
   Future<String?> getUserData() async {
     try {
       return _prefs.getString(_userDataKey);
@@ -76,7 +71,6 @@ class SecureStorageService {
       throw Exception('Failed to retrieve user data: $e');
     }
   }
-
 
   Future<void> deleteUserData() async {
     try {
@@ -109,7 +103,6 @@ class SecureStorageService {
       throw Exception('Failed to save user email: $e');
     }
   }
-
 
   Future<String?> getUserEmail() async {
     try {
@@ -150,8 +143,65 @@ class SecureStorageService {
       await _prefs.remove(_userIdKey);
       await _prefs.remove(_userEmailKey);
       await _prefs.remove(_psicologoDataKey);
+      await _prefs.remove(_favoriteDocumentsKey); 
     } catch (e) {
       throw Exception('Failed to clear storage: $e');
     }
+  }
+
+ 
+  Future<List<String>> getFavoriteDocumentIds() async {
+    try {
+      final jsonString = _prefs.getString(_favoriteDocumentsKey);
+      if (jsonString != null) {
+        final List<dynamic> decodedList = jsonDecode(jsonString);
+        return decodedList.cast<String>().toList();
+      }
+      return [];
+    } catch (e) {
+      print('Error getting favorite document IDs: $e');
+      return [];
+    }
+  }
+
+  Future<void> _saveFavoriteDocumentIds(List<String> ids) async {
+    try {
+      final jsonString = jsonEncode(ids);
+      await _prefs.setString(_favoriteDocumentsKey, jsonString);
+    } catch (e) {
+      print('Error saving favorite document IDs: $e');
+      throw Exception('Failed to save favorite document IDs: $e');
+    }
+  }
+
+  Future<bool> isDocumentFavorite(String documentId) async {
+    final favoriteIds = await getFavoriteDocumentIds();
+    return favoriteIds.contains(documentId);
+  }
+
+  Future<void> addFavoriteDocumentId(String documentId) async {
+    final favoriteIds = await getFavoriteDocumentIds();
+    if (!favoriteIds.contains(documentId)) {
+      favoriteIds.add(documentId);
+      await _saveFavoriteDocumentIds(favoriteIds);
+    }
+  }
+
+  Future<void> removeFavoriteDocumentId(String documentId) async {
+    final favoriteIds = await getFavoriteDocumentIds();
+    if (favoriteIds.contains(documentId)) {
+      favoriteIds.remove(documentId);
+      await _saveFavoriteDocumentIds(favoriteIds);
+    }
+  }
+
+  Future<void> toggleFavoriteDocumentId(String documentId) async {
+    final favoriteIds = await getFavoriteDocumentIds();
+    if (favoriteIds.contains(documentId)) {
+      favoriteIds.remove(documentId);
+    } else {
+      favoriteIds.add(documentId);
+    }
+    await _saveFavoriteDocumentIds(favoriteIds);
   }
 }

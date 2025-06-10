@@ -16,7 +16,7 @@ class DocumentModel {
   final String fileSize;
   final String fileType;
   final DocumentType type;
-  final bool isFavorite;
+  bool isFavorite; 
   final String patientId;
   final String patientName;
   final String fileUrl;
@@ -29,27 +29,25 @@ class DocumentModel {
     required this.fileSize,
     required this.fileType,
     required this.type,
-    required this.isFavorite,
+    this.isFavorite = false, 
     required this.patientId,
     required this.patientName,
     required this.fileUrl,
   });
 
-  factory DocumentModel.fromJson(Map<String, dynamic> json) {
+  factory DocumentModel.fromJson(Map<String, dynamic> json, {bool isFavorite = false}) {
     return DocumentModel(
-      id: json['id'],
-      title: json['title'],
-      description: json['description'],
-      date: DateTime.parse(json['date']),
-      fileSize: json['fileSize'],
-      fileType: json['fileType'],
-      type: DocumentType.values.firstWhere(
-        (e) => e.toString() == 'DocumentType.${json['type']}',
-      ),
-      isFavorite: json['isFavorite'],
-      patientId: json['patientId'],
-      patientName: json['patientName'],
-      fileUrl: json['fileUrl'],
+      id: json['id'] ?? '',
+      title: json['finalidade'] ?? '', 
+      description: json['descricao'] ?? '',
+      date: DateTime.tryParse(json['dataEmissao'] ?? '') ?? DateTime.now(),
+      fileSize: '', 
+      fileType: '', 
+      type: _mapDocumentTypeFromJson(json['finalidade'] ?? ''),
+      isFavorite: isFavorite, 
+      patientId: json['paciente']?['id'] ?? '',
+      patientName: json['paciente']?['nome'] ?? '',
+      fileUrl: '', 
     );
   }
 
@@ -62,7 +60,7 @@ class DocumentModel {
       'fileSize': fileSize,
       'fileType': fileType,
       'type': type.toString().split('.').last,
-      'isFavorite': isFavorite,
+    
       'patientId': patientId,
       'patientName': patientName,
       'fileUrl': fileUrl,
@@ -95,5 +93,28 @@ class DocumentModel {
       patientName: patientName ?? this.patientName,
       fileUrl: fileUrl ?? this.fileUrl,
     );
+  }
+}
+
+
+DocumentType _mapDocumentTypeFromJson(String finalidade) {
+  switch (finalidade.toUpperCase()) {
+    case 'ATESTADO':
+      return DocumentType.ATESTADO;
+    case 'DECLARACAO':
+      return DocumentType.DECLARACAO;
+    case 'RELATORIO PSICOLOGICO': 
+    case 'RELATÓRIO PSICOLÓGICO':
+      return DocumentType.RELATORIO_PSICOLOGICO;
+    case 'LAUDO PSICOLOGICO': 
+    case 'LAUDO PSICOLÓGICO':
+      return DocumentType.LAUDO_PSICOLOGICO;
+    case 'PARECER PSICOLOGICO': 
+    case 'PARECER PSICOLÓGICO':
+      return DocumentType.PARECER_PSICOLOGICO;
+    default:
+     
+      print("Tipo de documento desconhecido: '$finalidade', usando PARECER_PSICOLOGICO como padrão.");
+      return DocumentType.PARECER_PSICOLOGICO; 
   }
 }

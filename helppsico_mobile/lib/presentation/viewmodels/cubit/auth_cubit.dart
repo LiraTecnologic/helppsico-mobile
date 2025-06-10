@@ -11,12 +11,12 @@ class AuthCubit extends Cubit<AuthState> {
   final AuthService _authService;
 
   AuthCubit({AuthService? authService})
-      //initializer list(é usada para inicializar variáveis ​​de instância antes de chamar o construtor principal da classe )
+    
       : _authService = authService ?? AuthService(),
         super(const AuthInitial()) {
     print('[AuthCubit] Constructor called.');
     print('[AuthCubit] AuthCubit initialized, calling checkAuthStatus.');
-    // Verificar se o usuário já está autenticado ao iniciar o cubit
+  
     checkAuthStatus();
   }
 
@@ -43,7 +43,7 @@ class AuthCubit extends Cubit<AuthState> {
         emit(AuthSuccess(userData));
       } else {
         print('[AuthCubit] User info is null after being authenticated. Emitting AuthInitial.');
-        emit(const AuthInitial()); // Or AuthFailure if this is unexpected
+        emit(const AuthInitial()); 
       }
     } else {
       print('[AuthCubit] User is not authenticated. Emitting AuthInitial.');

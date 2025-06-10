@@ -5,232 +5,132 @@ import 'package:helppsico_mobile/core/services/storage/secure_storage_service.da
 
 class DocumentsDataSource {
   String get baseUrl {
-    const bool isAndroid = bool.fromEnvironment('dart.vm.android');
-
-    return isAndroid ? 'http://10.0.2.2:8080' : 'http://localhost:8080';
+    
+    return 'http://10.0.2.2:8080'; 
   }
-  
+
   final IGenericHttp _http;
   final SecureStorageService _secureStorage;
-  final AuthService _authService;
-  
+  final AuthService _authService; 
+
   DocumentsDataSource(this._http, this._secureStorage, this._authService);
 
-  
   Future<String> _getPacienteId() async {
     try {
-   
-      final userId = await _secureStorage.getUserId();
+      final userId = await _secureStorage.getUserId(); 
       if (userId != null && userId.isNotEmpty) {
         return userId;
       }
-      
-  
-      final userInfo = await _authService.getUserInfo();
-      return userInfo?['id'] ?? '';
+
+      final userInfo = await _authService.getUserInfo(); 
+      final patientId = userInfo?['id'] as String?;
+      if (patientId != null && patientId.isNotEmpty) {
+        await _secureStorage.saveUserId(patientId);
+        return patientId;
+      }
+      throw Exception('ID do paciente não encontrado no SecureStorage nem via AuthService.');
     } catch (e) {
-      print('Erro ao obter ID do paciente: $e');
-      return '';
+      print('DocumentsDataSource._getPacienteId(): Erro ao obter ID do paciente: $e');
+      throw Exception('Erro ao obter ID do paciente: $e');
     }
   }
 
   Future<HttpResponse> getDocuments() async {
     try {
-      final pacienteId = await _getPacienteId();
-      if (pacienteId.isEmpty) {
-        throw Exception('ID do paciente não encontrado');
-      }
-      
-      final endpoint = '$baseUrl/documentos/$pacienteId';
-      print('Attempting to fetch documents from $endpoint');
-      
+     
+      final endpoint = 'http://10.0.2.2:8080/documentos/57d106c1-2d28-4dbc-a295-da993de10704';
+      print('DocumentsDataSource.getDocuments(): Tentando buscar documentos de $endpoint');
+
       final response = await _http.get(endpoint);
-      print('Received response with status code: ${response.statusCode}\n');
-      print("[DocumentsDataSource] Response body: ${response.body}\n");
-      
+      print('DocumentsDataSource.getDocuments(): Recebida resposta com status: ${response.statusCode}');
+
       if (response.statusCode != 200) {
-        print('Failed to fetch documents: ${response.statusCode}');
-        final errorMessage = response.body['mensagem'] ?? 'Falha ao obter documentos';
+        print('DocumentsDataSource.getDocuments(): Falha ao buscar documentos: ${response.statusCode}');
+        final errorMessage = (response.body is Map && response.body.containsKey('mensagem')) 
+                           ? response.body['mensagem'] 
+                           : 'Falha ao obter documentos do servidor.';
         throw Exception(errorMessage);
       }
-      
-   
-      final responseData = response.body;
-      if (responseData == null || !responseData.containsKey('dado')) {
-        throw Exception('Formato de resposta inválido');
-      }
-      
-  
-      final adaptedResponse = HttpResponse(
+
+    
+      return HttpResponse(
         statusCode: response.statusCode,
-        body: responseData['dado'],
+        body: response.body, 
       );
-      
-      print('Successfully fetched documents');
-      return adaptedResponse;
+
     } catch (e) {
-      print('Error connecting to server: $e');
+      print('DocumentsDataSource.getDocuments(): Erro ao conectar com o servidor: $e');
       throw Exception('Erro ao conectar com o servidor: $e');
     }
   }
 
+  
   Future<HttpResponse> uploadDocument(String filePath, Map<String, dynamic> metadata) async {
     try {
       final pacienteId = await _getPacienteId();
-      if (pacienteId.isEmpty) {
-        throw Exception('ID do paciente não encontrado');
-      }
-      
-
-      final solicitacaoDocumentoDto = {
-        'idPaciente': pacienteId,
-        'titulo': metadata['title'] ?? '',
-        'descricao': metadata['description'] ?? '',
-        'tipo': metadata['type'] ?? 'OUTRO',
-        'urlArquivo': filePath, 
-      };
-      
-      final response = await _http.post(
-        '$baseUrl/solicitacoes-documentos',
-        solicitacaoDocumentoDto,
-      );
-      
-      if (response.statusCode != 201 && response.statusCode != 200) {
-        final errorMessage = response.body['mensagem'] ?? 'Falha ao enviar documento';
-        throw Exception(errorMessage);
-      }
-      
-
-      final responseData = response.body;
-      if (responseData == null || !responseData.containsKey('dado')) {
-        throw Exception('Formato de resposta inválido');
-      }
-      
-      final adaptedResponse = HttpResponse(
-        statusCode: response.statusCode,
-        body: responseData['dado'],
-      );
-      
-      return adaptedResponse;
-    } catch (e) {
-      throw Exception('Erro ao conectar com o servidor: $e');
-    }
-  }
-
-  Future<HttpResponse> updateDocument(String documentId, Map<String, dynamic> data) async {
-    try {
-      final pacienteId = await _getPacienteId();
-      if (pacienteId.isEmpty) {
-        throw Exception('ID do paciente não encontrado');
-      }
-      
-  
-      final solicitacaoDocumentoDto = {
-        'id': documentId,
-        'idPaciente': pacienteId,
-        'titulo': data['title'] ?? '',
-        'descricao': data['description'] ?? '',
-        'tipo': data['type'] ?? 'OUTRO',
-        'urlArquivo': data['fileUrl'] ?? '',
-      };
-      
-      final response = await _http.put(
-        '$baseUrl/solicitacoes-documentos/$documentId',
-        solicitacaoDocumentoDto,
-      );
-      
-      if (response.statusCode != 200) {
-        final errorMessage = response.body['mensagem'] ?? 'Falha ao atualizar documento';
-        throw Exception(errorMessage);
-      }
       
      
-      final responseData = response.body;
-      if (responseData == null || !responseData.containsKey('dado')) {
-        throw Exception('Formato de resposta inválido');
+      final solicitacaoDocumentoDto = {
+        'idPaciente': pacienteId,
+        'titulo': metadata['title'] ?? '', 
+        'descricao': metadata['description'] ?? '',
+        'tipo': metadata['type'] ?? 'OUTRO', 
+        'urlArquivo': filePath, 
+
+      };
+      
+  
+      final endpoint = '$baseUrl/solicitacoes-documentos'; 
+      print('DocumentsDataSource.uploadDocument(): Enviando para $endpoint');
+
+      final response = await _http.post(endpoint, solicitacaoDocumentoDto);
+      
+      if (response.statusCode != 201 && response.statusCode != 200) { 
+        final errorMessage = (response.body is Map && response.body.containsKey('mensagem'))
+                           ? response.body['mensagem']
+                           : 'Falha ao enviar documento.';
+        throw Exception(errorMessage);
       }
       
-    
-      final adaptedResponse = HttpResponse(
-        statusCode: response.statusCode,
-        body: responseData['dado'],
-      );
+      final responseData = response.body as Map<String, dynamic>; 
+      if (!responseData.containsKey('dado') || responseData['dado'] == null) {
+        throw Exception('Formato de resposta inválido após upload.');
+      }
       
-      return adaptedResponse;
+      return HttpResponse(
+        statusCode: response.statusCode,
+        body: responseData['dado'], 
+      );
     } catch (e) {
-      throw Exception('Erro ao conectar com o servidor: $e');
+      print('DocumentsDataSource.uploadDocument(): Erro: $e');
+      throw Exception('Erro ao fazer upload do documento: $e');
     }
   }
 
   Future<HttpResponse> deleteDocument(String documentId) async {
     try {
-      final pacienteId = await _getPacienteId();
-      if (pacienteId.isEmpty) {
-        throw Exception('ID do paciente não encontrado');
-      }
+     
+      final endpoint = '$baseUrl/documentos/$documentId'; 
+      print('DocumentsDataSource.deleteDocument(): Deletando $endpoint');
+
+      final response = await _http.delete(endpoint);
       
-      final response = await _http.delete('$baseUrl/solicitacoes-documentos/$documentId');
-      print('Response status: ${response.statusCode}');
-      print('Response body: ${response.body}');
-      
+    
       if (response.statusCode != 204 && response.statusCode != 200) {
-        final errorMessage = response.body != null && response.body is Map ? 
-            response.body['mensagem'] ?? 'Falha ao deletar documento' : 
-            'Falha ao deletar documento';
+         final errorMessage = (response.body is Map && response.body.containsKey('mensagem'))
+                           ? response.body['mensagem']
+                           : 'Falha ao deletar documento.';
         throw Exception(errorMessage);
       }
       
-
-      final adaptedResponse = HttpResponse(
-        statusCode: 204, 
-        body: {},
+      return HttpResponse(
+        statusCode: response.statusCode, 
+        body: response.body ?? {}, 
       );
-      
-      return adaptedResponse;
     } catch (e) {
-      print('Error connecting to server: $e');
-      throw Exception('Erro ao conectar com o servidor: $e');
+      print('DocumentsDataSource.deleteDocument(): Erro: $e');
+      throw Exception('Erro ao deletar documento: $e');
     }
   }
 
-  Future<HttpResponse> toggleFavorite(String documentId) async {
-    try {
-      final pacienteId = await _getPacienteId();
-      if (pacienteId.isEmpty) {
-        throw Exception('ID do paciente não encontrado');
-      }
-      
- 
-      final response = await _http.put(
-        '$baseUrl/solicitacoes-documentos/$documentId/favorito',
-        {},
-      );
-      print('Response status: ${response.statusCode}');
-      print('Response body: ${response.body}');
-      
-      if (response.statusCode != 200) {
-        final errorMessage = response.body != null && response.body is Map ? 
-            response.body['mensagem'] ?? 'Falha ao atualizar favorito' : 
-            'Falha ao atualizar favorito';
-        throw Exception(errorMessage);
-      }
-      
-
-      final responseData = response.body;
-      if (responseData == null || !responseData.containsKey('dado')) {
-        throw Exception('Formato de resposta inválido');
-      }
-      
-
-      final adaptedResponse = HttpResponse(
-        statusCode: response.statusCode,
-        body: responseData['dado'],
-      );
-      
-      return adaptedResponse;
-    } catch (e) {
-      print('Error connecting to server: $e');
-      throw Exception('Erro ao conectar com o servidor: $e');
-    }
-  }
 }

@@ -11,7 +11,6 @@ abstract class ReviewState {
   int get get_rating => 0;
 
   List<ReviewEntity> get reviews => const  [];
-
 }
 
 class ReviewInitial extends ReviewState {
@@ -20,23 +19,20 @@ class ReviewInitial extends ReviewState {
   @override
   final String psicologoNome;
   @override
-  final String psicolgoCrp;
-
+  final String psicologoCrp;
   final List<ReviewEntity> reviews;
   @override
   int get get_rating => 0;
   
   const ReviewInitial({
-    required this.psicolgoCrp,
     required this.psicologoId,
     required this.psicologoNome,
+    required this.psicologoCrp,
     required this.reviews,
   });
 }
 
 class ReviewLoading extends ReviewState {
-  
-
   const ReviewLoading();
 }
 
@@ -45,6 +41,8 @@ class ReviewRated extends ReviewState {
   final String psicologoId;
   @override
   final String psicologoNome;
+  @override
+  final String psicologoCrp;
   final List<ReviewEntity> reviews;
   final int rating;
   final TextEditingController comentarioController;
@@ -52,14 +50,14 @@ class ReviewRated extends ReviewState {
   const ReviewRated({
     required this.psicologoId,
     required this.psicologoNome,
+    required this.psicologoCrp,
     required this.reviews,
     required this.rating,
     required this.comentarioController,
   });
 
   @override
-  int get get_rating  => this.rating;
- 
+  int get get_rating => this.rating;
 }
 
 class ReviewSuccess extends ReviewState {
@@ -68,6 +66,8 @@ class ReviewSuccess extends ReviewState {
   final String psicologoId;
   @override
   final String psicologoNome;
+  @override
+  final String psicologoCrp;
   final List<ReviewEntity> reviews;
   final int rating;
   
@@ -75,19 +75,22 @@ class ReviewSuccess extends ReviewState {
     required this.message,
     required this.psicologoId,
     required this.psicologoNome,
+    required this.psicologoCrp,
     required this.reviews,
     required this.rating,
   });
 
   @override
-  int get get_rating  => this.rating;
+  int get get_rating => this.rating;
 }
 
 class ReviewDeleted extends ReviewState {
-   @override
+  @override
   final String psicologoId;
   @override
   final String psicologoNome;
+  @override
+  final String psicologoCrp;
   final List<ReviewEntity> reviews;
   final int rating;
   TextEditingController? comentarioController;
@@ -96,15 +99,15 @@ class ReviewDeleted extends ReviewState {
   ReviewDeleted({
     required this.psicologoId,
     required this.psicologoNome,
+    required this.psicologoCrp,
     required this.reviews,
     required this.rating,
     this.comentarioController,
     this.message,
   });
 
-
   @override
-  int get get_rating  => this.rating;
+  int get get_rating => this.rating;
 }
 
 class ReviewError extends ReviewState {
@@ -113,15 +116,18 @@ class ReviewError extends ReviewState {
   final String? psicologoId;
   @override
   final String? psicologoNome;
+  @override
+  final String? psicologoCrp;
   final List<ReviewEntity> reviews;
   
   const ReviewError({
     required this.message,
     this.psicologoId,
     this.psicologoNome,
-    this.reviews = const [], // Default to an empty list if not provided
+    this.psicologoCrp,
+    this.reviews = const [],
   });
 
   @override
-  int get get_rating  => 0;
+  int get get_rating => 0;
 }

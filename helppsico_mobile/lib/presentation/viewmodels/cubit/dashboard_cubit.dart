@@ -15,10 +15,14 @@ import '../state/dashboard_state.dart';
 class DashboardCubit extends Cubit<DashboardState> {
   
 
-  final DocumentRepository _documentRepository = DocumentRepository(DocumentsDataSource(
-   GenericHttp(),
-   GetIt.instance.get<SecureStorageService>(),
-   AuthService()));
+  final DocumentRepository _documentRepository = DocumentRepository(
+    DocumentsDataSource(
+      GenericHttp(),
+      GetIt.instance.get<SecureStorageService>(),
+      AuthService()
+    ),
+    GetIt.instance.get<SecureStorageService>()
+  );
    
   final SessionRepository _sessionRepository = SessionRepository(SessionsDataSource(GenericHttp()));
 

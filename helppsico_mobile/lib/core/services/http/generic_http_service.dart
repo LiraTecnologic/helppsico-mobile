@@ -161,7 +161,7 @@ class GenericHttp implements IGenericHttp {
         headers: finalHeaders,
       );
       
-      // Check if response is JSON before decoding
+ 
       final contentType = response.headers['content-type'];
       dynamic responseBody;
       

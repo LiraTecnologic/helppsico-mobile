@@ -12,7 +12,7 @@ class NotificationService {
   }
 
   NotificationService._internal() {
-    // Use a singleton instance of NotificationsCubit
+  
     _notificationsCubit = GetIt.instance.isRegistered<NotificationsCubit>() 
         ? GetIt.instance<NotificationsCubit>() 
         : NotificationsCubit();
@@ -47,7 +47,7 @@ class NotificationService {
   }
 
   void onNotificationReceived(NotificationResponse response) {
-    // Aqui podemos adicionar lógica para quando uma notificação é tocada
+    
     print('Notificação tocada: ${response.payload}');
   }
 

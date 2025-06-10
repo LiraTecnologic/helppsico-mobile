@@ -25,7 +25,7 @@ class ReviewCubit extends Cubit<ReviewState> {
   String? _currentPacienteId;
   String? _currentPacienteNome;
 
-  /// Getter público para a tela saber qual é o paciente logado
+ 
   String? get currentPacienteId => _currentPacienteId;
 
   ReviewCubit._internal(
@@ -51,11 +51,11 @@ class ReviewCubit extends Cubit<ReviewState> {
     _instance = null;
   }
 
-  /// Carrega dados de psicólogo e paciente do storage e busca avaliações
+
   Future<void> initialize() async {
     emit(const ReviewLoading());
     try {
-      // --- Psicólogo ---
+   
       final psicologoJson = await _secureStorageService.getPsicologoData();
       if (psicologoJson == null) {
         emit(const ReviewError(message: 'Faça login novamente.'));
@@ -65,12 +65,13 @@ class ReviewCubit extends Cubit<ReviewState> {
       _currentPsicologoId = psicologoMap['id'] as String?;
       _currentPsicologoNome = psicologoMap['nome'] as String?;
       _currentPsicologoCrp = psicologoMap['crp'] as String?;
+      
       if (_currentPsicologoId == null || _currentPsicologoNome == null) {
         emit(const ReviewError(message: 'Dados do psicólogo incompletos.'));
         return;
       }
 
-      // --- Paciente ---
+     
       _currentPacienteId = await _secureStorageService.getUserId();
       final userJson = await _secureStorageService.getUserData();
       if (_currentPacienteId == null || userJson == null) {
@@ -80,12 +81,12 @@ class ReviewCubit extends Cubit<ReviewState> {
       final userMap = json.decode(userJson) as Map<String, dynamic>;
       _currentPacienteNome = userMap['nome'] as String? ?? 'Usuário';
 
-      // --- Busca avaliações ---
+   
       final reviews = await _repository.getReviewsByPsicologoId(_currentPsicologoId!);
       emit(ReviewInitial(
         psicologoId: _currentPsicologoId!,
         psicologoNome: _currentPsicologoNome!,
-        psicolgoCrp: _currentPsicologoCrp!,
+        psicologoCrp: _currentPsicologoCrp!,
         reviews: reviews,
       ));
     } catch (e) {
@@ -93,7 +94,7 @@ class ReviewCubit extends Cubit<ReviewState> {
     }
   }
 
-  /// Atualiza apenas a nota selecionada
+ 
   void setRating(int rating) {
     _rating = rating;
     if (state is ReviewRated || state is ReviewInitial || state is ReviewDeleted) {
@@ -101,13 +102,13 @@ class ReviewCubit extends Cubit<ReviewState> {
       emit(ReviewRated(
         psicologoId: baseState.psicologoId!,
         psicologoNome: baseState.psicologoNome!,
+        psicologoCrp: baseState.psicologoCrp!,
         reviews: baseState.reviews,
         rating: rating,
         comentarioController: comentarioController,
       ));
     }
   }
-
 
   Future<void> enviarAvaliacao() async {
     if (_rating == 0) return;
@@ -130,14 +131,14 @@ class ReviewCubit extends Cubit<ReviewState> {
       await _repository.addReview(newReview);
       final updated = await _repository.getReviewsByPsicologoId(_currentPsicologoId!);
 
-      // Reset
-     
+
       comentarioController.clear();
 
       emit(ReviewSuccess(
         message: 'Avaliação enviada com sucesso!',
         psicologoId: _currentPsicologoId!,
         psicologoNome: _currentPsicologoNome!,
+        psicologoCrp: _currentPsicologoCrp!,
         reviews: updated,
         rating: _rating,
       ));
@@ -146,7 +147,6 @@ class ReviewCubit extends Cubit<ReviewState> {
     }
   }
 
-  /// Exclui uma avaliação e recarrega a lista
   Future<void> deleteReview(String reviewId) async {
     if (state is ReviewInitial ||
         state is ReviewRated ||
@@ -160,6 +160,7 @@ class ReviewCubit extends Cubit<ReviewState> {
         emit(ReviewDeleted(
           psicologoId: psicologoId,
           psicologoNome: state.psicologoNome!,
+          psicologoCrp: state.psicologoCrp!,
           reviews: updated,
           message: 'Comentário excluído com sucesso!',
           rating: _rating,
@@ -174,7 +175,7 @@ class ReviewCubit extends Cubit<ReviewState> {
     }
   }
 
-  /// Fecha o cubit limpando o controller
+  
   @override
   Future<void> close() {
     comentarioController.dispose();

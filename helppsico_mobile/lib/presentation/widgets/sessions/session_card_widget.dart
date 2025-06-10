@@ -1,4 +1,6 @@
 // lib/widgets/session_card_widget.dart
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../../domain/entities/session_model.dart';
@@ -10,7 +12,12 @@ enum SessionStatus {
 }
 
 
+
+
+
 class SessionCardWidget extends StatelessWidget {
+
+
   final SessionModel session;
 
   const SessionCardWidget({super.key, required this.session});
@@ -54,7 +61,7 @@ class SessionCardWidget extends StatelessWidget {
                 
                 const CircleAvatar(
                   radius: 25,
-                  backgroundImage: AssetImage('assets/images/ghibli.jpeg'),
+                  backgroundImage: AssetImage('assets/images/profile.jpeg'),
                 ),
                 const SizedBox(width: 12),
 
@@ -71,8 +78,8 @@ class SessionCardWidget extends StatelessWidget {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        session.endereco,
-                        style: TextStyle(color: Colors.grey[600], fontSize: 14),
+                        _formatEndereco(session.endereco),
+                        style: TextStyle(color: const Color.fromARGB(255, 32, 32, 32), fontSize: 14),
                       ),
                       const SizedBox(height: 4),
                       Text(
@@ -145,4 +152,37 @@ class SessionCardWidget extends StatelessWidget {
       ),
     );
   }
+
+  String _formatEndereco(String endereco) {
+ 
+  if (!endereco.startsWith('{') || !endereco.endsWith('}')) {
+    return endereco;
+  }
+
+ 
+  final content = endereco.substring(1, endereco.length - 1);
+
+  
+  final parts = content.split(',');
+
+
+  final Map<String, String> map = {};
+  for (var part in parts) {
+    final idx = part.indexOf(':');
+    if (idx == -1) continue;
+    final key = part.substring(0, idx).trim();
+    final value = part.substring(idx + 1).trim();
+    map[key] = value;
+  }
+
+
+  final rua    = map['rua']    ?? '';
+  final numero = map['numero'] ?? '';
+  final cidade = map['cidade'] ?? '';
+  final estado = map['estado'] ?? '';
+  final cep    = map['cep']    ?? '';
+
+ 
+  return '$rua, $numero – $cidade, $estado – CEP $cep';
+}
 }

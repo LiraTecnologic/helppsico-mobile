@@ -1,72 +1,84 @@
 import '../../domain/entities/document_model.dart';
 import '../datasource/documents_datasource.dart';
+import '../../core/services/storage/secure_storage_service.dart';
 
 class DocumentRepository {
   final DocumentsDataSource _dataSource;
+  final SecureStorageService _secureStorage;
 
-  DocumentRepository(this._dataSource);
+  DocumentRepository(this._dataSource, this._secureStorage);
 
   Future<List<DocumentModel>> getDocuments() async {
-  try {
-    print('DocumentRepository.getDocuments(): Entrando\n');
-    final response = await _dataSource.getDocuments();
+    try {
+      print('DocumentRepository.getDocuments(): Iniciando busca de documentos');
+      final response = await _dataSource.getDocuments();
+     
+      if (response.body is! Map<String, dynamic>) {
+        print('DocumentRepository.getDocuments(): Resposta inesperada, não é um Map: ${response.body.runtimeType}');
+        throw Exception('Formato de resposta inesperado do servidor.');
+      }
 
-   
-    final body = response.body as Map<String, dynamic>;
-    print('DocumentRepository.getDocuments(): Response.body keys: ${body.keys}\n');
-
-   
-    final List<dynamic> rawList = body['content'] as List<dynamic>;
-
-    print('DocumentRepository.getDocuments(): encontrou ${rawList.length} itens em dado.content\n');
-
-    
-    return rawList
-        .map((json) => _adaptDocumentToDocumentModel(json as Map<String, dynamic>))
-        .toList();
-  } catch (e) {
-    print('DocumentRepository.getDocuments(): Erro ao buscar documentos: $e');
-    throw Exception('Erro ao buscar documentos: $e');
-  }
-}
+      final Map<String, dynamic> responseMap = response.body as Map<String, dynamic>;
+      
   
-  DocumentModel _adaptDocumentToDocumentModel(Map<String, dynamic> dto) {
-  DocumentType _mapDocumentType(String finalidade) {
-    switch (finalidade.toUpperCase()) {
-      case 'LAUDO':
-        return DocumentType.LAUDO_PSICOLOGICO;
-      case 'RECEITA':
-        return DocumentType.DECLARACAO;
-      case 'ATESTADO':
-        return DocumentType.ATESTADO;
-      case 'EXAME':
-        return DocumentType.RELATORIO_PSICOLOGICO;
-      default:
-        return DocumentType.PARECER_PSICOLOGICO;
+      List<dynamic> rawList;
+      if (responseMap.containsKey('dado') && responseMap['dado'] is Map<String, dynamic>) {
+        final Map<String, dynamic> dado = responseMap['dado'] as Map<String, dynamic>;
+        if (dado.containsKey('content') && dado['content'] is List) {
+          rawList = dado['content'] as List<dynamic>;
+          print('DocumentRepository.getDocuments(): Lista encontrada em dado.content');
+        } else {
+          print('DocumentRepository.getDocuments(): Nenhuma lista encontrada em dado.content: $dado');
+          throw Exception('Lista de documentos não encontrada em dado.content');
+        }
+      } else {
+        print('DocumentRepository.getDocuments(): Resposta não contém chave "dado" ou não é um Map: $responseMap');
+        throw Exception('Formato de resposta do servidor não reconhecido');
+      }
+
+      print('DocumentRepository.getDocuments(): Processando ${rawList.length} documento(s)');
+
+  
+      final favoriteIds = await _secureStorage.getFavoriteDocumentIds();
+      print('DocumentRepository.getDocuments(): ${favoriteIds.length} documentos favoritos encontrados localmente');
+
+ 
+      final documents = await Future.wait(
+        rawList.map((json) async {
+          final doc = DocumentModel.fromJson(
+            json as Map<String, dynamic>,
+            isFavorite: favoriteIds.contains(json['id']),
+          );
+          return doc;
+        }),
+      );
+
+      return documents;
+    } catch (e) {
+      print('DocumentRepository.getDocuments(): Erro: $e');
+      throw Exception('Erro ao buscar documentos: $e');
     }
   }
 
-  // Pega o paciente aninhado
-  final paciente = dto['paciente'] as Map<String, dynamic>?;
+  Future<void> toggleFavorite(String documentId) async {
+    try {
+      print('DocumentRepository.toggleFavorite(): Alternando favorito para documento $documentId');
+      await _secureStorage.toggleFavoriteDocumentId(documentId);
+      print('DocumentRepository.toggleFavorite(): Favorito alternado com sucesso');
+    } catch (e) {
+      print('DocumentRepository.toggleFavorite(): Erro: $e');
+      throw Exception('Erro ao alternar favorito: $e');
+    }
+  }
 
-  // Usa dataEmissao como data “principal”
-  final rawDate = dto['dataEmissao'] as String? ?? DateTime.now().toIso8601String();
-  final parsedDate = DateTime.tryParse(rawDate) ?? DateTime.now();
-
-  return DocumentModel(
-    id: dto['id'] as String? ?? '',
-    title: dto['finalidade'] as String? ?? '',           // ex: “string” no seu JSON
-    description: dto['descricao'] as String? ?? '',
-    date: parsedDate,
-    fileSize: '',                                        // não vem no JSON
-    fileType: '',                                        // não vem no JSON
-    type: _mapDocumentType(dto['finalidade'] as String? ?? ''),
-    isFavorite: false,                                   // não há no JSON
-    patientId: paciente?['id'] as String? ?? '',
-    patientName: paciente?['nome'] as String? ?? '',
-    fileUrl: '',                                         // não vem no JSON
-  );
-}
+  Future<bool> isFavorite(String documentId) async {
+    try {
+      return await _secureStorage.isDocumentFavorite(documentId);
+    } catch (e) {
+      print('DocumentRepository.isFavorite(): Erro: $e');
+      return false;
+    }
+  }
 
   Future<DocumentModel> uploadDocument(DocumentModel document) async {
     try {
@@ -79,51 +91,27 @@ class DocumentRepository {
       };
 
       final response = await _dataSource.uploadDocument(document.fileUrl, metadata);
-      return _adaptDocumentToDocumentModel(response.body);
+      // O documento retornado da API não terá status de favorito, então mantemos o status atual
+      return DocumentModel.fromJson(
+        response.body as Map<String, dynamic>,
+        isFavorite: document.isFavorite,
+      );
     } catch (e) {
-      print('Erro ao fazer upload do documento: $e');
+      print('DocumentRepository.uploadDocument(): Erro: $e');
       throw Exception('Erro ao fazer upload do documento: $e');
     }
   }
 
   Future<void> deleteDocument(String documentId) async {
-    print('Attempting to delete document with id: $documentId');
     try {
+      print('DocumentRepository.deleteDocument(): Deletando documento $documentId');
       await _dataSource.deleteDocument(documentId);
-      print('Successfully deleted document with id: $documentId');
+      // Remover dos favoritos se estiver marcado
+      await _secureStorage.removeFavoriteDocumentId(documentId);
+      print('DocumentRepository.deleteDocument(): Documento deletado com sucesso');
     } catch (e) {
-      print('Error when attempting to delete document with id: $documentId: $e');
+      print('DocumentRepository.deleteDocument(): Erro: $e');
       throw Exception('Erro ao deletar documento: $e');
-    }
-  }
-
-  Future<DocumentModel> updateDocument(DocumentModel document) async {
-    try {
-      final response = await _dataSource.updateDocument(
-        document.id!,
-        document.toJson(),
-      );
-      return _adaptDocumentToDocumentModel(response.body);
-    } catch (e) {
-      print('Erro ao atualizar documento: $e');
-      throw Exception('Erro ao atualizar documento: $e');
-    }
-  }
-
-  Future<void> toggleFavorite(String documentId) async {
-    try {
-      print('Attempting to toggle favorite for document with id: $documentId');
-      final response = await _dataSource.toggleFavorite(documentId);
-      if (response.statusCode != 200) {
-        print(
-            'Error when attempting to toggle favorite for document with id: $documentId: ${response.statusCode}');
-        throw Exception('Falha ao atualizar favorito: ${response.statusCode}');
-      } else {
-        print('Successfully toggled favorite for document with id: $documentId');
-      }
-    } catch (e) {
-      print('Error when attempting to toggle favorite for document with id: $documentId: $e');
-      throw Exception('Erro ao atualizar favorito: $e');
     }
   }
 }

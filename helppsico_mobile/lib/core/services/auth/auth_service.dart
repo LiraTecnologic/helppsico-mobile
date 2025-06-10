@@ -13,7 +13,7 @@ class AuthService {
   final SecureStorageService _storage;
   final PsicologoService _psicologoService;
 
-  final String _baseUrl = "http://localhost:8080";
+  final String _baseUrl = "http://10.0.2.2:8080";
 
   AuthService({
     IGenericHttp? http,
@@ -77,7 +77,7 @@ class AuthService {
             crp: psicologoInfo['crp']?? '',
           );
           
-          // Salvar dados do psicólogo separadamente
+
           await _storage.savePsicologoData(json.encode(psicologo.toJson()));
           print("[AuthService] Psicologo data saved to secure storage: ${psicologo.nome}");
         }

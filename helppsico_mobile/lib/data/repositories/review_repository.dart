@@ -27,7 +27,7 @@ class ReviewRepository {
   Future<List<ReviewEntity>> getReviews() async {
     print('[ReviewRepository] getReviews called');
     try {
-      // Primeiro, obter informações do psicólogo
+ 
       print('[ReviewRepository] Getting psicologo info from datasource');
       final psicologoInfo = await _dataSource.getPsicologoInfo();
       
@@ -39,7 +39,6 @@ class ReviewRepository {
       final psicologoId = psicologoInfo['id']!;
       print('[ReviewRepository] Found psicologoId: $psicologoId, getting reviews');
       
-      // Buscar avaliações do psicólogo
       final reviews = await _dataSource.getReviewsByPsicologoId(psicologoId);
       print('[ReviewRepository] Retrieved ${reviews.length} reviews from datasource');
       return reviews;

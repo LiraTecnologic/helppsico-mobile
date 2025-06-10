@@ -6,9 +6,9 @@ import '../../core/services/storage/secure_storage_service.dart';
 
 class ReviewDataSource  {
   String get baseUrl {
-    const bool isAndroid = bool.fromEnvironment('dart.vm.android');
+   
     
-    return isAndroid ? 'http://10.0.2.2:8080' : 'http://localhost:8080';
+    return  'http://10.0.2.2:8080';
   }
   
   final IGenericHttp _http;
@@ -153,7 +153,7 @@ class ReviewDataSource  {
   final rating = (dto['nota'] is num) ? (dto['nota'] as num).toInt() : 0;
   final comment = dto['comentario']?.toString() ?? '';
 
-  // Usa data de criação se existir; senão, agora()
+
   DateTime date;
   if (dto.containsKey('dataCriacao') && dto['dataCriacao'] != null) {
     date = DateTime.parse(dto['dataCriacao']);

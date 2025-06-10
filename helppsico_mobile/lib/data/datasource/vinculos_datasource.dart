@@ -22,8 +22,8 @@ class VinculosDataSource implements IVinculosDataSource {
 
   @override
   String get baseUrl {
-    const bool isAndroid = bool.fromEnvironment('dart.vm.android');
-    final host = isAndroid ? 'http://10.0.2.2:8080' : 'http://localhost:8080';
+   
+    final host ='http://10.0.2.2:8080' ;
     return '$host/vinculos';
   }
 

@@ -31,9 +31,14 @@ Future <void> main() async {
   getIt.registerSingleton<SecureStorageService>(storage);
   print('[main.dart] SecureStorageService registered as singleton.');
 
-  
+  // Register GenericHttp service
+  getIt.registerSingleton<IGenericHttp>(GenericHttp());
+  print('[main.dart] GenericHttp registered as singleton.');
 
-  
+  // Register AuthService
+  getIt.registerSingleton<AuthService>(AuthService());
+  print('[main.dart] AuthService registered as singleton.');
+
   NotificationService().init();
   print('[main.dart] NotificationService initialized.');
 

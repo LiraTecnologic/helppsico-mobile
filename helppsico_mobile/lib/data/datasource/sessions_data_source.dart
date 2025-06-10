@@ -24,8 +24,8 @@ class SessionsDataSource implements ISessionsDataSource {
   @override
   String get baseUrl {
 
-    const bool isAndroid = bool.fromEnvironment('dart.vm.android');
-    const host = isAndroid ? 'http://10.0.2.2:8080' : 'http://localhost:8080';
+   
+    const host = 'http://10.0.2.2:8080';
     return '$host/consultas';
     
   }
@@ -48,7 +48,7 @@ class SessionsDataSource implements ISessionsDataSource {
       return null;
     }
 
-    final vinculoUrl = 'http://localhost:8080/vinculos/paciente/$pacienteId';
+    final vinculoUrl = 'http://10.0.2.2:8080/vinculos/paciente/$pacienteId';
     final headers = await _authService.getAuthHeaders();
     
     try {
@@ -77,7 +77,7 @@ class SessionsDataSource implements ISessionsDataSource {
       throw Exception('Não foi possível obter o ID do paciente');
     }
 
-    // Endpoint atualizado conforme o controller Java: /paciente/historico/{idPaciente}
+ 
     final url = '$baseUrl/paciente/futuras/$pacienteId';
     final headers = await _authService.getAuthHeaders();
     
@@ -95,7 +95,7 @@ class SessionsDataSource implements ISessionsDataSource {
       throw Exception('Não foi possível obter o ID do paciente');
     }
 
-    // Endpoint atualizado conforme o controller Java: /paciente/futuras/{idPaciente}
+    
     final url = '$baseUrl/paciente/futuras/$pacienteId';
     final headers = await _authService.getAuthHeaders();
     
@@ -103,8 +103,7 @@ class SessionsDataSource implements ISessionsDataSource {
     final response = await _http.get(url, headers: headers);
     print('Response from next sessions URL: ${response.statusCode}');
     
-    // A lógica de tratamento da resposta para pegar a primeira futura sessão permanece
-    // Assumindo que a API retorna uma página de consultas e queremos a primeira.
+  
     if (response.statusCode == 200 && response.body['dado'] != null) {
       final consultasPage = response.body['dado'];
       final consultas = consultasPage['content'] as List<dynamic>?;
@@ -121,7 +120,7 @@ class SessionsDataSource implements ISessionsDataSource {
     
     print('No upcoming sessions found');
     return HttpResponse(
-      statusCode: 200, // Mantém 200 OK mesmo sem sessões, mas com corpo vazio
+      statusCode: 200, 
       body: {}, 
     );
   }

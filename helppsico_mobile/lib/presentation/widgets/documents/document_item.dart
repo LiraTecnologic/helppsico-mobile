@@ -30,7 +30,7 @@ class DocumentListItem extends StatelessWidget {
           ],
         ),
         child: ListTile(
-          leading: _buildFileTypeIcon(),
+          leading: const Icon(Icons.file_copy_sharp, color: Color.fromARGB(255, 114, 184, 240), size: 32,),
           title: Text(document.title),
           subtitle: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -42,12 +42,7 @@ class DocumentListItem extends StatelessWidget {
           trailing: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              IconButton(
-                icon: const Icon(Icons.download),
-                onPressed: () {
-                  // Implementar lógica de download
-                },
-              ),
+             
               IconButton(
                 icon: Icon(
                   document.isFavorite ? Icons.star : Icons.star_border,
@@ -55,26 +50,7 @@ class DocumentListItem extends StatelessWidget {
                 ),
                 onPressed: onFavoritePressed,
               ),
-              PopupMenuButton<String>(
-                icon: const Icon(Icons.more_vert),
-                onSelected: (value) {
-                  if (value == 'delete') {
-                    onDeletePressed();
-                  }
-                },
-                itemBuilder: (BuildContext context) => [
-                  const PopupMenuItem<String>(
-                    value: 'delete',
-                    child: Row(
-                      children: [
-                        Icon(Icons.delete_outline, color: Colors.red),
-                        SizedBox(width: 8),
-                        Text('Excluir'),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
+             
             ],
           ),
         ),
@@ -82,49 +58,7 @@ class DocumentListItem extends StatelessWidget {
     );
   }
 
-  Widget _buildFileTypeIcon() {
-    Color backgroundColor;
-    Color textColor;
-    
-    switch (document.type) {
-      case DocumentType.ATESTADO:
-        backgroundColor = Colors.purple.withOpacity(0.1);
-        textColor = Colors.purple;
-        break;
-      case DocumentType.DECLARACAO:
-        backgroundColor = Colors.blue.withOpacity(0.1);
-        textColor = Colors.blue;
-        break;
-      case DocumentType.RELATORIO_PSICOLOGICO:
-        backgroundColor = Colors.orange.withOpacity(0.1);
-        textColor = Colors.orange;
-        break;
-      case DocumentType.LAUDO_PSICOLOGICO:
-        backgroundColor = Colors.red.withOpacity(0.1);
-        textColor = Colors.red;
-        break;
-      case DocumentType.PARECER_PSICOLOGICO:
-        backgroundColor = Colors.indigo.withOpacity(0.1);
-        textColor = Colors.indigo;
-        break;
-    }
-
-    return Container(
-      padding: const EdgeInsets.all(8),
-      decoration: BoxDecoration(
-        color: backgroundColor,
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Text(
-        document.fileType,
-        style: TextStyle(
-          color: textColor,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-    );
-  }
-
+  
   String _formatDate(DateTime date) {
     return '${date.day}/${date.month}/${date.year}';
   }

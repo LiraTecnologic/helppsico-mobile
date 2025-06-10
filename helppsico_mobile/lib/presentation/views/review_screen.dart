@@ -90,19 +90,23 @@ class _AvaliarPsicologoScreenState extends State<AvaliarPsicologoScreen> {
     if (state is ReviewInitial) {
       reviews = state.reviews;
       psicologoNome = state.psicologoNome;
-      psicologoCrp = state.psicolgoCrp;
+      psicologoCrp = state.psicologoCrp;
     } else if (state is ReviewRated) {
       reviews = state.reviews;
       psicologoNome = state.psicologoNome;
+      psicologoCrp = state.psicologoCrp;
     } else if (state is ReviewSuccess) {
       reviews = state.reviews;
       psicologoNome = state.psicologoNome;
+      psicologoCrp = state.psicologoCrp;
     } else if (state is ReviewDeleted) {
       reviews = state.reviews;
       psicologoNome = state.psicologoNome;
+      psicologoCrp = state.psicologoCrp;
     } else if (state is ReviewError) {
       reviews = state.reviews;
-      psicologoNome = state.psicologoNome ?? "Psicólogo"; 
+      psicologoNome = state.psicologoNome ?? "Psicólogo";
+      psicologoCrp = state.psicologoCrp ?? "xx/xxxx";
     }
     
     return Scaffold(
@@ -140,7 +144,8 @@ class _AvaliarPsicologoScreenState extends State<AvaliarPsicologoScreen> {
           children: [
             const CircleAvatar(
               radius: 40,
-              child: Icon(Icons.person, size: 40),
+              backgroundImage: AssetImage('assets/images/profile.jpeg'), 
+              
             ),
             const SizedBox(height: 10),
             Text(
@@ -152,12 +157,12 @@ class _AvaliarPsicologoScreenState extends State<AvaliarPsicologoScreen> {
               style: const TextStyle(color: Colors.grey),
             ),
             const SizedBox(height: 10),
-            Row(
+            const Row(
               mainAxisAlignment: MainAxisAlignment.center,
               
             ),
             const SizedBox(height: 5),
-            Text("(${reviewsCount}) avaliações", style: const TextStyle(color: Colors.grey)),
+            Text("($reviewsCount) avaliações", style: const TextStyle(color: Colors.grey)),
           ],
         ),
       ),
@@ -171,9 +176,9 @@ class _AvaliarPsicologoScreenState extends State<AvaliarPsicologoScreen> {
        if (state is ReviewRated) {
         currentRating = state.rating;
       } else if (state is ReviewDeleted) {
-        // —> usar o rating que estava no Cubit antes de deletar
+  
         currentRating = state.rating; 
-        // (ou, se preferir, resetar pra zero: currentRating = 0;)
+    
       }else if (state is ReviewSuccess) {
         currentRating = state.rating;
       }

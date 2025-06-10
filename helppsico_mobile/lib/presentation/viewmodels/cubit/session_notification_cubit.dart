@@ -32,7 +32,7 @@ class SessionNotificationCubit extends Cubit<SessionNotificationState> {
       tz_data.initializeTimeZones();
       tz.setLocalLocation(tz.getLocation('America/Sao_Paulo'));
       const AndroidInitializationSettings androidSettings = 
-          AndroidInitializationSettings('@mipmap/ic_launcher');
+          AndroidInitializationSettings('logonotifications');
       const DarwinInitializationSettings iosSettings = 
           DarwinInitializationSettings(
             requestAlertPermission: true,
@@ -161,7 +161,7 @@ class SessionNotificationCubit extends Cubit<SessionNotificationState> {
       payload: payload,
     );
     
-    // Salva a notificação no histórico
+
     await NotificationService().saveNotification(
       id: id,
       title: title,
