@@ -1,7 +1,14 @@
 import 'dart:convert';
+
 import 'package:shared_preferences/shared_preferences.dart';
 
-class SecureStorageService {
+abstract class StorageService {
+  Future<String?> getString(String key);
+  Future<void> setString(String key, String value);
+  Future<void> remove(String key);
+}
+
+class SecureStorageService implements StorageService {
   late SharedPreferences _prefs;
 
   static const String _tokenKey = 'jwt_token';
@@ -9,7 +16,7 @@ class SecureStorageService {
   static const String _userIdKey = 'user_id';
   static const String _userEmailKey = 'user_email';
   static const String _psicologoDataKey = 'psicologo_data';
-  static const String _favoriteDocumentsKey = 'favorite_documents'; 
+  static const String _favoriteDocumentsKey = 'favorite_documents';
 
   SecureStorageService._();
 
@@ -23,155 +30,111 @@ class SecureStorageService {
     _prefs = await SharedPreferences.getInstance();
   }
 
-  Future<void> saveToken(String token) async {
+  @override
+  Future<String?> getString(String key) async {
     try {
-      await _prefs.setString(_tokenKey, token);
+      return _prefs.getString(key);
     } catch (e) {
-      throw Exception('Failed to save token: $e');
+      throw Exception('Failed to retrieve value for key $key: $e');
     }
+  }
+
+  @override
+  Future<void> setString(String key, String value) async {
+    try {
+      await _prefs.setString(key, value);
+    } catch (e) {
+      throw Exception('Failed to save value for key $key: $e');
+    }
+  }
+
+  @override
+  Future<void> remove(String key) async {
+    try {
+      await _prefs.remove(key);
+    } catch (e) {
+      throw Exception('Failed to remove value for key $key: $e');
+    }
+  }
+
+  Future<void> saveToken(String token) async {
+    await setString(_tokenKey, token);
   }
 
   Future<String?> getToken() async {
-    try {
-      return _prefs.getString(_tokenKey);
-    } catch (e) {
-      throw Exception('Failed to retrieve token: $e');
-    }
+    return getString(_tokenKey);
   }
 
   Future<bool> hasToken() async {
-    try {
-      final token = await getToken();
-      return token != null && token.isNotEmpty;
-    } catch (e) {
-      return false;
-    }
+    final token = await getToken();
+    return token != null && token.isNotEmpty;
   }
 
   Future<void> deleteToken() async {
-    try {
-      await _prefs.remove(_tokenKey);
-    } catch (e) {
-      throw Exception('Failed to delete token: $e');
-    }
+    await remove(_tokenKey);
   }
 
   Future<void> saveUserData(String userData) async {
-    try {
-      await _prefs.setString(_userDataKey, userData);
-    } catch (e) {
-      throw Exception('Failed to save user data: $e');
-    }
+    await setString(_userDataKey, userData);
   }
 
   Future<String?> getUserData() async {
-    try {
-      return _prefs.getString(_userDataKey);
-    } catch (e) {
-      throw Exception('Failed to retrieve user data: $e');
-    }
+    return getString(_userDataKey);
   }
 
   Future<void> deleteUserData() async {
-    try {
-      await _prefs.remove(_userDataKey);
-    } catch (e) {
-      throw Exception('Failed to delete user data: $e');
-    }
+    await remove(_userDataKey);
   }
 
   Future<void> saveUserId(String userId) async {
-    try {
-      await _prefs.setString(_userIdKey, userId);
-    } catch (e) {
-      throw Exception('Failed to save user ID: $e');
-    }
+    await setString(_userIdKey, userId);
   }
 
   Future<String?> getUserId() async {
-    try {
-      return _prefs.getString(_userIdKey);
-    } catch (e) {
-      throw Exception('Failed to retrieve user ID: $e');
-    }
+    return getString(_userIdKey);
   }
 
   Future<void> saveUserEmail(String email) async {
-    try {
-      await _prefs.setString(_userEmailKey, email);
-    } catch (e) {
-      throw Exception('Failed to save user email: $e');
-    }
+    await setString(_userEmailKey, email);
   }
 
   Future<String?> getUserEmail() async {
-    try {
-      return _prefs.getString(_userEmailKey);
-    } catch (e) {
-      throw Exception('Failed to retrieve user email: $e');
-    }
+    return getString(_userEmailKey);
   }
 
   Future<void> savePsicologoData(String psicologoData) async {
-    try {
-      await _prefs.setString(_psicologoDataKey, psicologoData);
-    } catch (e) {
-      throw Exception('Failed to save psicologo data: $e');
-    }
+    await setString(_psicologoDataKey, psicologoData);
   }
 
   Future<String?> getPsicologoData() async {
-    try {
-      return _prefs.getString(_psicologoDataKey);
-    } catch (e) {
-      throw Exception('Failed to retrieve psicologo data: $e');
-    }
+    return getString(_psicologoDataKey);
   }
 
   Future<void> deletePsicologoData() async {
-    try {
-      await _prefs.remove(_psicologoDataKey);
-    } catch (e) {
-      throw Exception('Failed to delete psicologo data: $e');
-    }
+    await remove(_psicologoDataKey);
   }
 
   Future<void> clearAll() async {
-    try {
-      await _prefs.remove(_tokenKey);
-      await _prefs.remove(_userDataKey);
-      await _prefs.remove(_userIdKey);
-      await _prefs.remove(_userEmailKey);
-      await _prefs.remove(_psicologoDataKey);
-      await _prefs.remove(_favoriteDocumentsKey); 
-    } catch (e) {
-      throw Exception('Failed to clear storage: $e');
-    }
+    await remove(_tokenKey);
+    await remove(_userDataKey);
+    await remove(_userIdKey);
+    await remove(_userEmailKey);
+    await remove(_psicologoDataKey);
+    await remove(_favoriteDocumentsKey);
   }
 
- 
   Future<List<String>> getFavoriteDocumentIds() async {
-    try {
-      final jsonString = _prefs.getString(_favoriteDocumentsKey);
-      if (jsonString != null) {
-        final List<dynamic> decodedList = jsonDecode(jsonString);
-        return decodedList.cast<String>().toList();
-      }
-      return [];
-    } catch (e) {
-      print('Error getting favorite document IDs: $e');
-      return [];
+    final jsonString = await getString(_favoriteDocumentsKey);
+    if (jsonString != null) {
+      final List<dynamic> decodedList = jsonDecode(jsonString);
+      return decodedList.cast<String>().toList();
     }
+    return [];
   }
 
   Future<void> _saveFavoriteDocumentIds(List<String> ids) async {
-    try {
-      final jsonString = jsonEncode(ids);
-      await _prefs.setString(_favoriteDocumentsKey, jsonString);
-    } catch (e) {
-      print('Error saving favorite document IDs: $e');
-      throw Exception('Failed to save favorite document IDs: $e');
-    }
+    final jsonString = jsonEncode(ids);
+    await setString(_favoriteDocumentsKey, jsonString);
   }
 
   Future<bool> isDocumentFavorite(String documentId) async {

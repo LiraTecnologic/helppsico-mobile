@@ -12,13 +12,16 @@ class NotificationService {
   }
 
   NotificationService._internal() {
-  
-    _notificationsCubit = GetIt.instance.isRegistered<NotificationsCubit>() 
-        ? GetIt.instance<NotificationsCubit>() 
-        : NotificationsCubit();
-    
-    if (!GetIt.instance.isRegistered<NotificationsCubit>()) {
-      GetIt.instance.registerSingleton<NotificationsCubit>(_notificationsCubit);
+    _notificationsCubit = _initNotificationsCubit();
+  }
+
+  NotificationsCubit _initNotificationsCubit() {
+    if (GetIt.instance.isRegistered<NotificationsCubit>()) {
+      return GetIt.instance<NotificationsCubit>();
+    } else {
+      final cubit = NotificationsCubit();
+      GetIt.instance.registerSingleton<NotificationsCubit>(cubit);
+      return cubit;
     }
   }
 
@@ -35,19 +38,27 @@ class NotificationService {
     required DateTime scheduledDate,
     required String payload,
   }) async {
-    final notification = NotificationEntity(
+    final notification = _createNotificationEntity(id, title, body, scheduledDate, payload);
+    await _notificationsCubit.addNotification(notification);
+  }
+
+  NotificationEntity _createNotificationEntity(
+    int id,
+    String title,
+    String body,
+    DateTime scheduledDate,
+    String payload,
+  ) {
+    return NotificationEntity(
       id: id,
       title: title,
       body: body,
       scheduledDate: scheduledDate,
       payload: payload,
     );
-
-    await _notificationsCubit.addNotification(notification);
   }
 
   void onNotificationReceived(NotificationResponse response) {
-    
     print('Notificação tocada: ${response.payload}');
   }
 
