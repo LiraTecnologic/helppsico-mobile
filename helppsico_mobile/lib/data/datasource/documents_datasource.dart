@@ -11,37 +11,28 @@ class DocumentsDataSource {
   DocumentsDataSource(this._http, this._secureStorage, this._authService);
 
   Future<String> _getPacienteId() async {
-    try {
-      final userId = await _secureStorage.getUserId(); 
-      if (userId != null && userId.isNotEmpty) {
-        return userId;
-      }
-
-      final userInfo = await _authService.getUserInfo(); 
-      final patientId = userInfo?['id'] as String?;
-      if (patientId != null && patientId.isNotEmpty) {
-        await _secureStorage.saveUserId(patientId);
-        return patientId;
-      }
-      throw Exception('ID do paciente não encontrado no SecureStorage nem via AuthService.');
-    } catch (e) {
-      throw Exception('Erro ao obter ID do paciente: $e');
+    final userId = await _secureStorage.getUserId(); 
+    if (userId != null && userId.isNotEmpty) {
+      return userId;
     }
+    final userInfo = await _authService.getUserInfo(); 
+    final patientId = userInfo?['id'] as String?;
+    if (patientId != null && patientId.isNotEmpty) {
+      await _secureStorage.saveUserId(patientId);
+      return patientId;
+    }
+    throw Exception('ID do paciente não encontrado no SecureStorage nem via AuthService.');
   }
 
   Future<HttpResponse> _handleHttpRequest(Future<HttpResponse> Function() httpRequest) async {
-    try {
-      final response = await httpRequest();
-      if (response.statusCode != 200 && response.statusCode != 201 && response.statusCode != 204) {
-        final errorMessage = (response.body is Map && response.body.containsKey('mensagem'))
-          ? response.body['mensagem']
-          : 'Falha na operação HTTP.';
-        throw Exception(errorMessage);
-      }
-      return response;
-    } catch (e) {
-      throw Exception('Erro ao conectar com o servidor: $e');
+    final response = await httpRequest();
+    if (response.statusCode != 200 && response.statusCode != 201 && response.statusCode != 204) {
+      final errorMessage = (response.body is Map && response.body.containsKey('mensagem'))
+        ? response.body['mensagem']
+        : 'Falha na operação HTTP.';
+      throw Exception(errorMessage);
     }
+    return response;
   }
 
   Future<HttpResponse> getDocuments() async {

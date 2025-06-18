@@ -46,9 +46,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         return Icons.assessment;
       case DocumentType.PARECER_PSICOLOGICO:
         return Icons.send;
-      default:
-        return Icons.insert_drive_file;
-    }
+      }
   }
 
   @override

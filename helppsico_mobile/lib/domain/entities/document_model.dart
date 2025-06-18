@@ -60,7 +60,6 @@ class DocumentModel {
       'fileSize': fileSize,
       'fileType': fileType,
       'type': type.toString().split('.').last,
-    
       'patientId': patientId,
       'patientName': patientName,
       'fileUrl': fileUrl,
@@ -96,7 +95,6 @@ class DocumentModel {
   }
 }
 
-
 DocumentType _mapDocumentTypeFromJson(String finalidade) {
   switch (finalidade.toUpperCase()) {
     case 'ATESTADO':
@@ -113,8 +111,6 @@ DocumentType _mapDocumentTypeFromJson(String finalidade) {
     case 'PARECER PSICOLÓGICO':
       return DocumentType.PARECER_PSICOLOGICO;
     default:
-     
-      print("Tipo de documento desconhecido: '$finalidade', usando PARECER_PSICOLOGICO como padrão.");
       return DocumentType.PARECER_PSICOLOGICO; 
   }
 }
