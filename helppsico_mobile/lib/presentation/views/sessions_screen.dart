@@ -10,10 +10,6 @@ import 'package:helppsico_mobile/presentation/widgets/sessions/session_card_widg
 import 'package:helppsico_mobile/presentation/widgets/sessions/session_tab_bar_widget.dart';
 import 'package:helppsico_mobile/presentation/viewmodels/cubit/sessions_cubit.dart';
 
-
-
-
-
 class SessionsPage extends StatefulWidget {
   const SessionsPage({Key? key}) : super(key: key);
 
@@ -38,18 +34,16 @@ class _SessionsPageState extends State<SessionsPage> {
       drawer: const CustomDrawer(),
       floatingActionButton: ElevatedButton(
         onPressed: () async {
-        final cubit = context.read<SessionNotificationCubit>();
-        final now = DateTime.now().add(const Duration(seconds: 10));
-        
-        await cubit.scheduleTestNotification(now);
-      },
-      child: const Text("Testar Notificação em 10s"),
-    ),
+          final cubit = context.read<SessionNotificationCubit>();
+          final now = DateTime.now().add(const Duration(seconds: 10));
 
+          await cubit.scheduleTestNotification(now);
+        },
+        child: const Text("Testar Notificação em 10s"),
+      ),
       body: SafeArea(
         child: Column(
           children: [
-            // Tab Bar
             SessionTabBar(
               selectedIndex: _selectedTabIndex,
               onTap: (index) {
@@ -58,8 +52,6 @@ class _SessionsPageState extends State<SessionsPage> {
                 });
               },
             ),
-            
-          
             Expanded(
               child: BlocBuilder<SessionsCubit, SessionsState>(
                 builder: (context, state) {
@@ -76,13 +68,13 @@ class _SessionsPageState extends State<SessionsPage> {
                     );
                   } else if (state is SessionsLoaded) {
                     final sessions = state.sessions;
-                    
+
                     if (sessions.isEmpty) {
                       return const Center(
                         child: Text('Nenhuma sessão encontrada'),
                       );
                     }
-                    
+
                     return ListView(
                       padding: const EdgeInsets.symmetric(vertical: 8),
                       children: _buildSessionsList(sessions),
@@ -102,32 +94,24 @@ class _SessionsPageState extends State<SessionsPage> {
   }
 
   List<Widget> _buildSessionsList(List<SessionModel> allSessions) {
-    
     List<SessionModel> filteredSessions;
-    
+
     switch (_selectedTabIndex) {
       case 0: // Em Aberto
-        filteredSessions = allSessions
-            .where((session) => !session.finalizada)
-            .toList();
-        
+        filteredSessions = allSessions.where((session) => !session.finalizada).toList();
         filteredSessions.sort((a, b) => a.data.compareTo(b.data));
         break;
-        
+
       case 1: // Finalizadas
-        filteredSessions = allSessions
-            .where((session) => session.finalizada)
-            .toList();
-       
+        filteredSessions = allSessions.where((session) => session.finalizada).toList();
         filteredSessions.sort((a, b) => b.data.compareTo(a.data));
         break;
-        
+
       default:
         filteredSessions = [];
         break;
     }
-    
-    
+
     return filteredSessions.map((session) {
       return SessionCardWidget(
         session: session,

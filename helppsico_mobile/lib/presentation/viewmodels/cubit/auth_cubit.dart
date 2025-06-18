@@ -87,7 +87,7 @@ class AuthCubit extends Cubit<AuthState> {
   Future<String?> getToken() async {
     print('[AuthCubit] getToken called.');
     final token = await _authService.getToken();
-    if (token != null && token.length > 10) {
+    if (token.length > 10) {
       print('[AuthCubit] Token retrieved: ${token.substring(0, 10)}...'); 
     } else {
       print('[AuthCubit] Token retrieved: $token');

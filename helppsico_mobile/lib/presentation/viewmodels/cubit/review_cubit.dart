@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'dart:math';
+
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -35,12 +35,10 @@ class ReviewCubit extends Cubit<ReviewState> {
     ReviewRepository? repository,
     SecureStorageService? secureStorageService,
   }) {
-    if (_instance == null) {
-      _instance = ReviewCubit._internal(
+    _instance ??= ReviewCubit._internal(
         repository ?? ReviewRepository(),
         secureStorageService ?? GetIt.instance<SecureStorageService>(),
       );
-    }
     return _instance!;
   }
 

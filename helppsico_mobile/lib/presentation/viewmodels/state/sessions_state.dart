@@ -7,22 +7,19 @@ abstract class SessionsState extends Equatable {
 
   @override
   List<Object> get props => [];
-
 }
-
 
 class SessionsInitial extends SessionsState {}
 
 class SessionsLoading extends SessionsState {}
 
-class SessionsLoaded extends SessionsState{
+class SessionsLoaded extends SessionsState {
   final List<SessionModel> sessions;
 
   const SessionsLoaded(this.sessions);
-  
 
   @override
-  List<Object> get props =>[sessions];
+  List<Object> get props => [sessions];
 }
 
 class SessionsError extends SessionsState {

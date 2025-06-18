@@ -21,19 +21,19 @@ class SessionNotificationError extends SessionNotificationState {
 
 class SessionNotificationCubit extends Cubit<SessionNotificationState> {
   final FlutterLocalNotificationsPlugin _notificationsPlugin = FlutterLocalNotificationsPlugin();
-  
+
   static const int _defaultSessionDuration = 50;
-  
+
   SessionNotificationCubit() : super(SessionNotificationInitial());
-  
+
   Future<void> init() async {
     emit(SessionNotificationLoading());
     try {
       tz_data.initializeTimeZones();
       tz.setLocalLocation(tz.getLocation('America/Sao_Paulo'));
-      const AndroidInitializationSettings androidSettings = 
+      const AndroidInitializationSettings androidSettings =
           AndroidInitializationSettings('logonotifications');
-      const DarwinInitializationSettings iosSettings = 
+      const DarwinInitializationSettings iosSettings =
           DarwinInitializationSettings(
             requestAlertPermission: true,
             requestBadgePermission: true,
@@ -46,11 +46,11 @@ class SessionNotificationCubit extends Cubit<SessionNotificationState> {
         android: androidSettings,
         iOS: iosSettings,
       );
-     _notificationsPlugin.initialize(
-       initSettings,
-         onDidReceiveNotificationResponse: _onNotificationTapped,
+      _notificationsPlugin.initialize(
+        initSettings,
+        onDidReceiveNotificationResponse: _onNotificationTapped,
       );
-      
+
       await _requestPermissions();
       await _createNotificationChannel();
       emit(SessionNotificationSuccess());
@@ -58,7 +58,7 @@ class SessionNotificationCubit extends Cubit<SessionNotificationState> {
       emit(SessionNotificationError('Erro ao inicializar notificações: $e'));
     }
   }
-  
+
   Future<void> _requestPermissions() async {
     await _notificationsPlugin.resolvePlatformSpecificImplementation<
         IOSFlutterLocalNotificationsPlugin>()?.requestPermissions(
@@ -67,7 +67,7 @@ class SessionNotificationCubit extends Cubit<SessionNotificationState> {
       sound: true,
     );
   }
-  
+
   Future<void> _createNotificationChannel() async {
     const AndroidNotificationChannel channel = AndroidNotificationChannel(
       'sessoes',
@@ -75,27 +75,25 @@ class SessionNotificationCubit extends Cubit<SessionNotificationState> {
       description: 'Notificações de sessões agendadas',
       importance: Importance.high,
     );
-    
+
     await _notificationsPlugin
         .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
         ?.createNotificationChannel(channel);
   }
-  
+
   void _onNotificationTapped(NotificationResponse response) {
-    print('Notificação tocada: ${response.payload}');
-    // Delega o tratamento para o NotificationService
     NotificationService().onNotificationReceived(response);
   }
-  
+
   Future<void> scheduleSessionNotifications(SessionModel session) async {
     if (session.finalizada) return;
-    
+
     try {
       final bool enabled = await isSessionNotificationEnabled(session.id);
       if (!enabled) return;
-      
+
       final int sessionDurationMinutes = _calculateSessionDuration(session.valor);
-      
+
       await _scheduleNotification(
         id: int.parse(session.id) * 3 - 2,
         title: session.psicologoName,
@@ -103,7 +101,7 @@ class SessionNotificationCubit extends Cubit<SessionNotificationState> {
         scheduledDate: session.data.subtract(const Duration(minutes: 5)),
         payload: session.id,
       );
-      
+
       await _scheduleNotification(
         id: int.parse(session.id) * 3 - 1,
         title: session.psicologoName,
@@ -111,7 +109,7 @@ class SessionNotificationCubit extends Cubit<SessionNotificationState> {
         scheduledDate: session.data,
         payload: session.id,
       );
-      
+
       await _scheduleNotification(
         id: int.parse(session.id) * 3,
         title: session.psicologoName,
@@ -119,12 +117,12 @@ class SessionNotificationCubit extends Cubit<SessionNotificationState> {
         scheduledDate: session.data.add(Duration(minutes: sessionDurationMinutes)),
         payload: session.id,
       );
-      
+
     } catch (e) {
       emit(SessionNotificationError('Erro ao agendar notificações: $e'));
     }
   }
-  
+
   Future<void> _scheduleNotification({
     required int id,
     required String title,
@@ -133,7 +131,7 @@ class SessionNotificationCubit extends Cubit<SessionNotificationState> {
     required String payload,
   }) async {
     if (scheduledDate.isBefore(DateTime.now())) return;
-    
+
     final NotificationDetails details = NotificationDetails(
       android:  AndroidNotificationDetails(
         'sessoes',
@@ -150,7 +148,7 @@ class SessionNotificationCubit extends Cubit<SessionNotificationState> {
         categoryIdentifier: 'sessoes',
       ),
     );
-    
+
     await _notificationsPlugin.zonedSchedule(
       id,
       title,
@@ -160,7 +158,6 @@ class SessionNotificationCubit extends Cubit<SessionNotificationState> {
       androidScheduleMode:AndroidScheduleMode.exactAllowWhileIdle,
       payload: payload,
     );
-    
 
     await NotificationService().saveNotification(
       id: id,
@@ -170,19 +167,18 @@ class SessionNotificationCubit extends Cubit<SessionNotificationState> {
       payload: payload,
     );
   }
-  
 
   Future<void> cancelSessionNotifications(String sessionId) async {
     try {
       final int baseId = int.parse(sessionId) * 3;
-      await _notificationsPlugin.cancel(baseId - 2); 
-      await _notificationsPlugin.cancel(baseId - 1); 
-      await _notificationsPlugin.cancel(baseId);     
+      await _notificationsPlugin.cancel(baseId - 2);
+      await _notificationsPlugin.cancel(baseId - 1);
+      await _notificationsPlugin.cancel(baseId);
     } catch (e) {
       emit(SessionNotificationError('Erro ao cancelar notificações: $e'));
     }
   }
-  
+
   Future<void> cancelAllNotifications() async {
     try {
       await _notificationsPlugin.cancelAll();
@@ -190,14 +186,11 @@ class SessionNotificationCubit extends Cubit<SessionNotificationState> {
       emit(SessionNotificationError('Erro ao cancelar todas as notificações: $e'));
     }
   }
-  
- 
+
   Future<void> updateAllSessionsNotifications(List<SessionModel> sessions) async {
     try {
-      
       await cancelAllNotifications();
-      
-      
+
       for (final session in sessions) {
         if (!session.finalizada) {
           await scheduleSessionNotifications(session);
@@ -207,93 +200,77 @@ class SessionNotificationCubit extends Cubit<SessionNotificationState> {
       emit(SessionNotificationError('Erro ao atualizar notificações: $e'));
     }
   }
-  
 
   Future<void> toggleSessionNotification(String sessionId, bool enabled) async {
     try {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setBool('session_notification_$sessionId', enabled);
-      
+
       emit(SessionNotificationSuccess());
     } catch (e) {
       emit(SessionNotificationError('Erro ao salvar preferência: $e'));
     }
   }
-  
-  
+
   Future<bool> isSessionNotificationEnabled(String sessionId) async {
     try {
       final prefs = await SharedPreferences.getInstance();
       return prefs.getBool('session_notification_$sessionId') ?? true;
     } catch (e) {
       emit(SessionNotificationError('Erro ao verificar preferência: $e'));
-      return true; 
+      return true;
     }
   }
-  
-  
+
   int _calculateSessionDuration(String valor) {
     try {
-
       final double valorDouble = double.parse(valor.replaceAll(',', '.'));
       final int duration = (valorDouble / 3).round();
-      
-      
+
       return duration < 30 ? _defaultSessionDuration : duration;
     } catch (e) {
-     
       return _defaultSessionDuration;
     }
   }
 
   Future<void> scheduleTestNotification(DateTime scheduledDate) async {
-  try {
-    final NotificationDetails details = NotificationDetails(
-      android: AndroidNotificationDetails(
-        'sessoes',
-        'Sessões',
-        channelDescription: 'Notificações de teste',
-        importance: Importance.high,
-        priority: Priority.high,
-        icon: '@drawable/logonotifications',
-      ),
-      iOS: const DarwinNotificationDetails(
-        presentAlert: true,
-        presentBadge: true,
-        presentSound: true,
-        categoryIdentifier: 'sessoes',
-      ),
-    );
+    try {
+      final NotificationDetails details = NotificationDetails(
+        android: AndroidNotificationDetails(
+          'sessoes',
+          'Sessões',
+          channelDescription: 'Notificações de teste',
+          importance: Importance.high,
+          priority: Priority.high,
+          icon: '@drawable/logonotifications',
+        ),
+        iOS: const DarwinNotificationDetails(
+          presentAlert: true,
+          presentBadge: true,
+          presentSound: true,
+          categoryIdentifier: 'sessoes',
+        ),
+      );
 
-    await _notificationsPlugin.zonedSchedule(
-      999,
-      "Notificação de Teste",
-      "Essa é uma notificação de teste agendada para 10 segundos",
-      tz.TZDateTime.from(scheduledDate, tz.local),
-      details,
-      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-      payload: "teste",
-      
-    );
+      await _notificationsPlugin.zonedSchedule(
+        999,
+        "Notificação de Teste",
+        "Essa é uma notificação de teste agendada para 10 segundos",
+        tz.TZDateTime.from(scheduledDate, tz.local),
+        details,
+        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+        payload: "teste",
+      );
 
-    await NotificationService().saveNotification(
-      id: 999,
-      title: "Notificação de Teste",
-      body: "Essa é uma notificação de teste agendada para 10 segundos",
-      scheduledDate: scheduledDate,
-      payload: "teste",
-    );
-
-    // Exibe uma mensagem de sucesso no consol
-    print("✅ Notificação de teste agendada para: $scheduledDate");
-
-  } catch (e) {
-    print("❌ Erro ao agendar notificação de teste: $e");
-    emit(SessionNotificationError("Erro no teste de notificação: $e"));
+      await NotificationService().saveNotification(
+        id: 999,
+        title: "Notificação de Teste",
+        body: "Essa é uma notificação de teste agendada para 10 segundos",
+        scheduledDate: scheduledDate,
+        payload: "teste",
+      );
+    } catch (e) {
+      emit(SessionNotificationError("Erro no teste de notificação: $e"));
+    }
   }
-}
-
-  
-  
-
 }

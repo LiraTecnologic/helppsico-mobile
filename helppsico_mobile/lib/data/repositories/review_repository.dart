@@ -1,7 +1,8 @@
 import 'package:get_it/get_it.dart';
 import 'package:helppsico_mobile/core/services/auth/auth_service.dart';
 import 'package:helppsico_mobile/core/services/http/generic_http_service.dart';
-import 'package:helppsico_mobile/core/services/storage/secure_storage_service.dart' show SecureStorageService, StorageService;
+import 'package:helppsico_mobile/core/services/storage/secure_storage_service.dart';
+
 import 'package:helppsico_mobile/data/datasource/review_datasource.dart';
 
 import '../../domain/entities/review_entity.dart';

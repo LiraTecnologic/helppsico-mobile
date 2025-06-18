@@ -1,9 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:helppsico_mobile/domain/entities/notification_entity.dart';
 
-
-//Equatable garante que, se um State tem as propriedades especificadas no override
-// a UI não irá recarregar, garantindo uma melhor performance
 abstract class NotificationsState extends Equatable {
   const NotificationsState();
 

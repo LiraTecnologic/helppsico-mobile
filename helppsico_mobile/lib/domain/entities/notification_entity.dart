@@ -32,5 +32,4 @@ class NotificationEntity {
       'payload': payload,
     };
   }
-
 }

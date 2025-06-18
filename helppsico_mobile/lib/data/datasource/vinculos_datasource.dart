@@ -8,40 +8,34 @@ abstract class IVinculosDataSource {
   Future<HttpResponse> getVinculoByPacienteId();
   Future<HttpResponse> solicitarVinculo(String psicologoId);
   Future<HttpResponse> cancelarVinculo(String vinculoId);
-
 }
 
 class VinculosDataSource implements IVinculosDataSource {
   final IGenericHttp _http;
   final SecureStorageService _secureStorage;
   final AuthService _authService;
-  
+
   VinculosDataSource(this._http, {SecureStorageService? storage, AuthService? authService})
       : _secureStorage = GetIt.instance.get<SecureStorageService>(),
         _authService = authService ?? AuthService();
 
   @override
   String get baseUrl {
-   
-    final host ='http://10.0.2.2:8080' ;
+    final host = 'http://10.0.2.2:8080';
     return '$host/vinculos';
   }
 
-  
   Future<String?> _getPacienteId() async {
     try {
-    
       final userId = await _secureStorage.getUserId();
       if (userId != null && userId.isNotEmpty) {
         return userId;
       }
-      
-    
+
       final userId2 = await _authService.getCurrentUser();
       return userId2;
     } catch (e) {
-      print('Erro ao obter ID do paciente: $e');
-      return null;
+      throw Exception('Erro ao obter ID do paciente: $e');
     }
   }
 
@@ -51,14 +45,13 @@ class VinculosDataSource implements IVinculosDataSource {
     if (pacienteId == null) {
       throw Exception('Não foi possível obter o ID do paciente');
     }
-    
-   
+
     final url = '$baseUrl/paciente/$pacienteId';
     final headers = await _authService.getAuthHeaders();
-    
+
     try {
       final response = await _http.get(url, headers: headers);
-      
+
       if (response.statusCode == 200) {
         return response;
       } else {
@@ -66,7 +59,6 @@ class VinculosDataSource implements IVinculosDataSource {
         throw Exception(errorMessage);
       }
     } catch (e) {
-      print('Erro ao obter vínculo do paciente: $e');
       throw Exception('Erro de conexão: $e');
     }
   }
@@ -77,17 +69,17 @@ class VinculosDataSource implements IVinculosDataSource {
     if (pacienteId == null) {
       throw Exception('Não foi possível obter o ID do paciente');
     }
-    
+
     final vinculoDto = {
       'idPaciente': pacienteId,
       'idPsicologo': psicologoId,
     };
-    
+
     final headers = await _authService.getAuthHeaders();
-    
+
     try {
       final response = await _http.post(baseUrl, vinculoDto, headers: headers);
-      
+
       if (response.statusCode == 201 || response.statusCode == 200) {
         return response;
       } else {
@@ -95,7 +87,6 @@ class VinculosDataSource implements IVinculosDataSource {
         throw Exception(errorMessage);
       }
     } catch (e) {
-      print('Erro ao solicitar vínculo: $e');
       throw Exception('Erro de conexão: $e');
     }
   }
@@ -103,20 +94,19 @@ class VinculosDataSource implements IVinculosDataSource {
   @override
   Future<HttpResponse> cancelarVinculo(String vinculoId) async {
     final headers = await _authService.getAuthHeaders();
-    
+
     try {
       final response = await _http.delete('$baseUrl/$vinculoId', headers: headers);
-      
+
       if (response.statusCode == 200 || response.statusCode == 204) {
         return response;
       } else {
-        final errorMessage = response.body != null && response.body is Map ? 
-            response.body['mensagem'] ?? 'Falha ao cancelar vínculo' : 
-            'Falha ao cancelar vínculo';
+        final errorMessage = response.body != null && response.body is Map
+            ? response.body['mensagem'] ?? 'Falha ao cancelar vínculo'
+            : 'Falha ao cancelar vínculo';
         throw Exception(errorMessage);
       }
     } catch (e) {
-      print('Erro ao cancelar vínculo: $e');
       throw Exception('Erro de conexão: $e');
     }
   }

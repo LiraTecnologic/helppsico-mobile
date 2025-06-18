@@ -23,6 +23,7 @@ class _SessionsWrapperState extends State<SessionsWrapper> {
   @override
   void initState() {
     super.initState();
+    _http = GenericHttp(); // Initialize _http
     final sessionsDataSource = SessionsDataSource(_http);
     final sessionsRepository = SessionRepository(sessionsDataSource);
     _sessionsCubit = SessionsCubit(sessionsRepository);

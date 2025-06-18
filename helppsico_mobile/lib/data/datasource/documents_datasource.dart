@@ -36,7 +36,8 @@ class DocumentsDataSource {
   }
 
   Future<HttpResponse> getDocuments() async {
-    final endpoint = '$baseUrl/documentos/57d106c1-2d28-4dbc-a295-da993de10704';
+    final pacienteId = await _getPacienteId();
+    final endpoint = '$baseUrl/documentos/$pacienteId';
     return _handleHttpRequest(() => _http.get(endpoint));
   }
 

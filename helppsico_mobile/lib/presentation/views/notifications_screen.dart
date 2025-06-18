@@ -21,7 +21,6 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   @override
   void initState() {
     super.initState();
-    // Use the singleton instance from GetIt
     _notificationsCubit = GetIt.instance<NotificationsCubit>();
     _notificationsCubit.loadNotifications();
   }
@@ -94,7 +93,6 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       itemCount: notifications.length,
       padding: const EdgeInsets.all(16),
       itemBuilder: (context, index) {
-       //prevents the list from trying to build an  item that don't exist(comentário meu)
         if (index >= notifications.length) return null;
 
         final notification = notifications[index];

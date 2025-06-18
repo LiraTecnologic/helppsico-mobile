@@ -1,6 +1,6 @@
 class SessionModel {
   final String id;
-final String psicologoName;
+  final String psicologoName;
   final String pacienteId;
   final DateTime data;
   final String valor;
@@ -17,7 +17,6 @@ final String psicologoName;
     required this.finalizada,
   });
 
-
   factory SessionModel.fromJson(Map<String, dynamic> json) {
     return SessionModel(
       id: json['id']?.toString() ?? '',
@@ -31,7 +30,4 @@ final String psicologoName;
           : (json['finalizada']?.toString().toLowerCase() == 'true'),
     );
   }
-
-
-
 }
