@@ -30,13 +30,20 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
+  void _handleAuthFailure(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.red,
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    print('[LoginScreen] Build method called.');
-    // Removed local BlocProvider<AuthCubit>, will use the one from MyApp
     return BlocConsumer<AuthCubit, AuthState>(
         listener: (context, state) {
-          print('[LoginScreen] AuthState listener: $state');
           if (state is AuthSuccess) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
@@ -45,22 +52,13 @@ class _LoginScreenState extends State<LoginScreen> {
                 behavior: SnackBarBehavior.floating,
               ),
             );
-            print('[LoginScreen] AuthSuccess: Navigating to DashboardScreen.');
             Navigator.of(context).pushReplacement(
               MaterialPageRoute(
                 builder: (context) => const DashboardScreen(),
               ),
             );
           } else if (state is AuthFailure) {
-            print('[LoginScreen] AuthFailure: ${state.message}');
-          } else if (state is AuthFailure) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.message),
-                backgroundColor: Colors.red,
-                behavior: SnackBarBehavior.floating,
-              ),
-            );
+            _handleAuthFailure(context, state.message);
           }
         },
         builder: (context, state) {
@@ -104,7 +102,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 if (value == null || value.isEmpty) {
                                   return 'Por favor, insira seu email';
                                 }
-                                if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
+                                if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}\$')
                                     .hasMatch(value)) {
                                   return 'Por favor, insira um email válido';
                                 }
@@ -134,7 +132,6 @@ class _LoginScreenState extends State<LoginScreen> {
                                     onPressed: () {
                                       if (_formKey.currentState?.validate() ??
                                           false) {
-                                        print('[LoginScreen] Login button pressed. Email: ${_emailController.text}');
                                         context.read<AuthCubit>().login(
                                               _emailController.text,
                                               _passwordController.text,
@@ -164,7 +161,6 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                             ),
                             const SizedBox(height: 48.0),
-                          
                           ],
                         ),
                       ),
@@ -187,6 +183,5 @@ class _LoginScreenState extends State<LoginScreen> {
           );
         },
       );
-    
   }
 }

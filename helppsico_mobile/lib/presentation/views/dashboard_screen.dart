@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:helppsico_mobile/presentation/views/documents_screen.dart';
 import 'package:helppsico_mobile/presentation/views/sessions_wrapper.dart';
 import '../../core/theme.dart';
-import '../widgets/common/document_card.dart';
+import '../widgets/documents/document_card.dart';
 import '../../domain/entities/document_model.dart';
 import '../widgets/drawer/custom_drawer.dart';
 import 'package:helppsico_mobile/presentation/widgets/common/custom_app_bar.dart';

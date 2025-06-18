@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:helppsico_mobile/presentation/viewmodels/document/document_viewmodel.dart';
+import 'package:helppsico_mobile/presentation/viewmodels/changeNotifier/document_viewmodel.dart';
 import 'package:provider/provider.dart';
 import 'package:helppsico_mobile/presentation/widgets/common/custom_app_bar.dart';
 import 'package:helppsico_mobile/presentation/widgets/drawer/custom_drawer.dart';

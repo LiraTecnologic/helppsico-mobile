@@ -132,7 +132,7 @@ class SessionNotificationCubit extends Cubit<SessionNotificationState> {
   }) async {
     if (scheduledDate.isBefore(DateTime.now())) return;
 
-    final NotificationDetails details = NotificationDetails(
+    const NotificationDetails details = NotificationDetails(
       android:  AndroidNotificationDetails(
         'sessoes',
         'Sessões',
@@ -141,7 +141,7 @@ class SessionNotificationCubit extends Cubit<SessionNotificationState> {
         priority: Priority.high,
         icon: '@drawable/logonotifications',
       ),
-      iOS: const DarwinNotificationDetails(
+      iOS: DarwinNotificationDetails(
         presentAlert: true,
         presentBadge: true,
         presentSound: true,
@@ -235,7 +235,7 @@ class SessionNotificationCubit extends Cubit<SessionNotificationState> {
 
   Future<void> scheduleTestNotification(DateTime scheduledDate) async {
     try {
-      final NotificationDetails details = NotificationDetails(
+      const NotificationDetails details = NotificationDetails(
         android: AndroidNotificationDetails(
           'sessoes',
           'Sessões',
@@ -244,7 +244,7 @@ class SessionNotificationCubit extends Cubit<SessionNotificationState> {
           priority: Priority.high,
           icon: '@drawable/logonotifications',
         ),
-        iOS: const DarwinNotificationDetails(
+        iOS: DarwinNotificationDetails(
           presentAlert: true,
           presentBadge: true,
           presentSound: true,

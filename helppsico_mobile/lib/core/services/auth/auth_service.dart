@@ -31,46 +31,29 @@ class AuthService {
           'senha': password,
         },
       );
-
       if (response.statusCode == 200) {
         final responseData = response.body['dado'];
-
         if (responseData == null) {
           throw Exception('Dados de resposta inválidos');
         }
-
         final token = responseData['token'];
         final userId = responseData['idUsuario']?.toString();
         final userEmail = responseData['email'];
-
         if (token == null || userId == null || userEmail == null) {
           throw Exception('Dados de autenticação incompletos');
         }
-
         await _saveUserInfo(token, userId, userEmail);
-
         final psicologoInfo = await _psicologoService.getPsicologoByPacienteId(userId);
-
         Psicologo? psicologo;
-        
         if (psicologoInfo != null) {
           psicologo = Psicologo(
             id: psicologoInfo['id'] ?? '',
             nome: psicologoInfo['nome'] ?? '',
             crp: psicologoInfo['crp']?? '',
           );
-
           await _savePsicologoInfo(psicologo);
         }
-
-        return AuthResponse(
-          id: userId,
-          name: userEmail.split('@')[0],
-          email: userEmail,
-          role: 'PACIENTE',
-          message: 'Login realizado com sucesso',
-          token: token,
-        );
+        return _buildAuthResponse(userId, userEmail, token);
       } else {
         final errorMessage = response.body['mensagem'] ?? 'Falha na autenticação';
         throw Exception(errorMessage);
@@ -85,7 +68,6 @@ class AuthService {
     if (token == null) {
       return false;
     }
-
     final isExpired = JwtDecoder.isExpired(token);
     return !isExpired;
   }
@@ -95,16 +77,13 @@ class AuthService {
       final userData = await _storage.getUserData();
       if (userData != null) {
         final userMap = json.decode(userData);
-        
         final psicologoData = await _storage.getPsicologoData();
         if (psicologoData != null && !userMap.containsKey('psicologo')) {
           final psicologoMap = json.decode(psicologoData);
           userMap['psicologo'] = psicologoMap;
         }
-        
         return userMap;
       }
-
       return null;
     } catch (e) {
       return null;
@@ -116,7 +95,6 @@ class AuthService {
     if (token == null) {
       return {};
     }
-
     return {
       'Authorization': 'Bearer $token',
       'Content-Type': 'application/json',
@@ -141,7 +119,6 @@ class AuthService {
     await _storage.saveToken(token);
     await _storage.saveUserId(userId);
     await _storage.saveUserEmail(userEmail);
-
     final user = User(
       id: userId,
       name: userEmail.split('@')[0],
@@ -150,12 +127,22 @@ class AuthService {
       role: 'PACIENTE',
       psicologo: null,
     );
-
     await _storage.saveUserData(json.encode(user.toJson()));
   }
 
   Future<void> _savePsicologoInfo(Psicologo psicologo) async {
     await _storage.savePsicologoData(json.encode(psicologo.toJson()));
+  }
+
+  AuthResponse _buildAuthResponse(String userId, String userEmail, String token) {
+    return AuthResponse(
+      id: userId,
+      name: userEmail.split('@')[0],
+      email: userEmail,
+      role: 'PACIENTE',
+      message: 'Login realizado com sucesso',
+      token: token,
+    );
   }
 }
 
