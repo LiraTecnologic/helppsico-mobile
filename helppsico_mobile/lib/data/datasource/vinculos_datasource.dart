@@ -16,12 +16,12 @@ class VinculosDataSource implements IVinculosDataSource {
   final AuthService _authService;
 
   VinculosDataSource(this._http, {SecureStorageService? storage, AuthService? authService})
-      : _secureStorage = GetIt.instance.get<SecureStorageService>(),
+      : _secureStorage = storage ?? GetIt.instance.get<SecureStorageService>(),
         _authService = authService ?? AuthService();
 
   @override
   String get baseUrl {
-    final host = 'http://10.0.2.2:8080';
+    final host = const bool.fromEnvironment('IS_TEST') ? 'http://10.0.2.2:8080' : 'http://localhost:8080';
     return '$host/vinculos';
   }
 

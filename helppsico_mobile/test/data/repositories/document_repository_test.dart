@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:helppsico_mobile/core/services/http/generic_http_service.dart';
 import 'package:helppsico_mobile/core/services/storage/secure_storage_service.dart';
@@ -8,15 +10,22 @@ import 'package:helppsico_mobile/data/datasource/documents_datasource.dart';
 
 // Mock classes
 class MockDocumentsDataSource implements DocumentsDataSource {
+  @override
+  String _baseUrl = 'http://test.com';
+
+  @override
+  String get baseUrl => _baseUrl;
+
+  @override
+  set baseUrl(String value) {
+    _baseUrl = value;
+  }
   final Map<String, List<Map<String, dynamic>>> _documents = {};
   
   void setDocuments(List<Map<String, dynamic>> documents) {
     _documents['test'] = documents;
   }
   
-  @override
-  String get baseUrl => 'http://test.com';
-
   @override
   Future<HttpResponse> getDocuments() async {
     return HttpResponse(
@@ -56,6 +65,7 @@ class MockSecureStorageService implements SecureStorageService {
     _mockFavoriteDocuments = favoriteDocuments;
   }
   
+  @override
   Future<String?> getUserId() async {
     return _mockUserId;
   }
@@ -66,6 +76,43 @@ class MockSecureStorageService implements SecureStorageService {
   
   Future<void> saveFavoriteDocuments(String favoriteDocuments) async {
     _mockFavoriteDocuments = favoriteDocuments;
+  }
+  
+  @override
+  Future<List<String>> getFavoriteDocumentIds() async {
+    if (_mockFavoriteDocuments == null) return [];
+    try {
+      final List<dynamic> decodedList = jsonDecode(_mockFavoriteDocuments!);
+      return decodedList.cast<String>().toList();
+    } catch (e) {
+      return [];
+    }
+  }
+  
+  @override
+  Future<void> toggleFavoriteDocumentId(String documentId) async {
+    final favoriteIds = await getFavoriteDocumentIds();
+    if (favoriteIds.contains(documentId)) {
+      favoriteIds.remove(documentId);
+    } else {
+      favoriteIds.add(documentId);
+    }
+    _mockFavoriteDocuments = jsonEncode(favoriteIds);
+  }
+  
+  @override
+  Future<bool> isDocumentFavorite(String documentId) async {
+    final favoriteIds = await getFavoriteDocumentIds();
+    return favoriteIds.contains(documentId);
+  }
+  
+  @override
+  Future<void> removeFavoriteDocumentId(String documentId) async {
+    final favoriteIds = await getFavoriteDocumentIds();
+    if (favoriteIds.contains(documentId)) {
+      favoriteIds.remove(documentId);
+      _mockFavoriteDocuments = jsonEncode(favoriteIds);
+    }
   }
   
   // Implementações vazias para outros métodos não utilizados nos testes
@@ -298,7 +345,7 @@ void main() {
         
         // Assert
         final isFavorite = await documentRepository.isFavorite(documentId);
-        expect(isFavorite, isTrue);
+        expect(isFavorite, isFalse);
         // Verifica se foi removido dos favoritos
         expect(mockSecureStorageService._mockFavoriteDocuments, '["doc2"]');
       });
@@ -343,7 +390,10 @@ void main() {
         await documentRepository.toggleFavorite(documentId1); // Remove doc1
         
         // Assert
-        expect(mockDocumentsDataSource.getDocuments(), 3);
+        final isFavorite1 = await documentRepository.isFavorite(documentId1);
+        final isFavorite2 = await documentRepository.isFavorite(documentId2);
+        expect(isFavorite1, isFalse);
+        expect(isFavorite2, isTrue);
         expect(mockSecureStorageService._mockFavoriteDocuments, '["doc2"]');
       });
       

@@ -17,43 +17,71 @@ class GenericHttp implements IGenericHttp {
   final http.Client _client;
   final SecureStorageService _storage;
 
-  GenericHttp({http.Client? client, SecureStorageService? storage,  secureStorageService}) : 
+  GenericHttp({http.Client? client, SecureStorageService? secureStorageService}) : 
     _client = client ?? http.Client(),
-    _storage =  GetIt.instance.get<SecureStorageService>();
+    _storage = secureStorageService ?? GetIt.instance.get<SecureStorageService>();
   
   @override
   Future<HttpResponse> get(String url, {Map<String, String>? headers}) async {
-    return _executeRequest((url) => _client.get(Uri.parse(url), headers: headers));
+    final Map<String, String> requestHeaders = await _prepareHeaders(headers);
+    final response = await _client.get(Uri.parse(url), headers: requestHeaders);
+    return _processResponse(response);
   }
 
   @override
   Future<HttpResponse> post(String url, dynamic body, {Map<String, String>? headers}) async {
-    return _executeRequest((url) => _client.post(Uri.parse(url), headers: headers, body: json.encode(body)));
+    final Map<String, String> requestHeaders = await _prepareHeaders(headers);
+    final encodedBody = body is String ? body : json.encode(body);
+    final response = await _client.post(
+      Uri.parse(url), 
+      headers: requestHeaders,
+      body: encodedBody
+    );
+    return _processResponse(response);
   }
 
   @override
   Future<HttpResponse> put(String url, dynamic body, {Map<String, String>? headers}) async {
-    return _executeRequest((url) => _client.put(Uri.parse(url), headers: headers, body: json.encode(body)));
+    final Map<String, String> requestHeaders = await _prepareHeaders(headers);
+    final encodedBody = body is String ? body : json.encode(body);
+    final response = await _client.put(
+      Uri.parse(url), 
+      headers: requestHeaders,
+      body: encodedBody
+    );
+    return _processResponse(response);
   }
 
   @override
   Future<HttpResponse> delete(String url, {Map<String, String>? headers}) async {
-    return _executeRequest((url) => _client.delete(Uri.parse(url), headers: headers));
+    final Map<String, String> requestHeaders = await _prepareHeaders(headers);
+    final response = await _client.delete(Uri.parse(url), headers: requestHeaders);
+    return _processResponse(response);
   }
 
-  Future<HttpResponse> _executeRequest(Future<http.Response> Function(String) request) async {
-    try {
-      final token = await _storage.getToken();
-      final Map<String, String> authHeaders = (token != null) ? {'Authorization': 'Bearer $token'} : {};
-      final response = await request((authHeaders.isNotEmpty ? {'...?headers': authHeaders} : null) as String);
-      return HttpResponse(
-        statusCode: response.statusCode,
-        body: response.body.isEmpty ? {} : json.decode(response.body),
-        headers: response.headers,
-      );
-    } catch(e) {
-      rethrow;
+  Future<Map<String, String>> _prepareHeaders(Map<String, String>? customHeaders) async {
+    final Map<String, String> headers = customHeaders ?? {};
+    
+    // Adiciona Content-Type se não estiver presente
+    if (!headers.containsKey('Content-Type')) {
+      headers['Content-Type'] = 'application/json';
     }
+    
+    // Adiciona token de autorização se disponível
+    final token = await _storage.getToken();
+    if (token != null && !headers.containsKey('Authorization')) {
+      headers['Authorization'] = token.startsWith('Bearer ') ? token : 'Bearer $token';
+    }
+    
+    return headers;
+  }
+  
+  HttpResponse _processResponse(http.Response response) {
+    return HttpResponse(
+      statusCode: response.statusCode,
+      body: response.body,
+      headers: response.headers,
+    );
   }
 }
 

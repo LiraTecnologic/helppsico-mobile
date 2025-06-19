@@ -17,12 +17,13 @@ class SessionsDataSource implements ISessionsDataSource {
   final AuthService _authService;
 
   SessionsDataSource(this._http, {SecureStorageService? storage, AuthService? authService})
-      : _storage = GetIt.instance.get<SecureStorageService>(),
+      : _storage = storage ?? GetIt.instance.get<SecureStorageService>(),
         _authService = authService ?? AuthService();
 
   @override
   String get baseUrl {
-    const host = 'http://10.0.2.2:8080';
+    const isTest = bool.fromEnvironment('IS_TEST');
+    final host = isTest ? 'http://10.0.2.2:8080' : 'http://localhost:8080';
     return '$host/consultas';
   }
 

@@ -12,7 +12,7 @@ class AuthService {
   final SecureStorageService _storage;
   final PsicologoService _psicologoService;
 
-  final String _baseUrl = "http://10.0.2.2:8080";
+  final String _baseUrl = "http://localhost:8080";
 
   AuthService({
     IGenericHttp? http,
@@ -95,8 +95,9 @@ class AuthService {
     if (token == null) {
       return {};
     }
+    final authToken = token.startsWith('Bearer ') ? token : 'Bearer $token';
     return {
-      'Authorization': 'Bearer $token',
+      'Authorization': authToken,
       'Content-Type': 'application/json',
     };
   }
@@ -166,11 +167,11 @@ class AuthResponse {
   factory AuthResponse.fromJson(Map<String, dynamic> json) {
     return AuthResponse(
       id: json['id']?.toString() ?? '',
-      name: json['name'],
-      email: json['email'],
-      role: json['role'],
-      message: json['message'],
-      token: json['token'],
+      name: json['name'] ?? '',
+      email: json['email'] ?? '',
+      role: json['role'] ?? '',
+      message: json['message'] ?? '',
+      token: json['token'] ?? '',
     );
   }
 }

@@ -102,11 +102,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                 if (value == null || value.isEmpty) {
                                   return 'Por favor, insira seu email';
                                 }
-                                if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}\$')
-                                    .hasMatch(value)) {
-                                  return 'Por favor, insira um email válido';
-                                }
-                                return null;
+                               
+                                return value;
                               },
                             ),
                             const SizedBox(height: 16.0),

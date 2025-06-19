@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:helppsico_mobile/core/services/storage/secure_storage_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -298,13 +300,18 @@ void main() {
       test('should handle complex favorite documents structure', () async {
         // Arrange
         const favoriteDocuments = '[{"id": "doc1", "name": "Document 1"}, {"id": "doc2", "name": "Document 2"}]';
+        final List<dynamic> decodedList = jsonDecode(favoriteDocuments);
         
         // Act
-        await secureStorageService.addFavoriteDocumentId(favoriteDocuments);
+        for (final doc in decodedList) {
+          await secureStorageService.addFavoriteDocumentId(doc['id']);
+        }
         final retrievedFavoriteDocuments = await secureStorageService.getFavoriteDocumentIds();
         
         // Assert
-        expect(retrievedFavoriteDocuments, favoriteDocuments);
+        expect(retrievedFavoriteDocuments.length, 2);
+        expect(retrievedFavoriteDocuments.contains('doc1'), true);
+        expect(retrievedFavoriteDocuments.contains('doc2'), true);
       });
     });
     
@@ -315,7 +322,7 @@ void main() {
         await secureStorageService.saveUserData('{"id": "123"}');
         await secureStorageService.saveUserId('123');
         await secureStorageService.saveUserEmail('test@example.com');
-        await secureStorageService.addFavoriteDocumentId('["doc1"]');
+        await secureStorageService.addFavoriteDocumentId('doc1');
         
         // Act
         await secureStorageService.clearAll();

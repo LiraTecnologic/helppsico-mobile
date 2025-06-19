@@ -135,7 +135,7 @@ void main() {
         final baseUrl = vinculosDataSource.baseUrl;
         
         // Assert
-        expect(baseUrl, 'http://10.0.2.2:8080/vinculos');
+        expect(baseUrl, 'http://localhost:8080/vinculos');
       });
     });
     
@@ -145,7 +145,7 @@ void main() {
         const expectedUserId = '123';
         mockSecureStorage.setMockUserId(expectedUserId);
         mockAuthService.setMockAuthHeaders({'Authorization': 'Bearer token'});
-        mockHttp.setResponse('http://10.0.2.2:8080/vinculos/paciente/$expectedUserId', 
+        mockHttp.setResponse('http://localhost:8080/vinculos/paciente/$expectedUserId', 
           HttpResponse(statusCode: 200, body: {}));
         
         // Act
@@ -161,7 +161,7 @@ void main() {
         mockSecureStorage.setMockUserId(null);
         mockAuthService.setMockCurrentUser(expectedUserId);
         mockAuthService.setMockAuthHeaders({'Authorization': 'Bearer token'});
-        mockHttp.setResponse('http://10.0.2.2:8080/vinculos/paciente/$expectedUserId', 
+        mockHttp.setResponse('http://localhost:8080/vinculos/paciente/$expectedUserId', 
           HttpResponse(statusCode: 200, body: {}));
         
         // Act
@@ -208,7 +208,7 @@ void main() {
         mockSecureStorage.setMockUserId('');
         mockAuthService.setMockCurrentUser(fallbackUserId);
         mockAuthService.setMockAuthHeaders({'Authorization': 'Bearer token'});
-        mockHttp.setResponse('http://10.0.2.2:8080/vinculos/paciente/$fallbackUserId', 
+        mockHttp.setResponse('http://localhost:8080/vinculos/paciente/$fallbackUserId', 
           HttpResponse(statusCode: 200, body: {}));
         
         // Act
@@ -224,7 +224,7 @@ void main() {
         // Arrange
         const userId = '123';
         final authHeaders = {'Authorization': 'Bearer token123'};
-        final expectedUrl = 'http://10.0.2.2:8080/vinculos/paciente/$userId';
+        final expectedUrl = 'http://localhost:8080/vinculos/paciente/$userId';
         
         mockSecureStorage.setMockUserId(userId);
         mockAuthService.setMockAuthHeaders(authHeaders);
@@ -242,7 +242,7 @@ void main() {
       test('should return successful response', () async {
         // Arrange
         const userId = '123';
-        final expectedUrl = 'http://10.0.2.2:8080/vinculos/paciente/$userId';
+        final expectedUrl = 'http://localhost:8080/vinculos/paciente/$userId';
         final expectedResponse = HttpResponse(
           statusCode: 200, 
           body: {
@@ -269,7 +269,7 @@ void main() {
       test('should throw exception with error message from response', () async {
         // Arrange
         const userId = '123';
-        final expectedUrl = 'http://10.0.2.2:8080/vinculos/paciente/$userId';
+        final expectedUrl = 'http://localhost:8080/vinculos/paciente/$userId';
         
         mockSecureStorage.setMockUserId(userId);
         mockAuthService.setMockAuthHeaders({'Authorization': 'Bearer token'});
@@ -290,7 +290,7 @@ void main() {
       test('should throw exception with default message when no error message', () async {
         // Arrange
         const userId = '123';
-        final expectedUrl = 'http://10.0.2.2:8080/vinculos/paciente/$userId';
+        final expectedUrl = 'http://localhost:8080/vinculos/paciente/$userId';
         
         mockSecureStorage.setMockUserId(userId);
         mockAuthService.setMockAuthHeaders({'Authorization': 'Bearer token'});
@@ -333,7 +333,7 @@ void main() {
         const userId = '123';
         const psicologoId = '456';
         final authHeaders = {'Authorization': 'Bearer token123'};
-        final expectedUrl = 'http://10.0.2.2:8080/vinculos';
+        final expectedUrl = 'http://localhost:8080/vinculos';
         
         mockSecureStorage.setMockUserId(userId);
         mockAuthService.setMockAuthHeaders(authHeaders);
@@ -354,7 +354,7 @@ void main() {
         // Arrange
         const userId = '123';
         const psicologoId = '456';
-        final expectedUrl = 'http://10.0.2.2:8080/vinculos';
+        final expectedUrl = 'http://localhost:8080/vinculos';
         final expectedResponse = HttpResponse(
           statusCode: 201, 
           body: {
@@ -382,7 +382,7 @@ void main() {
         // Arrange
         const userId = '123';
         const psicologoId = '456';
-        final expectedUrl = 'http://10.0.2.2:8080/vinculos';
+        final expectedUrl = 'http://localhost:8080/vinculos';
         final expectedResponse = HttpResponse(
           statusCode: 200, 
           body: {
@@ -407,7 +407,7 @@ void main() {
         // Arrange
         const userId = '123';
         const psicologoId = '456';
-        final expectedUrl = 'http://10.0.2.2:8080/vinculos';
+        final expectedUrl = 'http://localhost:8080/vinculos';
         
         mockSecureStorage.setMockUserId(userId);
         mockAuthService.setMockAuthHeaders({'Authorization': 'Bearer token'});
@@ -429,7 +429,7 @@ void main() {
         // Arrange
         const userId = '123';
         const psicologoId = '456';
-        final expectedUrl = 'http://10.0.2.2:8080/vinculos';
+        final expectedUrl = 'http://localhost:8080/vinculos';
         
         mockSecureStorage.setMockUserId(userId);
         mockAuthService.setMockAuthHeaders({'Authorization': 'Bearer token'});
@@ -489,7 +489,7 @@ void main() {
         // Arrange
         const vinculoId = 'vinculo123';
         final authHeaders = {'Authorization': 'Bearer token123'};
-        final expectedUrl = 'http://10.0.2.2:8080/vinculos/$vinculoId';
+        final expectedUrl = 'http://localhost:8080/vinculos/$vinculoId';
         
         mockAuthService.setMockAuthHeaders(authHeaders);
         mockHttp.setResponse(expectedUrl, 
@@ -506,7 +506,7 @@ void main() {
       test('should return successful response', () async {
         // Arrange
         const vinculoId = 'vinculo123';
-        final expectedUrl = 'http://10.0.2.2:8080/vinculos/$vinculoId';
+        final expectedUrl = 'http://localhost:8080/vinculos/$vinculoId';
         final expectedResponse = HttpResponse(
           statusCode: 204, 
           body: {}
@@ -525,7 +525,7 @@ void main() {
       test('should handle special characters in vinculo ID', () async {
         // Arrange
         const vinculoId = 'vinculo@123#special';
-        final expectedUrl = 'http://10.0.2.2:8080/vinculos/$vinculoId';
+        final expectedUrl = 'http://localhost:8080/vinculos/$vinculoId';
         
         mockAuthService.setMockAuthHeaders({'Authorization': 'Bearer token'});
         mockHttp.setResponse(expectedUrl, 
@@ -541,7 +541,7 @@ void main() {
       test('should handle empty vinculo ID', () async {
         // Arrange
         const vinculoId = '';
-        final expectedUrl = 'http://10.0.2.2:8080/vinculos/$vinculoId';
+        final expectedUrl = 'http://localhost:8080/vinculos/$vinculoId';
         
         mockAuthService.setMockAuthHeaders({'Authorization': 'Bearer token'});
         mockHttp.setResponse(expectedUrl, 
@@ -585,11 +585,11 @@ void main() {
         mockAuthService.setMockAuthHeaders(authHeaders);
         
         // Mock responses for each operation
-        mockHttp.setResponse('http://10.0.2.2:8080/vinculos', 
+        mockHttp.setResponse('http://localhost:8080/vinculos', 
           HttpResponse(statusCode: 201, body: {'id': vinculoId, 'status': 'PENDENTE'}));
-        mockHttp.setResponse('http://10.0.2.2:8080/vinculos/paciente/$userId', 
+        mockHttp.setResponse('http://localhost:8080/vinculos/paciente/$userId', 
           HttpResponse(statusCode: 200, body: {'id': vinculoId, 'status': 'ATIVO'}));
-        mockHttp.setResponse('http://10.0.2.2:8080/vinculos/$vinculoId', 
+        mockHttp.setResponse('http://localhost:8080/vinculos/$vinculoId', 
           HttpResponse(statusCode: 204, body: {}));
         
         // Act
@@ -624,9 +624,9 @@ void main() {
         mockAuthService.setMockAuthHeaders({'Authorization': 'Bearer token'});
         
         // Mock error responses
-        mockHttp.setResponse('http://10.0.2.2:8080/vinculos', 
+        mockHttp.setResponse('http://localhost:8080/vinculos', 
           HttpResponse(statusCode: 400, body: {'mensagem': 'Vínculo já existe'}));
-        mockHttp.setResponse('http://10.0.2.2:8080/vinculos/paciente/$userId', 
+        mockHttp.setResponse('http://localhost:8080/vinculos/paciente/$userId', 
           HttpResponse(statusCode: 404, body: {'mensagem': 'Paciente não encontrado'}));
         
         // Act & Assert

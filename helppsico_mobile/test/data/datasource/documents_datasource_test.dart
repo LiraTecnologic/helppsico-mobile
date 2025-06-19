@@ -118,7 +118,7 @@ void main() {
         const expectedUserId = '456';
         mockSecureStorage.setMockUserId(null);
         mockAuthService.setMockUserInfo({'id': expectedUserId});
-        mockHttp.setResponse('http://10.0.2.2:8080/documentos/$expectedUserId', 
+        mockHttp.setResponse('http://localhost:8080/documentos/$expectedUserId', 
           HttpResponse(statusCode: 200, body: {}));
         
         // Act
@@ -133,7 +133,7 @@ void main() {
         const expectedUserId = '789';
         mockSecureStorage.setMockUserId(null);
         mockAuthService.setMockUserInfo({'id': expectedUserId});
-        mockHttp.setResponse('http://10.0.2.2:8080/documentos/$expectedUserId', 
+        mockHttp.setResponse('http://localhost:8080/documentos/$expectedUserId', 
           HttpResponse(statusCode: 200, body: {}));
         
         // Act
@@ -197,14 +197,14 @@ void main() {
         // Arrange
         const userId = '123';
         mockSecureStorage.setMockUserId(userId);
-        mockHttp.setResponse('http://10.0.2.2:8080/documentos/$userId', 
+        mockHttp.setResponse('http://localhost:8080/documentos/$userId', 
           HttpResponse(statusCode: 200, body: {}));
         
         // Act
         await documentsDataSource.getDocuments();
         
         // Assert
-        expect(mockHttp.getRequests, contains('http://10.0.2.2:8080/documentos/$userId'));
+        expect(mockHttp.getRequests, contains('http://localhost:8080/documentos/$userId'));
       });
       
       test('should return successful response', () async {
@@ -212,7 +212,7 @@ void main() {
         const userId = '123';
         final expectedResponse = HttpResponse(statusCode: 200, body: {'documents': []});
         mockSecureStorage.setMockUserId(userId);
-        mockHttp.setResponse('http://10.0.2.2:8080/documentos/$userId', expectedResponse);
+        mockHttp.setResponse('http://localhost:8080/documentos/$userId', expectedResponse);
         
         // Act
         final response = await documentsDataSource.getDocuments();
@@ -226,7 +226,7 @@ void main() {
         // Arrange
         const userId = '123';
         mockSecureStorage.setMockUserId(userId);
-        mockHttp.setResponse('http://10.0.2.2:8080/documentos/$userId', 
+        mockHttp.setResponse('http://localhost:8080/documentos/$userId', 
           HttpResponse(statusCode: 500, body: {'mensagem': 'Server error'}));
         
         // Act & Assert
@@ -244,7 +244,7 @@ void main() {
         // Arrange
         const userId = '123';
         mockSecureStorage.setMockUserId(userId);
-        mockHttp.setResponse('http://10.0.2.2:8080/documentos/$userId', 
+        mockHttp.setResponse('http://localhost:8080/documentos/$userId', 
           HttpResponse(statusCode: 404, body: {}));
         
         // Act & Assert
@@ -271,7 +271,7 @@ void main() {
         };
         
         mockSecureStorage.setMockUserId(userId);
-        mockHttp.setResponse('http://10.0.2.2:8080/solicitacoes-documentos', 
+        mockHttp.setResponse('http://localhost:8080/solicitacoes-documentos', 
           HttpResponse(statusCode: 201, body: {}));
         
         // Act
@@ -293,7 +293,7 @@ void main() {
         final metadata = <String, dynamic>{};
         
         mockSecureStorage.setMockUserId(userId);
-        mockHttp.setResponse('http://10.0.2.2:8080/solicitacoes-documentos', 
+        mockHttp.setResponse('http://localhost:8080/solicitacoes-documentos', 
           HttpResponse(statusCode: 201, body: {}));
         
         // Act
@@ -314,7 +314,7 @@ void main() {
         final expectedResponse = HttpResponse(statusCode: 201, body: {'id': 'doc123'});
         
         mockSecureStorage.setMockUserId(userId);
-        mockHttp.setResponse('http://10.0.2.2:8080/solicitacoes-documentos', expectedResponse);
+        mockHttp.setResponse('http://localhost:8080/solicitacoes-documentos', expectedResponse);
         
         // Act
         final response = await documentsDataSource.uploadDocument(filePath, metadata);
@@ -327,22 +327,21 @@ void main() {
       test('should throw exception on upload error', () async {
         // Arrange
         const userId = '123';
-        const filePath = '/path/to/file.pdf';
-        final metadata = {'title': 'Test'};
-        
+        const filePath = 'invalid/path';
+        final metadata = {'title': 'Test Document'};
+
         mockSecureStorage.setMockUserId(userId);
-        mockHttp.setResponse('http://10.0.2.2:8080/solicitacoes-documentos', 
+        mockHttp.setResponse('http://localhost:8080/solicitacoes-documentos', 
           HttpResponse(statusCode: 400, body: {'mensagem': 'Invalid file'}));
         
         // Act & Assert
-        expect(
-          () => documentsDataSource.uploadDocument(filePath, metadata),
-          throwsA(isA<Exception>().having(
-            (e) => e.toString(),
-            'message',
-            contains('Invalid file'),
-          )),
-        );
+        try {
+          await documentsDataSource.uploadDocument(filePath, metadata);
+          fail('should have thrown an exception');
+        } catch (e) {
+          expect(e, isA<Exception>());
+          expect(e.toString(), contains('Invalid file'));
+        }
       });
     });
     
@@ -350,21 +349,21 @@ void main() {
       test('should make DELETE request to correct endpoint', () async {
         // Arrange
         const documentId = 'doc123';
-        mockHttp.setResponse('http://10.0.2.2:8080/documentos/$documentId', 
+        mockHttp.setResponse('http://localhost:8080/documentos/$documentId', 
           HttpResponse(statusCode: 204, body: {}));
         
         // Act
         await documentsDataSource.deleteDocument(documentId);
         
         // Assert
-        expect(mockHttp.deleteRequests, contains('http://10.0.2.2:8080/documentos/$documentId'));
+        expect(mockHttp.deleteRequests, contains('http://localhost:8080/documentos/$documentId'));
       });
       
       test('should return successful response', () async {
         // Arrange
         const documentId = 'doc123';
         final expectedResponse = HttpResponse(statusCode: 204, body: {});
-        mockHttp.setResponse('http://10.0.2.2:8080/documentos/$documentId', expectedResponse);
+        mockHttp.setResponse('http://localhost:8080/documentos/$documentId', expectedResponse);
         
         // Act
         final response = await documentsDataSource.deleteDocument(documentId);
@@ -373,34 +372,33 @@ void main() {
         expect(response.statusCode, 204);
       });
       
-      test('should throw exception on delete error', () async {
+      test('should throw exception on deletion error', () async {
         // Arrange
-        const documentId = 'doc123';
-        mockHttp.setResponse('http://10.0.2.2:8080/documentos/$documentId', 
-          HttpResponse(statusCode: 403, body: {'mensagem': 'Forbidden'}));
+        const documentId = 'doc-to-fail';
+        mockHttp.setResponse('http://localhost:8080/documentos/$documentId', 
+          HttpResponse(statusCode: 500, body: {'mensagem': 'Server error'}));
         
         // Act & Assert
-        expect(
-          () => documentsDataSource.deleteDocument(documentId),
-          throwsA(isA<Exception>().having(
-            (e) => e.toString(),
-            'message',
-            contains('Forbidden'),
-          )),
-        );
+        try {
+          await documentsDataSource.deleteDocument(documentId);
+          fail('should have thrown an exception');
+        } catch (e) {
+          expect(e, isA<Exception>());
+          expect(e.toString(), contains('Server error'));
+        }
       });
       
       test('should handle special characters in document ID', () async {
         // Arrange
         const documentId = 'doc@123#special';
-        mockHttp.setResponse('http://10.0.2.2:8080/documentos/$documentId', 
+        mockHttp.setResponse('http://localhost:8080/documentos/$documentId', 
           HttpResponse(statusCode: 204, body: {}));
         
         // Act
         await documentsDataSource.deleteDocument(documentId);
         
         // Assert
-        expect(mockHttp.deleteRequests, contains('http://10.0.2.2:8080/documentos/$documentId'));
+        expect(mockHttp.deleteRequests, contains('http://localhost:8080/documentos/$documentId'));
       });
     });
     
@@ -409,7 +407,7 @@ void main() {
         // Arrange
         const userId = '123';
         mockSecureStorage.setMockUserId(userId);
-        mockHttp.setResponse('http://10.0.2.2:8080/documentos/$userId', 
+        mockHttp.setResponse('http://localhost:8080/documentos/$userId', 
           HttpResponse(statusCode: 200, body: {}));
         
         // Act & Assert
@@ -423,7 +421,7 @@ void main() {
         final metadata = {'title': 'Test'};
         
         mockSecureStorage.setMockUserId(userId);
-        mockHttp.setResponse('http://10.0.2.2:8080/solicitacoes-documentos', 
+        mockHttp.setResponse('http://localhost:8080/solicitacoes-documentos', 
           HttpResponse(statusCode: 201, body: {}));
         
         // Act & Assert
@@ -433,7 +431,7 @@ void main() {
       test('should accept status code 204', () async {
         // Arrange
         const documentId = 'doc123';
-        mockHttp.setResponse('http://10.0.2.2:8080/documentos/$documentId', 
+        mockHttp.setResponse('http://localhost:8080/documentos/$documentId', 
           HttpResponse(statusCode: 204, body: {}));
         
         // Act & Assert
@@ -444,7 +442,7 @@ void main() {
         // Arrange
         const userId = '123';
         mockSecureStorage.setMockUserId(userId);
-        mockHttp.setResponse('http://10.0.2.2:8080/documentos/$userId', 
+        mockHttp.setResponse('http://localhost:8080/documentos/$userId', 
           HttpResponse(statusCode: 401, body: {}));
         
         // Act & Assert
@@ -468,7 +466,7 @@ void main() {
         
         mockSecureStorage.setMockUserId(null);
         mockAuthService.setMockUserInfo({'id': userId});
-        mockHttp.setResponse('http://10.0.2.2:8080/solicitacoes-documentos', 
+        mockHttp.setResponse('http://localhost:8080/solicitacoes-documentos', 
           HttpResponse(statusCode: 201, body: {'id': 'doc123'}));
         
         // Act
@@ -486,7 +484,7 @@ void main() {
         // Arrange
         const userId = '123';
         mockSecureStorage.setMockUserId(userId);
-        mockHttp.setResponse('http://10.0.2.2:8080/documentos/$userId', 
+        mockHttp.setResponse('http://localhost:8080/documentos/$userId', 
           HttpResponse(statusCode: 500, body: {'mensagem': 'Database connection failed'}));
         
         // Act & Assert

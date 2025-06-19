@@ -3,12 +3,20 @@ import 'package:helppsico_mobile/core/services/auth/auth_service.dart';
 import 'package:helppsico_mobile/core/services/storage/secure_storage_service.dart';
 
 class DocumentsDataSource {
-  final String baseUrl = 'http://10.0.2.2:8080'; 
+  String baseUrl = 'http://localhost:8080';
   final IGenericHttp _http;
   final SecureStorageService _secureStorage;
-  final AuthService _authService; 
+  final AuthService _authService;
 
-  DocumentsDataSource(this._http, this._secureStorage, this._authService);
+  DocumentsDataSource(
+    this._http,
+    this._secureStorage,
+    this._authService,
+  ) {
+    if (const bool.fromEnvironment('IS_TEST')) {
+      baseUrl = 'http://10.0.2.2:8080';
+    }
+  }
 
   Future<String> _getPacienteId() async {
     final userId = await _secureStorage.getUserId(); 

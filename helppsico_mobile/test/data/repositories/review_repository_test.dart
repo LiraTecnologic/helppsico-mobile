@@ -183,7 +183,7 @@ void main() {
       
       test('should throw exception when psicologo info has null id', () async {
         // Arrange
-        mockDataSource.setMockPsicologoInfo({'id': "1", 'nome': 'Dr. Maria Santos'});
+        mockDataSource.setMockPsicologoInfo({'id': "", 'nome': 'Dr. Maria Santos'});
         
         // Act & Assert
         expect(

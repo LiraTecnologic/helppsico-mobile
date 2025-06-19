@@ -1,17 +1,20 @@
 
+import 'package:get_it/get_it.dart';
 import '../../domain/entities/review_entity.dart';
 import '../../core/services/http/generic_http_service.dart';
 import '../../core/services/auth/auth_service.dart';
 import '../../core/services/storage/secure_storage_service.dart';
 
 class ReviewDataSource {
-  String get baseUrl => 'http://10.0.2.2:8080';
+  String get baseUrl => const bool.fromEnvironment('IS_TEST') ? 'http://10.0.2.2:8080' : 'http://localhost:8080';
 
   final IGenericHttp _http;
   final SecureStorageService _secureStorage;
   final AuthService _authService;
 
-  ReviewDataSource(this._http, this._secureStorage, this._authService);
+  ReviewDataSource(this._http, [SecureStorageService? secureStorage, AuthService? authService])
+      : _secureStorage = secureStorage ?? GetIt.instance.get<SecureStorageService>(),
+        _authService = authService ?? GetIt.instance.get<AuthService>();
 
   Future<String> _getPacienteId() async {
     try {
@@ -86,10 +89,14 @@ class ReviewDataSource {
         return _mapAvaliacoesToEntities(avaliacoes);
       } else {
         final errorMessage = response.body['mensagem'] ?? 'Falha ao carregar avaliações';
-        throw Exception('Erro ao buscar avaliações: $errorMessage');
+        throw Exception(errorMessage);
       }
     } catch (e) {
-      throw Exception('Erro de conexão: $e');
+      // Se já for uma exceção com a mensagem que esperamos, apenas repasse
+      if (e is Exception && e.toString().contains('Formato de resposta inválido')) {
+        rethrow;
+      }
+      throw Exception('Erro de conexão');
     }
   }
 
